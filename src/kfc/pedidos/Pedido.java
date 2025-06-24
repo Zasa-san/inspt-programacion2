@@ -1,7 +1,7 @@
 package kfc.pedidos;
 
 import java.util.ArrayList;
-import kfc.Item;
+import items.Item;
 
 enum Estado {
     CREADO,

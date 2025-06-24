@@ -1,9 +1,11 @@
-package kfc;
+package items;
 
 public class Item {
 
+    private static int idAutoincremental = 0;
     private final String nombre;
     private final Float precio;
+    private final int id;
 
     /**
      * @param nombre nombre del item
@@ -12,6 +14,7 @@ public class Item {
     public Item(String nombre, Float precio) {
         this.nombre = nombre;
         this.precio = precio;
+        this.id = idAutoincremental++;
     }
 
     /**
