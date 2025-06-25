@@ -1,14 +1,18 @@
-package items;
+package items.productos;
+
+import items.Item;
+import items.UsaIngredientes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Hamburguesa extends Item implements UsaIngredientes {
 
-    private final ArrayList<Item> ingredientes;
+    private final List<Item> ingredientes;
 
-    public Hamburguesa(String nombre, Float precio, ArrayList<Item> ingredientes) {
+    public Hamburguesa(String nombre, Float precio) {
         super(nombre, precio);
-        this.ingredientes = ingredientes;
+        this.ingredientes = new ArrayList<>(); //todo agregar ingredientes base
     }
 
     @Override

@@ -1,4 +1,7 @@
-package items;
+package items.productos;
+
+import items.Item;
+import items.Size;
 
 public class Gaseosa extends Item {
 
