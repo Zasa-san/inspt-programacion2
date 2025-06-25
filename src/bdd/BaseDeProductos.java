@@ -18,7 +18,7 @@ public class BaseDeProductos {
      * @param cantidadVendida cantidad que se vende
      */
     public static void registrarVenta(int id, int cantidadVendida) {
-        for (dbEntry entry : base) {
+        for (DBEntry entry : base) {
             if (entry.getIdProducto() == id) {
                 entry.actualizarStock(cantidadVendida);
             }
