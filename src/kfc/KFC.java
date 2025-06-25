@@ -1,5 +1,6 @@
 package kfc;
 
+import bdd.BaseDeProductos;
 import items.productos.Bacon;
 
 public class KFC {
@@ -8,6 +9,9 @@ public class KFC {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        BaseDeProductos baseProductos = new BaseDeProductos();
+
         // TODO code application logic here
         Bacon bacon = new Bacon();
         /*
