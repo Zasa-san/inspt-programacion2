@@ -1,7 +1,7 @@
 package kfc.pedidos;
 
 import java.util.ArrayList;
-import items.Item;
+import items.Producto;
 
 enum Estado {
     CREADO,
@@ -11,7 +11,7 @@ enum Estado {
 
 public class Pedido {
 
-    private final ArrayList<Item> contenidos;
+    private final ArrayList<Producto> contenidos;
     private Estado estado;
     private final Orden orden;
 
@@ -19,7 +19,7 @@ public class Pedido {
      * @param contenidos items del pedido
      * @param cliente nombre del cliente
      */
-    public Pedido(ArrayList<Item> contenidos, String cliente) {
+    public Pedido(ArrayList<Producto> contenidos, String cliente) {
         this.contenidos = contenidos;
         this.estado = Estado.CREADO;
         this.orden = new Orden(cliente);
@@ -28,14 +28,14 @@ public class Pedido {
     /**
      * @param item agrega item al pedido
      */
-    public void agregarItem(Item item) {
+    public void agregarItem(Producto item) {
         this.contenidos.add(item);
     }
 
     /**
      * @param item quita item al pedido
      */
-    public void quitarItem(Item item) {
+    public void quitarItem(Producto item) {
         this.contenidos.remove(item);
     }
 
@@ -65,7 +65,7 @@ public class Pedido {
      */
     public Float getPrecio() {
         float precio = 0;
-        for (Item item : contenidos) {
+        for (Producto item : contenidos) {
             precio += item.getPrecio();
         }
         return precio;

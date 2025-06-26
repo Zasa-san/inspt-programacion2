@@ -1,27 +1,33 @@
 package items.productos;
 
-import items.Item;
+import bdd.BaseDeIngredientes;
+import items.Ingrediente;
+import items.Producto;
 import items.UsaIngredientes;
-
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-public class Hamburguesa extends Item implements UsaIngredientes {
+public class Hamburguesa extends Producto implements UsaIngredientes {
 
-    private final List<Item> ingredientes;
+    private final ArrayList<Ingrediente> ingredientes;
 
+    /**
+     * @param nombre nombre del producto
+     * @param precio precio básico del producto
+     */
     public Hamburguesa(String nombre, Float precio) {
         super(nombre, precio);
-        this.ingredientes = new ArrayList<>(); //todo agregar ingredientes base
+        this.ingredientes = new ArrayList<>(Arrays.asList(BaseDeIngredientes.getIngrediente("PAN"), BaseDeIngredientes.getIngrediente("MEDALLON_POLLO"), BaseDeIngredientes.getIngrediente("CHEDDAR"), BaseDeIngredientes.getIngrediente("LECHUGA"), BaseDeIngredientes.getIngrediente("TOMATE")));
     }
 
     @Override
-    public void agregar(Item ingrediente) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void agregar(Ingrediente ingrediente) {
+        super.setPrecio(ingrediente.getPrecio());
+        ingredientes.add(ingrediente);
     }
 
     @Override
-    public void quitar(Item ingrediente) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void quitar(Ingrediente ingrediente) {
+        ingredientes.remove(ingrediente);
     }
 }

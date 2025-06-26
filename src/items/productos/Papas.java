@@ -1,39 +1,31 @@
 package items.productos;
 
-import items.Item;
-import items.Size;
+import bdd.BaseDeIngredientes;
+import items.Ingrediente;
+import items.Producto;
+
 import items.UsaIngredientes;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class Papas extends Item implements UsaIngredientes {
+public class Papas extends Producto implements UsaIngredientes {
 
-    private final Size size;
-    private final ArrayList<Item> ingredientes;
+    private final ArrayList<Ingrediente> ingredientes;
 
-    /**
-     * @param nombre nombre del item
-     * @param precio precio del item
-     * @param size tamaño del item
-     */
-    public Papas(String nombre, Float precio, Size size, ArrayList<Item> ingredientes) {
+    public Papas(String nombre, Float precio) {
         super(nombre, precio);
-        this.size = size;
-        this.ingredientes = ingredientes;
+        this.ingredientes = new ArrayList<>(Arrays.asList(BaseDeIngredientes.getIngrediente("PAPAS")));
     }
 
     @Override
-    public void agregar(Item ingrediente) {
-
+    public void agregar(Ingrediente ingrediente) {
+        super.setPrecio(ingrediente.getPrecio());
+        ingredientes.add(ingrediente);
     }
 
     @Override
-    public void quitar(Item ingrediente) {
-
+    public void quitar(Ingrediente ingrediente) {
+        ingredientes.remove(ingrediente);
     }
 
-    @Override
-    public void crear(ArrayList<Item> ingredientes) {
-
-    }
 }

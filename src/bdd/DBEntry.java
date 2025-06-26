@@ -1,6 +1,6 @@
 package bdd;
 
-class DBEntry {
+public class DBEntry {
 
     private final String nombre;
     private final float precio;
