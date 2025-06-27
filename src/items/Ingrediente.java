@@ -17,4 +17,12 @@ public class Ingrediente {
     public Float getPrecio() {
         return precio;
     }
+
+    @Override
+    public String toString() {
+        return "Ingrediente{" +
+                "nombre=" + nombre +
+                ", precio=" + precio +
+                '}';
+    }
 }

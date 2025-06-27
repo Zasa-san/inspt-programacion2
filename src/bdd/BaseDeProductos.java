@@ -1,6 +1,7 @@
 package bdd;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BaseDeProductos {
 
@@ -24,5 +25,9 @@ public class BaseDeProductos {
                 break;
             }
         }
+    }
+
+    public static List<DBEntry> getAllProductos() {
+        return base;
     }
 }

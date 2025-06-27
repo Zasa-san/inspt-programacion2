@@ -3,6 +3,7 @@ package kfc;
 import bdd.BaseDeIngredientes;
 import bdd.BaseDeProductos;
 import bdd.DBEntry;
+import bdd.printer.DBPrinter;
 import items.Ingrediente;
 import items.productos.Hamburguesa;
 import items.productos.Papas;
@@ -39,5 +40,7 @@ public class KFC {
         BaseDeProductos.agregarProducto(new DBEntry(papasConChedar.getNombre(), 5000, papasConChedar.getPrecio(), papasConChedar.getId()));
         BaseDeProductos.agregarProducto(new DBEntry(papasBravas.getNombre(), 5000, papasBravas.getPrecio(), papasBravas.getId()));
 
+        DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
+        DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
     }
 }

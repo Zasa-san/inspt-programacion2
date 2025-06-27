@@ -30,4 +30,11 @@ public class Hamburguesa extends Producto implements UsaIngredientes {
     public void quitar(Ingrediente ingrediente) {
         ingredientes.remove(ingrediente);
     }
+
+    @Override
+    public String toString() {
+        return "Hamburguesa{" +
+                "ingredientes=" + ingredientes +
+                '}';
+    }
 }
