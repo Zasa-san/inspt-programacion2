@@ -16,7 +16,6 @@ public class BaseDeIngredientes {
     }
 
     private static void inicializarIngredientesBase() {
-        // Ingredientes base con claves predefinidas
         agregarIngrediente("PAN", new Ingrediente("Pan", 50F));
         agregarIngrediente("MEDALLON_POLLO", new Ingrediente("Medallón de pollo", 200F));
         agregarIngrediente("CHEDDAR", new Ingrediente("Cheddar", 100F));
