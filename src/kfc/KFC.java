@@ -56,5 +56,6 @@ public class KFC {
         //MUESTREO DE STOCK EXISTENTE
         DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
         DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
+
     }
 }
