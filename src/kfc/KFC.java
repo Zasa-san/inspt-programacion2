@@ -57,5 +57,12 @@ public class KFC {
         DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
         DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
 
+        /*
+        La idea es que el gerente sea quien agregar productos y puede pedir ventas de la base
+
+        Por otro lado solo el vendedor puede registrarVentas en la base
+
+        El cocinero no tiene responsabilidades
+         */
     }
 }
