@@ -24,4 +24,14 @@ public class DBEntry {
         this.disponible -= egreso;
     }
 
+    @Override
+    public String toString() {
+        return "Producto{" +
+                "nombre=" + nombre +
+                ", precio=" + precio +
+                ", idProducto=" + idProducto +
+                ", vendido=" + vendido +
+                ", disponible=" + disponible +
+                '}';
+    }
 }

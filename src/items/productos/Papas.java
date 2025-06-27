@@ -28,4 +28,10 @@ public class Papas extends Producto implements UsaIngredientes {
         ingredientes.remove(ingrediente);
     }
 
+    @Override
+    public String toString() {
+        return "Papas{" +
+                "ingredientes=" + ingredientes +
+                '}';
+    }
 }

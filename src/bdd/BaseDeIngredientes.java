@@ -1,7 +1,10 @@
 package bdd;
 
 import items.Ingrediente;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BaseDeIngredientes {
@@ -36,5 +39,9 @@ public class BaseDeIngredientes {
             throw new IllegalArgumentException("Ingrediente no encontrado para la clave: " + clave);
         }
         return ingrediente;
+    }
+
+    public static List<Ingrediente> getAllIngredientes() {
+        return new ArrayList<>(ingredientes.values());
     }
 }
