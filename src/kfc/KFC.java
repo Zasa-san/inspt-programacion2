@@ -2,12 +2,12 @@ package kfc;
 
 import bdd.BaseDeIngredientes;
 import bdd.BaseDeProductos;
-import bdd.DBEntry;
 import bdd.printer.DBPrinter;
 import items.Ingrediente;
 import items.Producto;
 import items.productos.Hamburguesa;
 import items.productos.Papas;
+import usuarios.Gerente;
 
 public class KFC {
 
@@ -15,6 +15,9 @@ public class KFC {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        //USUARIOS
+        Gerente gerente1 = new Gerente("Romina Perez");
 
         //INICIALIZACIÓN DE PRODUCTOS
         Hamburguesa hamburguesaSimple = new Hamburguesa("Hamburguesa Simple", 4350.76F);
@@ -41,17 +44,17 @@ public class KFC {
         Producto pechuga = new Producto("Supremas de pollo", 2000F);
 
         //INCIALIZACIÓN DE STOCK
-        BaseDeProductos.agregarProducto(new DBEntry(hamburguesaSimple.getNombre(), 5000, hamburguesaSimple.getPrecio(), hamburguesaSimple.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(hamburguesaDoble.getNombre(), 5000, hamburguesaDoble.getPrecio(), hamburguesaDoble.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(hamburguesaBacon.getNombre(), 5000, hamburguesaBacon.getPrecio(), hamburguesaBacon.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(papasSimples.getNombre(), 5000, papasSimples.getPrecio(), papasSimples.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(papasConChedar.getNombre(), 5000, papasConChedar.getPrecio(), papasConChedar.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(papasBravas.getNombre(), 5000, papasBravas.getPrecio(), papasBravas.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(cocaCola.getNombre(), 5000, cocaCola.getPrecio(), cocaCola.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(sprite.getNombre(), 5000, sprite.getPrecio(), sprite.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(patas.getNombre(), 5000, patas.getPrecio(), patas.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(alitas.getNombre(), 5000, alitas.getPrecio(), alitas.getId()));
-        BaseDeProductos.agregarProducto(new DBEntry(pechuga.getNombre(), 5000, pechuga.getPrecio(), pechuga.getId()));
+        gerente1.agregarAStock(hamburguesaSimple, 5000);
+        gerente1.agregarAStock(hamburguesaDoble, 5000);
+        gerente1.agregarAStock(hamburguesaBacon, 5000);
+        gerente1.agregarAStock(papasSimples, 5000);
+        gerente1.agregarAStock(papasConChedar, 5000);
+        gerente1.agregarAStock(papasBravas, 5000);
+        gerente1.agregarAStock(cocaCola, 5000);
+        gerente1.agregarAStock(sprite, 5000);
+        gerente1.agregarAStock(patas, 5000);
+        gerente1.agregarAStock(alitas, 5000);
+        gerente1.agregarAStock(pechuga, 5000);
 
         //MUESTREO DE STOCK EXISTENTE
         DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
