@@ -17,6 +17,12 @@ public class Producto {
         this.id = idAutoincremental++;
     }
 
+    public Producto(String nombre, Float precio, Integer id) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.id = id;
+    }
+
     /**
      * @return precio del producto
      */
@@ -32,7 +38,7 @@ public class Producto {
     }
 
     /**
-     * @return nomre del producto
+     * @return nombre del producto
      */
     public String getNombre() {
         return nombre;

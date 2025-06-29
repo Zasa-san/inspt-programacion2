@@ -12,4 +12,9 @@ public class DBPrinter {
         data.forEach(item -> System.out.println(item.toString() + ","));
         System.out.println("}\n");
     }
+
+    public static <T> void print(String name, Object data) {
+        System.out.println("Visualizando producto '" + name + "'...");
+        System.out.println(data + "\n");
+    }
 }

@@ -2,12 +2,18 @@ package kfc;
 
 import bdd.BaseDeIngredientes;
 import bdd.BaseDeProductos;
+import bdd.DBEntry;
 import bdd.printer.DBPrinter;
+import items.Combo;
 import items.Ingrediente;
 import items.Producto;
 import items.productos.Hamburguesa;
 import items.productos.Papas;
 import usuarios.Gerente;
+import usuarios.Vendedor;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class KFC {
 
@@ -18,6 +24,7 @@ public class KFC {
 
         //USUARIOS
         Gerente gerente1 = new Gerente("Romina Perez");
+        Vendedor vendedor = new Vendedor("Jose Jovic");
 
         //INICIALIZACIÓN DE PRODUCTOS
         Hamburguesa hamburguesaSimple = new Hamburguesa("Hamburguesa Simple", 4350.76F);
@@ -43,6 +50,12 @@ public class KFC {
         Producto alitas = new Producto("Alitas de pollo", 450F);
         Producto pechuga = new Producto("Supremas de pollo", 2000F);
 
+        //INICIALIZACION DE COMBOS
+        Combo combo1 = new Combo("Chicken doble", new ArrayList<>(Arrays.asList(
+                hamburguesaDoble.getId(),
+                papasSimples.getId(),
+                cocaCola.getId())));
+
         //INCIALIZACIÓN DE STOCK
         gerente1.agregarAStock(hamburguesaSimple, 5000);
         gerente1.agregarAStock(hamburguesaDoble, 5000);
@@ -59,6 +72,24 @@ public class KFC {
         //MUESTREO DE STOCK EXISTENTE
         DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
         DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
+
+        //EJEMPLO DE VENTA REGISTRADA POR EL VENDEDOR EN CASO DE COMBO
+        for (Integer idProducto : combo1.getContenidosPorId()) {
+            vendedor.registrarVenta(idProducto, 1);
+        }
+
+        //MUESTREO DEL CAMBIO EN STOCK (VENDIDO Y DISPONIBLES) PARA LOS PRODUCTOS DEL COMBO
+        for (Integer idProducto : combo1.getContenidosPorId()) {
+            DBEntry productoPorId = BaseDeProductos.getProductoPorId(idProducto);
+            if (productoPorId != null) {
+                DBPrinter.print(productoPorId.getNombre(), productoPorId);
+            }
+        }
+
+        //CASO DE VENTA DE PRODUCTO UNICO
+        vendedor.registrarVenta(sprite.getId(), 2);
+        //MUESTREO DE CAMBIO EN STOCK
+        DBPrinter.print(sprite.getNombre(), BaseDeProductos.getProductoPorId(sprite.getId()));
 
         /*
         La idea es que el gerente sea quien agregar productos y puede pedir ventas de la base
