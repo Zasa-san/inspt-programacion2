@@ -28,6 +28,10 @@ public class DBEntry {
         return precio;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
     @Override
     public String toString() {
         return "Producto{"
