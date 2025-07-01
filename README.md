@@ -1,8 +1,7 @@
 # INSPT - Programación 2
 ## 1er Trabajo Práctico
 ### Espacio de entrega para el grupo 12, tema 13.
-
-### Requiere Java Runtime 67.0
+Requiere JDK 21 o más
 
 - #### Consigna del desarrollo: <a href="consigna-desarrollo.pdf" download>consigna-desarrollo.pdf</a>
 
