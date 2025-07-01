@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"bdd"},{"l":"bdd.printer"},{"l":"items"},{"l":"items.productos"},{"l":"kfc"},{"l":"usuarios"}];updateSearchResults();
