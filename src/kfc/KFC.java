@@ -69,10 +69,6 @@ public class KFC {
         gerente1.agregarAStock(alitas, 5000);
         gerente1.agregarAStock(pechuga, 5000);
 
-        //MUESTREO DE STOCK EXISTENTE
-        DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
-        DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
-
         //EJEMPLO DE VENTA REGISTRADA POR EL VENDEDOR EN CASO DE COMBO
         for (Integer idProducto : combo1.getContenidosPorId()) {
             vendedor.registrarVenta(idProducto, 1);
@@ -91,12 +87,8 @@ public class KFC {
         //MUESTREO DE CAMBIO EN STOCK
         DBPrinter.print(sprite.getNombre(), BaseDeProductos.getProductoPorId(sprite.getId()));
 
-        /*
-        La idea es que el gerente sea quien agregar productos y puede pedir ventas de la base
-
-        Por otro lado solo el vendedor puede registrarVentas en la base
-
-        El cocinero no tiene responsabilidades
-         */
+        //MUESTREO DE STOCK FINAL
+        DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());
+        DBPrinter.print(BaseDeIngredientes.class.getSimpleName(), BaseDeIngredientes.getAllIngredientes());
     }
 }
