@@ -11,3 +11,5 @@
   ##### Archivo base de casos de uso:  <a href="casos_de_uso_base.drawio" download>casos_de_uso_base.drawio</a>
 
 - #### Ejecutable de Java: <a href="" download>agregar link</a>
+
+- #### Documentación JavaDocs: <a href="dist\javadoc\index.html" download>index.html</a>
