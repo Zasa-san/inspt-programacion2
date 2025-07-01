@@ -28,6 +28,10 @@ public class DBEntry {
         return precio;
     }
 
+    public int getVendido() {
+        return vendido;
+    }
+
     public String getNombre() {
         return nombre;
     }

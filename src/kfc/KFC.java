@@ -2,7 +2,6 @@ package kfc;
 
 import bdd.BaseDeIngredientes;
 import bdd.BaseDeProductos;
-import bdd.DBEntry;
 import bdd.printer.DBPrinter;
 import items.Combo;
 import items.Ingrediente;
@@ -11,9 +10,9 @@ import items.productos.Hamburguesa;
 import items.productos.Papas;
 import usuarios.Gerente;
 import usuarios.Vendedor;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import usuarios.Cocinero;
 
 public class KFC {
 
@@ -25,6 +24,7 @@ public class KFC {
         //USUARIOS
         Gerente gerente1 = new Gerente("Romina Perez");
         Vendedor vendedor = new Vendedor("Jose Jovic");
+        Cocinero cocinero = new Cocinero("Fernando Laprida");
 
         //INICIALIZACIÓN DE PRODUCTOS
         Hamburguesa hamburguesaSimple = new Hamburguesa("Hamburguesa Simple", 4350.76F);
@@ -50,13 +50,13 @@ public class KFC {
         Producto alitas = new Producto("Alitas de pollo", 450F);
         Producto pechuga = new Producto("Supremas de pollo", 2000F);
 
-        //INICIALIZACION DE COMBOS
+        //EJEMPLO INICIALIZACION DE COMBOS
         Combo combo1 = new Combo("Chicken doble", new ArrayList<>(Arrays.asList(
                 hamburguesaDoble.getId(),
                 papasSimples.getId(),
                 cocaCola.getId())));
 
-        //INCIALIZACIÓN DE STOCK
+        //ASIGNACIÓN DE STOCK POR USUARIO GERENTE
         gerente1.agregarAStock(hamburguesaSimple, 5000);
         gerente1.agregarAStock(hamburguesaDoble, 5000);
         gerente1.agregarAStock(hamburguesaBacon, 5000);
@@ -73,19 +73,17 @@ public class KFC {
         for (Integer idProducto : combo1.getContenidosPorId()) {
             vendedor.registrarVenta(idProducto, 1);
         }
-
-        //MUESTREO DEL CAMBIO EN STOCK (VENDIDO Y DISPONIBLES) PARA LOS PRODUCTOS DEL COMBO
-        for (Integer idProducto : combo1.getContenidosPorId()) {
-            DBEntry productoPorId = BaseDeProductos.getProductoPorId(idProducto);
-            if (productoPorId != null) {
-                DBPrinter.print(productoPorId.getNombre(), productoPorId);
-            }
-        }
+        cocinero.despachar(combo1.getContenidosPorId(), combo1.getNombre());
 
         //CASO DE VENTA DE PRODUCTO UNICO
+        System.out.println("");
         vendedor.registrarVenta(sprite.getId(), 2);
-        //MUESTREO DE CAMBIO EN STOCK
-        DBPrinter.print(sprite.getNombre(), BaseDeProductos.getProductoPorId(sprite.getId()));
+        cocinero.despachar(sprite.getId());
+
+        System.out.println("");
+        //MUESTREO DE VENTAS POR EL GERENTE
+        gerente1.listarVentas();
+        System.out.println("");
 
         //MUESTREO DE STOCK FINAL
         DBPrinter.print(BaseDeProductos.class.getSimpleName(), BaseDeProductos.getAllProductos());

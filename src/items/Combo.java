@@ -15,4 +15,8 @@ public class Combo {
     public ArrayList<Integer> getContenidosPorId() {
         return contenidosPorId;
     }
+
+    public String getNombre() {
+        return nombre;
+    }
 }

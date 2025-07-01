@@ -1,7 +1,9 @@
 package bdd;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseDeProductos {
 
@@ -33,5 +35,15 @@ public class BaseDeProductos {
         }
         System.out.println("Producto no encontrado.\n");
         return null;
+    }
+
+    public static Map<String, Integer> listarVentas() {
+        Map<String, Integer> resultado = new HashMap<>();
+        BaseDeProductos.getAllProductos().forEach(producto -> {
+            if (producto.getVendido() > 0) {
+                resultado.put(producto.getNombre(), producto.getVendido());
+            }
+        });
+        return resultado;
     }
 }
