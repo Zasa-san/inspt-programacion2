@@ -5,16 +5,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Landing - INSPT KFC</title>
+  <link rel="stylesheet" th:href="@{/css/bulma.min.css}">
 </head>
 
 <body>
-  <div class="center">
-    <div class="card">
-      <h1 th:text="${mensaje}">Hola Mundo!</h1>
-      <p>Esta es la página pública de aterrizaje.</p>
-      <p><a th:href="@{/login}">Iniciar sesión</a></p>
+  <section class="section">
+    <div class="container">
+      <div class="card">
+        <div class="card-content">
+          <h1 class="title" th:text="${mensaje}">Hola Mundo!</h1>
+          <p class="content">Esta es la página pública.</p>
+          <p><a class="button is-link" th:href="@{/login}">Iniciar sesión</a></p>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 </body>
 
 </html>
