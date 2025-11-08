@@ -1,0 +1,33 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - Inspt KFC</title>
+</head>
+
+<body>
+  <div>
+    <div>
+      <h1>Iniciar sesión</h1>
+      <div th:if="${param.error}">Usuario o contraseña inválidos.</div>
+      <div th:if="${param.logout}">Sesión cerrada correctamente.</div>
+      <form th:action="@{/login}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div>
+          <input type="text" name="username" placeholder="Usuario" required />
+        </div>
+        <div>
+          <input type="password" name="password" placeholder="Contraseña" required />
+        </div>
+        <div>
+          <button type="submit">Iniciar sesión</button>
+        </div>
+      </form>
+      <p>Volver a <a th:href="@{/}">landing pública</a></p>
+    </div>
+  </div>
+</body>
+
+</html>

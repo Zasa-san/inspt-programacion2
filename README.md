@@ -1,7 +1,6 @@
 # INSPT - Programación 2
-## 1er Trabajo Práctico
+## Trabajo Final
 ### Espacio de entrega para el grupo 12, tema 13.
-Requiere JDK 21 o más
 
 - #### Consigna del desarrollo: <a href="consigna-desarrollo.pdf" download>consigna-desarrollo.pdf</a>
 
@@ -11,10 +10,46 @@ Requiere JDK 21 o más
 - #### Visualización de casos de uso: <a href="casos_de_uso_base-imagen.png" download>casos_de_uso_base-imagen.png</a>
   ##### Archivo base de casos de uso:  <a href="casos_de_uso_base.drawio" download>casos_de_uso_base.drawio</a>
 
------
+## Requisitos para ejecutar el proyecto
+- Java: JDK 21.
+- Base de datos: MariaDB 10.4.32 o superior.
+- Cliente `mysql` (opcional, para ejecutar scripts SQL de inicialización de la base).
+- Maven Wrapper incluido (`mvnw.cmd` en Windows) — no es necesario tener Maven instalado globalmente.
 
-- ### Ejecutable de Java: 
-  ##### `KFC.jar` en la carpeta `dist\`
+## Dependencias del proyecto
+- spring-boot-starter-data-jpa
+- spring-boot-starter-security
+- spring-boot-starter-thymeleaf
+- spring-boot-starter-validation
+- spring-boot-starter-web
+- spring-boot-starter-jetty
+- thymeleaf-extras-springsecurity6
+- mysql-connector-j
+- lombok (opcional)
 
-- ### Documentación JavaDocs: 
-  ##### Consultar en `dist\javadoc\index.html`
+## Pasos para poner el proyecto en marcha (rápido, en Windows PowerShell)
+ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
+1) Clonar el repositorio
+
+2) Crear la base de datos corriendo el script de inicialización en `db/init_mysql_inspt_programacion2_kfc.sql`.
+
+3) Compilar el proyecto (omitiendo tests para rapidez):
+```powershell
+.\mvnw.cmd -DskipTests package
+```
+
+4) Ejecutar la aplicación (arranca Jetty en el puerto 8080 por defecto):
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
+5) Abrir en el navegador: http://localhost:8080
+
+Notas importantes:
+- El script SQL crea la base de datos `inspt_programacion2_kfc`. Hibernate está configurado con `spring.jpa.hibernate.ddl-auto=update` (en `application.properties`), por lo que las tablas necesarias se crearán/actualizarán al arrancar la app.
+- Spring Security está activo por defecto. Spring genera un usuario en memoria `user` con una contraseña aleatoria mostrada en los logs al iniciar la aplicación.
+
+## Ubicaciones relevantes
+- Script de inicialización SQL: `db/init_mysql_inspt_programacion2_kfc.sql`
+- Configuración de la aplicación: `src/main/resources/application.properties`
+- Clase principal: `src/main/java/inspt_programacion2_kfc/InsptProgramacion2KfcApplication.java`
