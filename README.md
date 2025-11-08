@@ -27,7 +27,7 @@
 - mysql-connector-j
 - lombok (opcional)
 
-## Pasos para poner el proyecto en marcha (rápido, en Windows PowerShell)
+## Pasos para ejecturar el proyecto
 ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
 1) Clonar el repositorio
 
