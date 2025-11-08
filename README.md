@@ -17,16 +17,16 @@
 - Maven Wrapper incluido (`mvnw.cmd` en Windows) — no es necesario tener Maven instalado globalmente.
 
 ## Dependencias del proyecto
-- spring-boot-starter-data-jpa
-- spring-boot-starter-security
-- spring-boot-starter-thymeleaf
-- spring-boot-starter-validation
-- spring-boot-starter-web
-- spring-boot-starter-jetty
-- thymeleaf-extras-springsecurity6
-- mysql-connector-j
-- bulma.io
-- lombok (opcional)
+- [spring-boot-starter-data-jpa](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa)
+- [spring-boot-starter-security](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security)
+- [spring-boot-starter-thymeleaf](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf)
+- [spring-boot-starter-validation](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation)
+- [spring-boot-starter-web](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web)
+- [spring-boot-starter-jetty](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jetty)
+- [thymeleaf-extras-springsecurity6](https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6)
+- [mysql-connector-j](https://mvnrepository.com/artifact/mysql/mysql-connector-java)
+- [Bulma (bulma.io)](https://bulma.io/)
+- [Lombok](https://projectlombok.org/) (opcional)
 
 ## Pasos para ejecturar el proyecto
 ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
