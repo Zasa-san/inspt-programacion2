@@ -1,9 +1,10 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/head :: head"></head>
+<head th:replace="~{fragments/head :: head}"></head>
 
 <body>
+  <header th:replace="~{fragments/navbar :: navbar(${navLinks})}"></header>
   <section class="section">
     <div class="container">
       <div class="box">
@@ -28,7 +29,6 @@
             </div>
           </div>
         </form>
-        <p>Volver a <a th:href="@{/}">landing pública</a></p>
       </div>
     </div>
   </section>

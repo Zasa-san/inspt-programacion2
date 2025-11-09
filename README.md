@@ -26,6 +26,7 @@
 - [thymeleaf-extras-springsecurity6](https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6)
 - [mysql-connector-j](https://mvnrepository.com/artifact/mysql/mysql-connector-java)
 - [Bulma (bulma.io)](https://bulma.io/)
+- [jQuery](https://jquery.com/)
 - [Lombok](https://projectlombok.org/) (opcional)
 
 ## Pasos para ejecturar el proyecto
