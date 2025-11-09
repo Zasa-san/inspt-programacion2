@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.services.users;
+package inspt_programacion2_kfc.backend.services.users;
 
 import java.util.Optional;
 
@@ -7,9 +7,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import inspt_programacion2_kfc.models.users.Role;
-import inspt_programacion2_kfc.models.users.User;
-import inspt_programacion2_kfc.repositories.users.UserRepository;
+import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
+import inspt_programacion2_kfc.backend.services.users.exceptions.UserCreationFailedException;
+import inspt_programacion2_kfc.backend.services.users.exceptions.UserPasswordResetFailedException;
 
 @Service
 @Transactional

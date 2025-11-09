@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc;
+package inspt_programacion2_kfc.frontend.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -63,3 +63,14 @@ Notas importantes:
 - Script de inicialización SQL: `db/init_mysql_inspt_programacion2_kfc.sql`
 - Configuración de la aplicación: `src/main/resources/application.properties`
 - Clase principal: `src/main/java/inspt_programacion2_kfc/InsptProgramacion2KfcApplication.java`
+
+## Arquitectura
+
+La aplicación sigue el patrón **MVC** organizado en tres capas:
+
+- **Backend** (`backend/models`, `backend/repositories`, `backend/services`): Contiene la lógica de negocio, acceso a datos y modelos de la aplicación
+- **API REST** (`api/`): Controllers REST que exponen los endpoints de la aplicación
+- **Frontend** (`frontend/controllers` + `templates/`): Controladores y vistas Thymeleaf para la interfaz web
+
+Los **DTOs** (`backend/dto/`) se utilizan para transferir datos entre capas sin exponer las entidades internas.
+
