@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.service;
+package inspt_programacion2_kfc.services.users;
 
 public class UserServiceException extends RuntimeException {
 

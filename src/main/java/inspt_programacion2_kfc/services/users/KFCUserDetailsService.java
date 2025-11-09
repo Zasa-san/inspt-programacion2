@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.service;
+package inspt_programacion2_kfc.services.users;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import inspt_programacion2_kfc.repository.UserRepository;
+import inspt_programacion2_kfc.repositories.users.UserRepository;
 
 @Service
 @Transactional

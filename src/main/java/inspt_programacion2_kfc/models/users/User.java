@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.model;
+package inspt_programacion2_kfc.models.users;
 
 import java.util.Collection;
 import java.util.Collections;

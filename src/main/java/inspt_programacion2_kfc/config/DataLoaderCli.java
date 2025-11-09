@@ -8,8 +8,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import inspt_programacion2_kfc.model.Role;
-import inspt_programacion2_kfc.service.UserService;
+import inspt_programacion2_kfc.models.users.Role;
+import inspt_programacion2_kfc.services.users.UserService;
 
 public class DataLoaderCli {
 

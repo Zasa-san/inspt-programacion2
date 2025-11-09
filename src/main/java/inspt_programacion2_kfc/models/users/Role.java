@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.model;
+package inspt_programacion2_kfc.models.users;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
