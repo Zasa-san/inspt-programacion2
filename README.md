@@ -30,23 +30,30 @@
 
 ## Pasos para ejecturar el proyecto
 ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
-1) Clonar el repositorio
 
-2) Iniciar MySQL
+#### 1 - Clonar el repositorio
 
-3) Crear la base de datos corriendo el script de inicialización en `db/init_mysql_inspt_programacion2_kfc.sql`.
+#### 2 - Iniciar MySQL
 
-4) Compilar el proyecto (omitiendo tests que no se utilizan por ahora):
-```powershell
+#### 3 - Crear la base de datos corriendo el script de inicialización en 
+`db/init_mysql_inspt_programacion2_kfc.sql`.
+
+#### 4 - Compilar el proyecto (omitiendo tests que no se utilizan por ahora):
+```
 .\mvnw.cmd -DskipTests package
 ```
+(Opcional) Inicializar usuarios por defecto desde la consola
+  ```
+  .\mvnw.cmd --% exec:java@dataloader -DskipTests
+  ```
 
-5) Ejecutar la aplicación (arranca Jetty en el puerto 8080 por defecto):
-```powershell
+#### 5 - Ejecutar la aplicación (arranca Jetty en el puerto 8080 por defecto):
+```
 .\mvnw.cmd spring-boot:run
 ```
 
-6) Abrir en el navegador: http://localhost:8080
+#### 6 - Abrir en el navegador:
+http://localhost:8080
 
 Notas importantes:
 - El script SQL crea la base de datos `inspt_programacion2_kfc`. Hibernate está configurado con `spring.jpa.hibernate.ddl-auto=update` (en `application.properties`), por lo que las tablas necesarias se crearán/actualizarán al arrancar la app.

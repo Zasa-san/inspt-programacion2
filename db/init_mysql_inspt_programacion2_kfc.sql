@@ -15,6 +15,3 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_users_username` (`username`)
 );
-
-INSERT INTO `users` (`username`, `password`, `enabled`, `role`) VALUES
-  ('Gerente1', 'Gerente1', 1, 'ROLE_ADMIN');
