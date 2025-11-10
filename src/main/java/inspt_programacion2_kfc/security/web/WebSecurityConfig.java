@@ -1,7 +1,8 @@
-package inspt_programacion2_kfc;
+package inspt_programacion2_kfc.security.web;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,16 +14,15 @@ import inspt_programacion2_kfc.backend.models.users.Role;
 
 @Configuration
 @EnableMethodSecurity
-public class SecurityConfig {
+@Order(2)
+public class WebSecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/login", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/users/**").hasRole(Role.ROLE_ADMIN.getRoleName())
-                .requestMatchers("/api/users/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
                 )

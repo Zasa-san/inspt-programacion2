@@ -10,11 +10,11 @@ import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 
 @Service
 @Transactional
-public class KFCUserDetailsService implements UserDetailsService {
+public class AppUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public KFCUserDetailsService(UserRepository userRepository) {
+    public AppUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
