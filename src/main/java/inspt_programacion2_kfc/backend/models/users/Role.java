@@ -11,7 +11,7 @@ public enum Role {
         return name();
     }
 
-    public String withoutPrefix() {
+    public String getRoleName() {
         String n = name();
         return n.startsWith("ROLE_") ? n.substring(5) : n;
     }

@@ -1,7 +1,11 @@
 package inspt_programacion2_kfc.api.users;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,5 +64,24 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<String> getCurrentUser() {
         return ResponseEntity.ok("Información del usuario autenticado");
+    }
+
+    /**
+     * Obtener la lista de usuarios.
+     *
+     * @return Retorna la lista de usuarios en formato DTO
+     */
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserResponseDTO>> listUsers() {
+        var users = userService.findAll();
+        List<UserResponseDTO> dtos = users.stream().map(u -> new UserResponseDTO(
+                u.getId(),
+                u.getUsername(),
+                u.getRole().toString(),
+                u.isEnabled()
+        )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 }

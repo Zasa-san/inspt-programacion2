@@ -25,6 +25,20 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Crea un usuario nuevo o actualiza la contraseña de uno existente.
+     *
+     * @throws UserCreationFailedException si no se pudo crear el usuario
+     * @throws UserPasswordResetFailedException si no se pudo resetear la
+     * contraseña
+     * @param username nombre de usuario (único)
+     * @param rawPassword contraseña en texto plano (se encripta internamente)
+     * @param role rol a asignar (enum {@link Role})
+     * @param resetIfExists si true, resetea la contraseña si el usuario ya
+     * existe
+     * @return el usuario creado o existente (con contraseña actualizada si se
+     * solicitó)
+     */
     public User create(String username, String rawPassword, Role role, boolean resetIfExists) {
         Optional<User> dbUser = userRepository.findByUsername(username);
         if (dbUser.isEmpty()) {
@@ -49,5 +63,14 @@ public class UserService {
             }
         }
         return dbUser.get();
+    }
+
+    /**
+     * Devuelve todos los usuarios en la base.
+     *
+     * @return lista de usuarios
+     */
+    public java.util.List<User> findAll() {
+        return userRepository.findAll();
     }
 }
