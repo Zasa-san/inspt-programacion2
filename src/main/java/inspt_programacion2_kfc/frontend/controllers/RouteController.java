@@ -30,4 +30,12 @@ public class RouteController {
         return "login";
     }
 
+    @GetMapping("/access-denied")
+    public String accessDenied(Model model) {
+        PageMetadata page = new PageMetadata("Acceso denegado");
+        model.addAttribute("page", page);
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("index"));
+        return "access-denied";
+    }
+
 }

@@ -57,13 +57,34 @@ public class UserController {
     }
 
     /**
-     * Obtener información del usuario actual autenticado.
+     * Actualizar un usuario existente.
      *
-     * @return Respuesta con los datos del usuario autenticado
+     * @param id ID del usuario a actualizar
+     * @param userRequest DTO con los datos actualizados del usuario
+     * @return Respuesta con los datos del usuario actualizado
      */
-    @GetMapping("/me")
-    public ResponseEntity<String> getCurrentUser() {
-        return ResponseEntity.ok("Información del usuario autenticado");
+    @PostMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@org.springframework.web.bind.annotation.PathVariable Long id,
+            @RequestBody UserRequestDTO userRequest) {
+        try {
+            var user = userService.update(
+                    id,
+                    userRequest.getUsername(),
+                    userRequest.getPassword(),
+                    Role.valueOf(userRequest.getRole())
+            );
+
+            UserResponseDTO response = new UserResponseDTO(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getRole().toString(),
+                    user.isEnabled()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     /**

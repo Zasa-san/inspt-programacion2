@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body>
+  <div th:replace="fragments/navbar :: navbar(${navLinks})"></div>
+
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Acceso denegado</h1>
+      <div class="notification is-warning">
+        <p>No tienes permisos para acceder a esta página.</p>
+        <p>Si crees que deberías tener acceso, contacta al administrador.</p>
+      </div>
+
+      <p>
+        <a class="button" th:href="@{/}">Volver al inicio</a>
+      </p>
+    </div>
+  </section>
+
+</body>
+
+</html>

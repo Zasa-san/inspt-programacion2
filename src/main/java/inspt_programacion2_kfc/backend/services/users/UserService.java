@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.backend.services.users;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -72,5 +73,40 @@ public class UserService {
      */
     public java.util.List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    /**
+     * Buscar un usuario por id.
+     *
+     * @param id id del usuario
+     * @return usuario si existe
+     */
+    public java.util.Optional<User> findById(Long id) {
+        Objects.requireNonNull(id, "ID no puede ser NULL");
+        return userRepository.findById(id);
+    }
+
+    /**
+     * Actualiza los datos de un usuario existente. Si la contraseña es null o
+     * vacía, no se modifica.
+     *
+     * @param id id del usuario a actualizar
+     * @param username nuevo username
+     * @param rawPassword nueva contraseña en texto plano
+     * @param role nuevo rol
+     * @return usuario actualizado
+     */
+    public User update(Long id, String username, String rawPassword, Role role) {
+        Objects.requireNonNull(id, "ID no puede ser NULL");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+
+        user.setUsername(username);
+        if (rawPassword != null && !rawPassword.isBlank()) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+        }
+        user.setRole(role);
+
+        return userRepository.save(user);
     }
 }
