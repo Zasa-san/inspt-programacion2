@@ -75,3 +75,29 @@ La aplicación sigue el patrón **MVC** organizado en tres capas:
 
 Los **DTOs** (`backend/dto/`) se utilizan para transferir datos entre capas sin exponer las entidades internas.
 
+### Autenticación — sesiones (UI) y tokens (API)
+
+La aplicación soporta dos métodos de autenticación que coexisten de forma segura:
+
+- Sesiones (formLogin)
+  - Uso: pensado para usuarios humanos que interactúan con la interfaz Thymeleaf.
+  - Cómo funciona: el usuario hace login en la página `/login`. Spring Security crea una sesión en el servidor y devuelve una cookie de sesión al navegador. Las solicitudes posteriores usan esa cookie para autenticarse.
+  - Implementación: configurado en `src/main/java/inspt_programacion2_kfc/security/web/WebSecurityConfig.java` (formLogin, redirección a `/login`, protección de rutas web, CSRF activo por defecto).
+
+- Tokens API (Bearer tokens)
+  - Uso: pensado para clientes programáticos (scripts, servicios) que no usan navegador.
+  - Cómo funciona: el cliente obtiene un token (texto plano) mediante `/api/auth/login` (credenciales) o `/api/auth/token` (cuando ya tiene sesión). El servidor guarda sólo el hash SHA-256 del token en la base de datos (`ApiToken`) y devuelve el token en texto plano sólo una vez. En las llamadas posteriores el cliente incluye el header `Authorization: Bearer <token>`.
+  - Implementación: filtro `ApiTokenAuthenticationFilter` valida el token y, si es válido, rellena el `SecurityContext`. La lógica de tokens está en `src/main/java/inspt_programacion2_kfc/backend/services/auth/ApiTokenService.java` y la persistencia en `ApiToken`/`ApiTokenRepository`.
+
+Componentes clave (archivo / responsabilidad)
+- `WebSecurityConfig` (security/web): configuración de la cadena de seguridad para la UI (formLogin, CSRF, acceso a `/users/**`).
+- `ApiSecurityConfig` (security/api): configuración para `/api/**` — aquí se ha deshabilitado CSRF para facilitar clientes programáticos y se registró el filtro de tokens.
+- `ApiTokenAuthenticationFilter`: lee `Authorization: Bearer ...`, valida el token con `ApiTokenService` y establece la autenticación para la request.
+- `ApiTokenService`: genera tokens con entropía fuerte, almacena sólo el hash, y valida tokens.
+- `ApiTokenController` (`/api/auth`): endpoints para generar token desde sesión (`POST /api/auth/token`) y para login por credenciales que emite token (`POST /api/auth/login`).
+- `AppUserDetailsService`: carga la entidad `User` desde la base de datos; `User` implementa `UserDetails` para integración con Spring Security.
+
+Flujos comunes
+- Flujo UI (usuario humano): login en `/login` → sesión cookie → acceder a `/users` y vistas protegidas.
+- Flujo API con token (script): `POST /api/auth/login` {username,password} → recibir `{token}` → usar `Authorization: Bearer <token>` en llamadas a `/api/**`.
+- Flujo API desde sesión (script en navegador o cliente que comparte cookie): `POST /api/auth/token` (requiere sesión) → recibir `{token}` → usar header Bearer en futuras llamadas.
