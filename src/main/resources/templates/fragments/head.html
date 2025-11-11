@@ -1,0 +1,10 @@
+<head th:fragment="head">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title th:text="'KFC - ' + ${page.title}">KFC - Página de KFC</title>
+  <meta name="description" th:content="${page.description}" />
+  <link rel="stylesheet" th:href="@{/css/bulma.min.css}">
+  <link rel="stylesheet" th:href="@{/css/fontawsome/css/all.min.css}">
+  <script th:src="@{/js/jquery-3.7.1.slim.min.js}" defer></script>
+  <script th:src="@{/js/dark-mode.js}" defer></script>
+</head>

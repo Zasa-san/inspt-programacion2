@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body>
+  <div th:replace="fragments/navbar :: navbar(${navLinks})"></div>
+
+  <h1 th:text="${page.title}">Editar usuario</h1>
+
+  <form th:action="@{'/users/edit/' + ${userId}}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <div>
+      <label>Usuario</label>
+      <input type="text" name="username" th:value="${user.username}" />
+    </div>
+
+    <div>
+      <label>Nueva contraseña (dejar en blanco para no modificar)</label>
+      <input type="password" name="password" />
+    </div>
+
+    <div>
+      <label>Rol</label>
+      <select name="role">
+        <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.name()}"
+          th:selected="${r.name()==user.role}"></option>
+      </select>
+    </div>
+
+    <div>
+      <button type="submit">Guardar</button>
+      <a th:href="@{/users}">Cancelar</a>
+    </div>
+  </form>
+
+</body>
+
+</html>
