@@ -45,7 +45,7 @@ ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
 ```
 (Opcional) Inicializar usuarios por defecto desde la consola
   ```
-  .\mvnw.cmd --% exec:java@dataloader -DskipTests
+  .\mvnw.cmd exec:java@dataloader -DskipTests
   ```
 
 #### 5 - Ejecutar la aplicación (arranca Jetty en el puerto 8080 por defecto):
@@ -56,9 +56,26 @@ ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
 #### 6 - Abrir en el navegador:
 http://localhost:8080
 
-Notas importantes:
-- El script SQL crea la base de datos `inspt_programacion2_kfc`. Hibernate está configurado con `spring.jpa.hibernate.ddl-auto=update` (en `application.properties`), por lo que las tablas necesarias se crearán/actualizarán al arrancar la app.
-- Spring Security está activo por defecto. Spring genera un usuario en memoria `user` con una contraseña aleatoria mostrada en los logs al iniciar la aplicación.
+## Ejecutar .jar compilado
+
+- Usando propiedades del sistema Java:
+
+```
+java -DMYSQL_HOST=db.example.com -DMYSQL_PORT=3307 -DMYSQL_DB=mi_db -DMYSQL_USER=mi_usuario -DMYSQL_PASSWORD=secreto -jar inspt-programacion2-kfc.jar
+```
+
+- Usando argumentos de Spring Boot:
+
+```powershell
+java -jar inspt-programacion2-kfc.jar --MYSQL_HOST=db.example.com --MYSQL_PORT=3307 --MYSQL_DB=mi_db --MYSQL_USER=mi_usuario --MYSQL_PASSWORD=secreto
+```
+
+- Usando una variable de entorno:
+
+```cmd
+set "MYSQL_HOST=db.example.com" && set "MYSQL_PORT=3307" && java -jar inspt-programacion2-kfc.jar
+```
+
 
 ## Ubicaciones relevantes
 - Script de inicialización SQL: `db/init_mysql_inspt_programacion2_kfc.sql`

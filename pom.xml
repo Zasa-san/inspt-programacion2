@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>inspt.utn.edu.ar</groupId>
 	<artifactId>inspt-programacion2-kfc</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>inspt-programacion2-kfc</name>
 	<description>Implementación de una página de una cadena de comida rápida.</description>
 	<url/>
@@ -88,6 +88,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>inspt-programacion2-kfc</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
