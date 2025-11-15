@@ -8,17 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
-import inspt_programacion2_kfc.frontend.services.NavbarService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
 @Controller
 public class PedidosPageController {
 
-    private final NavbarService navbarService;
     private final PedidoService pedidoService;
 
-    public PedidosPageController(NavbarService navbarService, PedidoService pedidoService) {
-        this.navbarService = navbarService;
+    public PedidosPageController(PedidoService pedidoService) {
         this.pedidoService = pedidoService;
     }
 
@@ -26,7 +23,6 @@ public class PedidosPageController {
     public String pedidosPage(Model model) {
         PageMetadata page = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("vendedor"));
 
         var pedidos = pedidoService.findAll();
         model.addAttribute("pedidos", pedidos);
@@ -45,5 +41,3 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 }
-
-

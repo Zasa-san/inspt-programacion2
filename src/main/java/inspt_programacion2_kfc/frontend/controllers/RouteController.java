@@ -10,16 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.services.NavbarService;
 import inspt_programacion2_kfc.frontend.services.ProductService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class RouteController {
-
-    @Autowired
-    private NavbarService navbarService;
 
     @Autowired
     private ProductService productService;
@@ -38,7 +34,6 @@ public class RouteController {
     public String index(Model model, HttpSession session) {
         PageMetadata page = new PageMetadata("Inicio", "Página pública para que el cliente vea el menú y su carrito");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("index"));
 
         // Productos disponibles para el cliente
         model.addAttribute("products", productService.findAll());
@@ -57,7 +52,6 @@ public class RouteController {
     public String login(Model model) {
         PageMetadata page = new PageMetadata("Iniciar sesión");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("index"));
         return "login";
     }
 
@@ -65,7 +59,6 @@ public class RouteController {
     public String accessDenied(Model model) {
         PageMetadata page = new PageMetadata("Acceso denegado");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("index"));
         return "access-denied";
     }
 

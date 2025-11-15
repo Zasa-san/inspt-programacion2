@@ -12,17 +12,14 @@ import inspt_programacion2_kfc.backend.models.dto.users.UserRequestDTO;
 import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.users.UserService;
-import inspt_programacion2_kfc.frontend.services.NavbarService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
 @Controller
 public class UsersPageController {
 
-    private final NavbarService navbarService;
     private final UserService userService;
 
-    public UsersPageController(NavbarService navbarService, UserService userService) {
-        this.navbarService = navbarService;
+    public UsersPageController(UserService userService) {
         this.userService = userService;
     }
 
@@ -30,7 +27,6 @@ public class UsersPageController {
     public String usersPage(Model model) {
         PageMetadata page = new PageMetadata("Usuarios");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         var users = userService.findAll();
         List<UserResponseDTO> dtos = users.stream().map(u -> new UserResponseDTO(
@@ -48,7 +44,6 @@ public class UsersPageController {
     public String newUserPage(Model model) {
         PageMetadata page = new PageMetadata("Nuevo usuario");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         model.addAttribute("user", new UserRequestDTO());
         model.addAttribute("roles", Role.values());
@@ -60,7 +55,6 @@ public class UsersPageController {
     public String editUserPage(@PathVariable Long id, Model model) {
         PageMetadata page = new PageMetadata("Editar usuario");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         var userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
@@ -111,7 +105,6 @@ public class UsersPageController {
     public String usersErrorPage(Model model) {
         PageMetadata page = new PageMetadata("Error");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
         return "users/error";
     }
 
