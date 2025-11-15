@@ -17,6 +17,8 @@ public class NavbarService {
                 getLoginLinks();
             case "users" ->
                 getUsersLinks();
+            case "admin" ->
+                getAdminLinks();
             default ->
                 List.of();
         };
@@ -41,6 +43,14 @@ public class NavbarService {
         return List.of(
                 new NavLink("Inicio", "/"),
                 new NavLink("Usuarios", "/users")
+        );
+    }
+
+    private List<NavLink> getAdminLinks() {
+        return List.of(
+                new NavLink("Inicio", "/"),
+                new NavLink("Usuarios", "/users"),
+                new NavLink("Pedidos", "/pedidos")
         );
     }
 }

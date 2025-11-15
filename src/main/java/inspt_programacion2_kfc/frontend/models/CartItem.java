@@ -1,21 +1,16 @@
 package inspt_programacion2_kfc.frontend.models;
 
+import lombok.Data;
+
+@Data
 public class CartItem {
 
-    private final Product product;
+    private final Producto producto;
     private int quantity;
 
-    public CartItem(Product product, int quantity) {
-        this.product = product;
+    public CartItem(Producto producto, int quantity) {
+        this.producto = producto;
         this.quantity = quantity;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public int getQuantity() {
-        return quantity;
     }
 
     public void increment(int amount) {
@@ -26,7 +21,7 @@ public class CartItem {
     }
 
     public int getSubtotal() {
-        return product.getPrice() * quantity;
+        return producto.getPrice() * quantity;
     }
 }
 

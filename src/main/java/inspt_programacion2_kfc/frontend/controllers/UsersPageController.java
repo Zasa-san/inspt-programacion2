@@ -30,7 +30,7 @@ public class UsersPageController {
     public String usersPage(Model model) {
         PageMetadata page = new PageMetadata("Usuarios");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("users"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         var users = userService.findAll();
         List<UserResponseDTO> dtos = users.stream().map(u -> new UserResponseDTO(
@@ -48,7 +48,7 @@ public class UsersPageController {
     public String newUserPage(Model model) {
         PageMetadata page = new PageMetadata("Nuevo usuario");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("users"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         model.addAttribute("user", new UserRequestDTO());
         model.addAttribute("roles", Role.values());
@@ -60,7 +60,7 @@ public class UsersPageController {
     public String editUserPage(@PathVariable Long id, Model model) {
         PageMetadata page = new PageMetadata("Editar usuario");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("users"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
 
         var userOpt = userService.findById(id);
         if (userOpt.isEmpty()) {
@@ -111,7 +111,7 @@ public class UsersPageController {
     public String usersErrorPage(Model model) {
         PageMetadata page = new PageMetadata("Error");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("users"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
         return "users/error";
     }
 }

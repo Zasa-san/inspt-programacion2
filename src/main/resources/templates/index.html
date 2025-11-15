@@ -73,14 +73,14 @@
               </thead>
               <tbody>
                 <tr th:each="item : ${cartItems}">
-                  <td th:text="${item.product.name}">Producto</td>
+                  <td th:text="${item.producto.name}">Producto</td>
                   <td class="has-text-centered" th:text="${item.quantity}">1</td>
                   <td class="has-text-right">
                     $ <span th:text="${item.subtotal}">0</span>
                   </td>
                   <td class="has-text-right">
                     <form th:action="@{/cart/remove}" method="post">
-                      <input type="hidden" name="productId" th:value="${item.product.id}" />
+                      <input type="hidden" name="productId" th:value="${item.producto.id}" />
                       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                       <button type="submit" class="button is-small is-light is-danger">
                         Quitar
@@ -99,6 +99,13 @@
                 </tr>
               </tfoot>
             </table>
+
+            <form th:action="@{/cart/checkout}" method="post" class="mb-3">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <button type="submit" class="button is-primary is-fullwidth mb-2">
+                Confirmar pedido
+              </button>
+            </form>
 
             <form th:action="@{/cart/clear}" method="post">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
