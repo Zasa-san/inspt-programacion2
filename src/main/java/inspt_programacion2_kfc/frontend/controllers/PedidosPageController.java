@@ -26,7 +26,7 @@ public class PedidosPageController {
     public String pedidosPage(Model model) {
         PageMetadata page = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("vendedor"));
 
         var pedidos = pedidoService.findAll();
         model.addAttribute("pedidos", pedidos);

@@ -57,7 +57,7 @@ public class RouteController {
     public String login(Model model) {
         PageMetadata page = new PageMetadata("Iniciar sesión");
         model.addAttribute("page", page);
-        model.addAttribute("navLinks", navbarService.getLinksForRoute("login"));
+        model.addAttribute("navLinks", navbarService.getLinksForRoute("index"));
         return "login";
     }
 
