@@ -15,6 +15,13 @@ const applyTheme = ($doc, theme) => {
   $doc.attr('data-theme', theme);
   const isDark = theme === 'dark';
   $('#darkModeToggle').attr('aria-pressed', isDark ? 'true' : 'false');
+
+  const $icon = $('#darkModeToggle i');
+  if (isDark) {
+    $icon.removeClass('fa-lightbulb').addClass('fa-moon');
+  } else {
+    $icon.removeClass('fa-moon').addClass('fa-lightbulb');
+  }
 }
 
 const darkModeInit = ($) => {
@@ -34,4 +41,16 @@ const darkModeInit = ($) => {
   });
 }
 
+const navbarBurgerInit = ($) => {
+  $('.navbar-burger').on('click', function () {
+    const $burger = $(this);
+    const target = $burger.data('target');
+    const $target = $('#' + target);
+
+    $burger.toggleClass('is-active');
+    $target.toggleClass('is-active');
+  });
+}
+
 darkModeInit(jQuery);
+navbarBurgerInit(jQuery);

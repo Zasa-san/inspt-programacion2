@@ -5,17 +5,42 @@
 
 <body>
   <header th:replace="~{fragments/navbar :: navbar}"></header>
-  <section class="section">
+
+  <!-- Hero Section -->
+  <section class="hero is-primary is-medium" sec:authorize="isAnonymous()">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title is-1">
+          Disfrutá el Mejor Pollo
+        </h1>
+        <p class="subtitle is-4">
+          Pedí ahora y disfrutá en un click
+        </p>
+        <a href="#productos" class="button is-light is-large">
+          <span class="icon">
+            <i class="fa-solid fa-drumstick-bite"></i>
+          </span>
+          <span>Ver el Menú</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" sec:authorize="isAuthenticated()">
     <div class="container">
       <div class="card">
         <div class="card-content">
           <h1 class="title" th:text="${page.title}">Inicio</h1>
           <p class="content">
-            Bienvenido al sistema. Aquí el cliente puede ver el menú de KFC y armar su carrito.
+            Bienvenido al sistema de administración de KFC.
           </p>
         </div>
       </div>
+    </div>
+  </section>
 
+  <section class="section">
+    <div class="container">
       <div class="columns mt-5" sec:authorize="isAnonymous()">
         <!-- Lista de productos -->
         <div class="column is-two-thirds" id="productos">

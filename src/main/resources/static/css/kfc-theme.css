@@ -1,0 +1,423 @@
+/* KFC Theme Variables */
+:root {
+  --kfc-red: #e4002b;
+  --kfc-dark-red: #c4001f;
+  --kfc-white: #ffffff;
+  --kfc-black: #000000;
+  --kfc-gray-light: #f5f5f5;
+  --kfc-gray: #e8e8e8;
+  --kfc-text: #333333;
+  --kfc-beige: #f4ede4;
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+  --kfc-bg: #1a1a1a;
+  --kfc-bg-secondary: #2d2d2d;
+  --kfc-bg-card: #242424;
+  --kfc-text: #e8e8e8;
+  --kfc-text-secondary: #b8b8b8;
+  --kfc-border: #404040;
+}
+
+[data-theme="light"] {
+  --kfc-bg: #ffffff;
+  --kfc-bg-secondary: #f5f5f5;
+  --kfc-bg-card: #ffffff;
+  --kfc-text: #333333;
+  --kfc-text-secondary: #666666;
+  --kfc-border: #dbdbdb;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--kfc-bg);
+  color: var(--kfc-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* KFC Logo Styling */
+.navbar-brand .navbar-item img {
+  max-height: 3rem;
+  height: auto;
+}
+
+.kfc-logo {
+  max-height: 3rem;
+  height: auto;
+}
+
+/* Navbar Customization */
+.navbar.is-primary {
+  background-color: var(--kfc-red) !important;
+}
+
+.navbar.is-primary .navbar-brand > a.navbar-item:hover,
+.navbar.is-primary .navbar-brand > a.navbar-item.is-active {
+  background-color: var(--kfc-dark-red);
+}
+
+.navbar.is-primary .navbar-start .navbar-item,
+.navbar.is-primary .navbar-end .navbar-item {
+  color: var(--kfc-white);
+}
+
+.navbar.is-primary .navbar-start .navbar-item:hover,
+.navbar.is-primary .navbar-end .navbar-item:hover {
+  background-color: var(--kfc-dark-red);
+  color: var(--kfc-white);
+}
+
+.navbar.is-primary .navbar-burger {
+  color: var(--kfc-white);
+}
+
+/* Dark Mode Toggle Button */
+#darkModeToggle {
+  background-color: transparent;
+  border: 1px solid var(--kfc-white);
+  color: var(--kfc-white);
+}
+
+#darkModeToggle:hover {
+  background-color: var(--kfc-dark-red);
+  border-color: var(--kfc-white);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--kfc-bg-card);
+  border: 1px solid var(--kfc-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .card {
+  box-shadow: 0 0.5em 1em -0.125em rgba(255, 255, 255, 0.05), 0 0px 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.card-content .title,
+.card-content .subtitle {
+  color: var(--kfc-text);
+}
+
+/* Button Styles */
+.button.is-primary {
+  background-color: var(--kfc-red);
+  border-color: transparent;
+  color: var(--kfc-white);
+}
+
+.button.is-primary:hover,
+.button.is-primary.is-hovered {
+  background-color: var(--kfc-dark-red);
+  border-color: transparent;
+  color: var(--kfc-white);
+}
+
+.button.is-primary:active,
+.button.is-primary.is-active {
+  background-color: var(--kfc-dark-red);
+  border-color: transparent;
+  color: var(--kfc-white);
+}
+
+.button.is-light {
+  background-color: var(--kfc-white);
+  color: var(--kfc-red);
+}
+
+[data-theme="dark"] .button.is-light {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-white);
+  border-color: var(--kfc-border);
+}
+
+.button.is-light:hover {
+  background-color: var(--kfc-gray);
+}
+
+[data-theme="dark"] .button.is-light:hover {
+  background-color: var(--kfc-bg-card);
+}
+
+/* Input Styles */
+.input,
+.textarea,
+.select select {
+  background-color: var(--kfc-bg);
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .textarea:focus,
+[data-theme="dark"] .select select:focus {
+  border-color: var(--kfc-red);
+}
+
+/* Table Styles */
+.table {
+  background-color: var(--kfc-bg-card);
+  color: var(--kfc-text);
+}
+
+.table thead th {
+  color: var(--kfc-text);
+  border-bottom-color: var(--kfc-border);
+}
+
+.table tbody tr {
+  background-color: var(--kfc-bg-card);
+}
+
+.table.is-striped tbody tr:nth-child(even) {
+  background-color: var(--kfc-bg-secondary);
+}
+
+.table td,
+.table th {
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+/* Notification Styles */
+.notification {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-text);
+}
+
+.notification.is-success {
+  background-color: #48c774;
+  color: var(--kfc-white);
+}
+
+.notification.is-danger {
+  background-color: #f14668;
+  color: var(--kfc-white);
+}
+
+.notification.is-warning {
+  background-color: #ffdd57;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.notification.is-info {
+  background-color: #3298dc;
+  color: var(--kfc-white);
+}
+
+/* Section Styles */
+.section {
+  background-color: var(--kfc-bg);
+}
+
+.hero {
+  background-color: var(--kfc-bg-secondary);
+}
+
+/* Title Styles */
+.title,
+.subtitle {
+  color: var(--kfc-text);
+}
+
+/* Link Styles */
+a {
+  color: var(--kfc-red);
+}
+
+a:hover {
+  color: var(--kfc-dark-red);
+}
+
+[data-theme="dark"] a {
+  color: #ff4757;
+}
+
+[data-theme="dark"] a:hover {
+  color: var(--kfc-red);
+}
+
+/* Hero Section for Landing */
+.hero.is-primary {
+  background-color: var(--kfc-red);
+}
+
+.hero.is-primary .title,
+.hero.is-primary .subtitle {
+  color: var(--kfc-white);
+}
+
+/* Modal Styles */
+[data-theme="dark"] .modal-background {
+  background-color: rgba(10, 10, 10, 0.86);
+}
+
+[data-theme="dark"] .modal-card-head,
+[data-theme="dark"] .modal-card-body,
+[data-theme="dark"] .modal-card-foot {
+  background-color: var(--kfc-bg-card);
+  border-color: var(--kfc-border);
+}
+
+/* Box Styles */
+.box {
+  background-color: var(--kfc-bg-card);
+  border: 1px solid var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+/* Menu Styles */
+.menu-list a {
+  color: var(--kfc-text);
+}
+
+.menu-list a:hover {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-red);
+}
+
+.menu-list a.is-active {
+  background-color: var(--kfc-red);
+  color: var(--kfc-white);
+}
+
+/* Pagination Styles */
+.pagination-previous,
+.pagination-next,
+.pagination-link {
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+  background-color: var(--kfc-bg-card);
+}
+
+.pagination-link.is-current {
+  background-color: var(--kfc-red);
+  border-color: var(--kfc-red);
+  color: var(--kfc-white);
+}
+
+/* Tabs Styles */
+.tabs a {
+  border-bottom-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+.tabs a:hover {
+  border-bottom-color: var(--kfc-text);
+  color: var(--kfc-text);
+}
+
+.tabs li.is-active a {
+  border-bottom-color: var(--kfc-red);
+  color: var(--kfc-red);
+}
+
+/* Breadcrumb Styles */
+.breadcrumb a {
+  color: var(--kfc-text-secondary);
+}
+
+.breadcrumb a:hover {
+  color: var(--kfc-red);
+}
+
+.breadcrumb li.is-active a {
+  color: var(--kfc-text);
+}
+
+/* Tag Styles */
+.tag:not(body) {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-text);
+}
+
+.tag:not(body).is-primary {
+  background-color: var(--kfc-red);
+  color: var(--kfc-white);
+}
+
+/* Progress Bar */
+.progress::-webkit-progress-value {
+  background-color: var(--kfc-red);
+}
+
+.progress::-moz-progress-bar {
+  background-color: var(--kfc-red);
+}
+
+/* Message Styles */
+.message {
+  background-color: var(--kfc-bg-secondary);
+}
+
+.message-header {
+  background-color: var(--kfc-red);
+  color: var(--kfc-white);
+}
+
+.message-body {
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+/* Delete Button */
+.delete {
+  background-color: rgba(10, 10, 10, 0.2);
+}
+
+[data-theme="dark"] .delete {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dropdown Styles */
+.dropdown-content {
+  background-color: var(--kfc-bg-card);
+  border: 1px solid var(--kfc-border);
+}
+
+.dropdown-item {
+  color: var(--kfc-text);
+}
+
+.dropdown-item:hover {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-red);
+}
+
+/* Panel Styles */
+.panel-heading {
+  background-color: var(--kfc-bg-secondary);
+  color: var(--kfc-text);
+}
+
+.panel-block {
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+.panel-block:hover {
+  background-color: var(--kfc-bg-secondary);
+}
+
+/* Content Styles */
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+  color: var(--kfc-text);
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+button,
+input,
+select,
+textarea {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}

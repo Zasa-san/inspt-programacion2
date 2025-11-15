@@ -1,10 +1,15 @@
 <nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
-     th:fragment="navbar"
-     class="navbar is-primary" role="navigation" aria-label="main navigation">
+  th:fragment="navbar" class="navbar is-primary" role="navigation" aria-label="main navigation">
   <div class="container">
     <div class="navbar-brand">
       <a class="navbar-item" th:href="@{/}">
-        <strong>KFC</strong>
+        <img src="/img/logo.png" alt="KFC Logo" class="kfc-logo">
+      </a>
+
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
       </a>
     </div>
 

@@ -43,7 +43,7 @@ ACA TENEMOS QUE DEJAR LAS INSTRUCCIONES FINALES POR AHORA SON PROVISORIAS
 ```
 .\mvnw.cmd -DskipTests package
 ```
-(Opcional) Inicializar usuarios por defecto desde la consola
+Inicializar base de datos por defecto
   ```
   .\mvnw.cmd exec:java@dataloader -DskipTests
   ```

@@ -4,28 +4,44 @@
 <head th:replace="fragments/head :: head"></head>
 
 <body>
-  <div th:replace="fragments/navbar :: navbar"></div>
+  <header th:replace="fragments/navbar :: navbar"></header>
 
-  <h1>Usuarios</h1>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">Usuarios</h1>
+      <p class="subtitle">Gestión de usuarios del sistema</p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Usuario</th>
-        <th>Rol</th>
-        <th>Habilitado</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr th:each="u : ${users}">
-        <td th:text="${u.id}">1</td>
-        <td th:text="${u.username}">usuario</td>
-        <td th:text="${u.role}">ROLE_ADMIN</td>
-        <td th:text="${u.enabled}">true</td>
-      </tr>
-    </tbody>
-  </table>
+      <div class="box">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th class="has-text-centered">Habilitado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="u : ${users}">
+              <td th:text="${u.id}">1</td>
+              <td th:text="${u.username}">usuario</td>
+              <td>
+                <span class="tag is-primary" th:text="${u.role}">ROLE_ADMIN</span>
+              </td>
+              <td class="has-text-centered">
+                <span class="icon" th:if="${u.enabled}">
+                  <i class="fa-solid fa-check has-text-success"></i>
+                </span>
+                <span class="icon" th:unless="${u.enabled}">
+                  <i class="fa-solid fa-times has-text-danger"></i>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
 </body>
 

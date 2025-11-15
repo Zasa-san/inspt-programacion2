@@ -34,14 +34,31 @@
             <tr th:each="p : ${pedidos}">
               <td th:text="${p.id}">1</td>
               <td th:text="${#temporals.format(p.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2025 12:00</td>
-              <td th:text="${p.estado}">CREADO</td>
+              <td>
+                <span class="tag is-info"
+                  th:if="${p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CREADO}"
+                  th:text="${p.estado}">CREADO</span>
+                <span class="tag is-warning"
+                  th:if="${p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).EN_PREPARACION}"
+                  th:text="${p.estado}">EN_PREPARACION</span>
+                <span class="tag is-success"
+                  th:if="${p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).ENTREGADO}"
+                  th:text="${p.estado}">ENTREGADO</span>
+                <span class="tag is-danger"
+                  th:if="${p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CANCELADO}"
+                  th:text="${p.estado}">CANCELADO</span>
+                <span class="tag"
+                  th:unless="${p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CREADO or p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).EN_PREPARACION or p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).ENTREGADO or p.estado == T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CANCELADO}"
+                  th:text="${p.estado}">OTRO</span>
+              </td>
               <td class="has-text-right">
                 $ <span th:text="${p.total}">0</span>
               </td>
               <td class="has-text-centered" th:text="${#lists.size(p.items)}">0</td>
               <td class="has-text-centered">
-                <form th:if="${p.estado != T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CANCELADO and p.estado != T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).ENTREGADO}"
-                      th:action="@{'/pedidos/' + ${p.id} + '/cancel'}" method="post" style="display:inline">
+                <form
+                  th:if="${p.estado != T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).CANCELADO and p.estado != T(inspt_programacion2_kfc.backend.models.orders.EstadoPedido).ENTREGADO}"
+                  th:action="@{'/pedidos/' + ${p.id} + '/cancel'}" method="post" style="display:inline">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <button type="submit" class="button is-small is-danger is-light">
                     Cancelar
@@ -57,5 +74,3 @@
 </body>
 
 </html>
-
-
