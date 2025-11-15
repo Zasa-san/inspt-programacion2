@@ -1,31 +1,13 @@
 package inspt_programacion2_kfc.frontend.models;
 
-public class NavLink {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class NavLink {
     private String name;
     private String href;
-
-    public NavLink() {
-    }
-
-    public NavLink(String name, String href) {
-        this.name = name;
-        this.href = href;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getHref() {
-        return href;
-    }
-
-    public void setHref(String href) {
-        this.href = href;
-    }
 }

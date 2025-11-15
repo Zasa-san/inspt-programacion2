@@ -8,8 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import inspt_programacion2_kfc.backend.dto.users.UserRequestDTO;
-import inspt_programacion2_kfc.backend.dto.users.UserResponseDTO;
+import inspt_programacion2_kfc.backend.models.dto.users.UserRequestDTO;
+import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.users.UserService;
 import inspt_programacion2_kfc.frontend.services.NavbarService;

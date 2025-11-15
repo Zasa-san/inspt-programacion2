@@ -3,6 +3,8 @@ package inspt_programacion2_kfc.api.users;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import inspt_programacion2_kfc.backend.models.dto.users.UserRequestDTO;
+import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import inspt_programacion2_kfc.backend.dto.users.UserRequestDTO;
-import inspt_programacion2_kfc.backend.dto.users.UserResponseDTO;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.users.UserService;
 
