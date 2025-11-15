@@ -15,6 +15,10 @@ public class NavbarService {
                 getIndexLinks();
             case "login" ->
                 getLoginLinks();
+            case "users" ->
+                getUsersLinks();
+            case "admin" ->
+                getAdminLinks();
             default ->
                 List.of();
         };
@@ -23,8 +27,8 @@ public class NavbarService {
     private List<NavLink> getIndexLinks() {
         return List.of(
                 new NavLink("Inicio", "/"),
-                new NavLink("Productos", "/"),
-                new NavLink("Contacto", "/")
+                new NavLink("Productos", "/#productos"),
+                new NavLink("Carrito", "/#carrito")
         );
     }
 
@@ -32,6 +36,21 @@ public class NavbarService {
         return List.of(
                 new NavLink("Inicio", "/"),
                 new NavLink("Productos", "/")
+        );
+    }
+
+    private List<NavLink> getUsersLinks() {
+        return List.of(
+                new NavLink("Inicio", "/"),
+                new NavLink("Usuarios", "/users")
+        );
+    }
+
+    private List<NavLink> getAdminLinks() {
+        return List.of(
+                new NavLink("Inicio", "/"),
+                new NavLink("Usuarios", "/users"),
+                new NavLink("Pedidos", "/pedidos")
         );
     }
 }

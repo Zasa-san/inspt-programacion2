@@ -1,5 +1,7 @@
 package inspt_programacion2_kfc.api.auth;
 
+import inspt_programacion2_kfc.backend.models.dto.users.UserRequestDTO;
+import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import inspt_programacion2_kfc.backend.dto.users.UserRequestDTO;
-import inspt_programacion2_kfc.backend.dto.users.UserResponseDTO;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.services.users.UserService;
@@ -47,25 +47,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-    }
-
-    public static class AuthResponseDTO {
-
-        private final String username;
-        private final String message;
-
-        public AuthResponseDTO(String username, String message) {
-            this.username = username;
-            this.message = message;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public String getMessage() {
-            return message;
         }
     }
 }
