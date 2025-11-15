@@ -38,21 +38,25 @@ public class DataLoaderCli {
                 p1.setName("Combo Clásico");
                 p1.setDescription("Sandwich de pollo frito + papas medianas + bebida.");
                 p1.setPrice(5500);
+                p1.setImgUrl("/uploads/products/combo-clasico.jpg");
 
                 ProductoEntity p2 = new ProductoEntity();
                 p2.setName("Bucket Familiar");
                 p2.setDescription("8 piezas de pollo + 2 papas grandes + 4 bebidas.");
                 p2.setPrice(12900);
+                p2.setImgUrl("/uploads/products/bucket-familiar.jpg");
 
                 ProductoEntity p3 = new ProductoEntity();
                 p3.setName("Tenders Box");
                 p3.setDescription("6 tenders + papas chicas + bebida.");
                 p3.setPrice(6200);
+                p3.setImgUrl("/uploads/products/tenders-box.jpg");
 
                 ProductoEntity p4 = new ProductoEntity();
                 p4.setName("Helado Sundae");
                 p4.setDescription("Postre helado con salsa a elección.");
                 p4.setPrice(2500);
+                p4.setImgUrl("/uploads/products/helado-sundae.jpg");
 
                 productoService.save(p1);
                 productoService.save(p2);

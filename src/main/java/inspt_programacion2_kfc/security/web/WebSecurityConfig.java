@@ -23,7 +23,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index", "/login", "/access-denied", "/css/**", "/js/**", "/img/**", "/favicon.ico", "/cart/**").permitAll()
+                .requestMatchers("/", "/index", "/login", "/access-denied", "/css/**", "/js/**", "/img/**", "/uploads/**", "/favicon.ico", "/cart/**").permitAll()
                 .requestMatchers("/users/**", "/stock/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/pedidos/**").hasRole(Role.ROLE_VENDEDOR.getRoleName())
                 .requestMatchers("/api/**").authenticated()

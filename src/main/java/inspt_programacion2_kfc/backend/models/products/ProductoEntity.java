@@ -28,6 +28,7 @@ public class ProductoEntity {
      */
     @Column(nullable = false)
     private int price;
+
+    @Column(nullable = true)
+    private String imgUrl;
 }
-
-
