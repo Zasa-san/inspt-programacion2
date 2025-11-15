@@ -48,6 +48,11 @@
           <div class="columns is-multiline">
             <div class="column is-half" th:each="p : ${products}">
               <div class="card">
+                <div class="card-image">
+                  <figure class="image is-4by3">
+                    <img th:src="@{${p.imgUrl}}" th:alt="${p.name}" />
+                  </figure>
+                </div>
                 <div class="card-content">
                   <p class="title is-5" th:text="${p.name}">Nombre producto</p>
                   <p class="subtitle is-6" th:text="${p.description}">Descripción</p>

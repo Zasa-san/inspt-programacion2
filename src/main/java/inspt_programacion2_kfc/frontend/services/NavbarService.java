@@ -26,7 +26,6 @@ public class NavbarService {
         return List.of(
                 new NavLink("Inicio", "/"),
                 new NavLink("Productos", "/#productos")
-//                new NavLink("Carrito", "/#carrito")
         );
     }
 
