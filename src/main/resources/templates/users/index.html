@@ -8,8 +8,35 @@
 
   <section class="section">
     <div class="container">
-      <h1 class="title">Usuarios</h1>
-      <p class="subtitle">Gestión de usuarios del sistema</p>
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <div>
+              <h1 class="title">Usuarios</h1>
+              <p class="subtitle">Gestión de usuarios del sistema</p>
+            </div>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <a class="button is-primary" th:href="@{/users/new}">
+              <span class="icon">
+                <i class="fa-solid fa-plus"></i>
+              </span>
+              <span>Nuevo Usuario</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${successMessage != null}" class="notification is-success">
+        <button class="delete"></button>
+        <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage != null}" class="notification is-danger">
+        <button class="delete"></button>
+        <span th:text="${errorMessage}"></span>
+      </div>
 
       <div class="box">
         <table class="table is-fullwidth is-striped is-hoverable">
@@ -18,7 +45,8 @@
               <th>ID</th>
               <th>Usuario</th>
               <th>Rol</th>
-              <th class="has-text-centered">Habilitado</th>
+              <th class="has-text-centered">Estado</th>
+              <th class="has-text-centered">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -29,12 +57,49 @@
                 <span class="tag is-primary" th:text="${u.role}">ROLE_ADMIN</span>
               </td>
               <td class="has-text-centered">
-                <span class="icon" th:if="${u.enabled}">
-                  <i class="fa-solid fa-check has-text-success"></i>
-                </span>
-                <span class="icon" th:unless="${u.enabled}">
-                  <i class="fa-solid fa-times has-text-danger"></i>
-                </span>
+                <span class="tag is-success" th:if="${u.enabled}">Activo</span>
+                <span class="tag is-danger" th:unless="${u.enabled}">Inactivo</span>
+              </td>
+              <td class="has-text-centered">
+                <div class="buttons is-centered">
+                  <a class="button is-small is-info" th:href="@{'/users/edit/' + ${u.id}}">
+                    <span class="icon is-small">
+                      <i class="fa-solid fa-edit"></i>
+                    </span>
+                  </a>
+
+                  <form th:if="${u.enabled}" th:action="@{'/users/toggle/' + ${u.id}}" method="post"
+                    style="display:inline">
+                    <input type="hidden" name="enabled" value="false" />
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="button is-small is-warning" title="Deshabilitar">
+                      <span class="icon is-small">
+                        <i class="fa-solid fa-ban"></i>
+                      </span>
+                    </button>
+                  </form>
+
+                  <form th:unless="${u.enabled}" th:action="@{'/users/toggle/' + ${u.id}}" method="post"
+                    style="display:inline">
+                    <input type="hidden" name="enabled" value="true" />
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="button is-small is-success" title="Habilitar">
+                      <span class="icon is-small">
+                        <i class="fa-solid fa-check"></i>
+                      </span>
+                    </button>
+                  </form>
+
+                  <form th:action="@{'/users/delete/' + ${u.id}}" method="post" style="display:inline"
+                    onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="button is-small is-danger" title="Eliminar">
+                      <span class="icon is-small">
+                        <i class="fa-solid fa-trash"></i>
+                      </span>
+                    </button>
+                  </form>
+                </div>
               </td>
             </tr>
           </tbody>

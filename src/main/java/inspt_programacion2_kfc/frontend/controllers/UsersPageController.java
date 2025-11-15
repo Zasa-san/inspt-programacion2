@@ -114,4 +114,32 @@ public class UsersPageController {
         model.addAttribute("navLinks", navbarService.getLinksForRoute("admin"));
         return "users/error";
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        try {
+            userService.delete(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Usuario eliminado correctamente");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/users/error";
+        }
+        return "redirect:/users";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/users/toggle/{id}")
+    public String toggleUserEnabled(@PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestParam boolean enabled,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
+        try {
+            userService.toggleEnabled(id, enabled);
+            String status = enabled ? "habilitado" : "deshabilitado";
+            redirectAttrs.addFlashAttribute("successMessage", "Usuario " + status + " correctamente");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/users/error";
+        }
+        return "redirect:/users";
+    }
 }

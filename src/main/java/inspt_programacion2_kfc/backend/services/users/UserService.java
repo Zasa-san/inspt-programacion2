@@ -109,4 +109,33 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    /**
+     * Elimina un usuario por su id.
+     *
+     * @param id id del usuario a eliminar
+     */
+    public void delete(Long id) {
+        Objects.requireNonNull(id, "ID no puede ser NULL");
+        if (!userRepository.existsById(id)) {
+            throw new IllegalArgumentException("Usuario no encontrado: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    /**
+     * Cambia el estado habilitado/deshabilitado de un usuario.
+     *
+     * @param id id del usuario
+     * @param enabled nuevo estado
+     * @return usuario actualizado
+     */
+    public User toggleEnabled(Long id, boolean enabled) {
+        Objects.requireNonNull(id, "ID no puede ser NULL");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+
+        user.setEnabled(enabled);
+        return userRepository.save(user);
+    }
 }
