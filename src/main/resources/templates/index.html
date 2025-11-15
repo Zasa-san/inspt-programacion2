@@ -1,10 +1,10 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="~{fragments/head :: head}"></head>
 
 <body>
-  <header th:replace="~{fragments/navbar :: navbar(${navLinks})}"></header>
+  <header th:replace="~{fragments/navbar :: navbar}"></header>
   <section class="section">
     <div class="container">
       <div class="card">
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="columns mt-5">
+      <div class="columns mt-5" sec:authorize="isAnonymous()">
         <!-- Lista de productos -->
         <div class="column is-two-thirds" id="productos">
           <h2 class="title is-4">Menú</h2>
@@ -115,6 +115,10 @@
             </form>
           </div>
         </div>
+      </div>
+
+      <div class="notification is-info mt-5" sec:authorize="isAuthenticated()">
+        Solo los clientes anónimos pueden armar un carrito desde esta página. Cierre sesión para ver el menú de compra.
       </div>
     </div>
   </section>

@@ -9,8 +9,10 @@ import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
+import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 
 @Service
@@ -18,10 +20,14 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
+    private final MovimientoStockService movimientoStockService;
 
-    public PedidoService(PedidoRepository pedidoRepository, ProductoRepository productoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository,
+            ProductoRepository productoRepository,
+            MovimientoStockService movimientoStockService) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
+        this.movimientoStockService = movimientoStockService;
     }
 
     public List<Pedido> findAll() {
@@ -32,6 +38,16 @@ public class PedidoService {
     public Pedido crearPedidoDesdeCarrito(List<CartItem> items) {
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("El carrito está vacío.");
+        }
+
+        // Primero validamos stock disponible para todos los productos del carrito
+        for (CartItem cartItem : items) {
+            Long productoId = cartItem.getProducto().getId();
+            int stockActual = movimientoStockService.calcularStockProducto(productoId);
+            if (stockActual < cartItem.getQuantity()) {
+                throw new IllegalArgumentException("No hay stock suficiente para el producto: "
+                        + cartItem.getProducto().getName());
+            }
         }
 
         Pedido pedido = new Pedido();
@@ -53,7 +69,19 @@ public class PedidoService {
         }
 
         pedido.setTotal(total);
-        return pedidoRepository.save(pedido);
+        Pedido guardado = pedidoRepository.save(pedido);
+
+        // Registramos salidas de stock para cada producto del pedido
+        for (ItemPedido item : guardado.getItems()) {
+            movimientoStockService.registrarMovimiento(
+                    item.getProducto(),
+                    TipoMovimiento.SALIDA,
+                    item.getQuantity(),
+                    "Venta pedido #" + guardado.getId(),
+                    guardado.getId());
+        }
+
+        return guardado;
     }
 
     @Transactional

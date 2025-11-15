@@ -1,5 +1,6 @@
-<nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="navbar(navLinks)"
-  class="navbar is-primary" role="navigation" aria-label="main navigation">
+<nav xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org"
+     th:fragment="navbar"
+     class="navbar is-primary" role="navigation" aria-label="main navigation">
   <div class="container">
     <div class="navbar-brand">
       <a class="navbar-item" th:href="@{/}">
@@ -9,7 +10,18 @@
 
     <div id="navbarMenu" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" th:each="ln : ${navLinks}" th:href="${ln.href}" th:text="${ln.name}">Link</a>
+        <!-- Navbar para clientes anónimos -->
+        <a class="navbar-item" sec:authorize="isAnonymous()" th:href="@{/}">Inicio</a>
+        <a class="navbar-item" sec:authorize="isAnonymous()" th:href="@{'/#productos'}">Productos</a>
+
+        <!-- Navbar para vendedor -->
+        <a class="navbar-item" sec:authorize="hasRole('VENDEDOR')" th:href="@{/}">Inicio</a>
+        <a class="navbar-item" sec:authorize="hasRole('VENDEDOR')" th:href="@{/pedidos}">Pedidos</a>
+
+        <!-- Navbar para admin -->
+        <a class="navbar-item" sec:authorize="hasRole('ADMIN')" th:href="@{/}">Inicio</a>
+        <a class="navbar-item" sec:authorize="hasRole('ADMIN')" th:href="@{/users}">Usuarios</a>
+        <a class="navbar-item" sec:authorize="hasRole('ADMIN')" th:href="@{/stock}">Stock</a>
       </div>
 
       <div class="navbar-end">
