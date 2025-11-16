@@ -97,7 +97,16 @@ public class PedidoService {
         }
 
         pedido.setEstado(EstadoPedido.CANCELADO);
-        pedidoRepository.save(pedido);
+        Pedido guardado = pedidoRepository.save(pedido);
+
+        for (ItemPedido item : guardado.getItems()) {
+            movimientoStockService.registrarMovimiento(
+                    item.getProducto(),
+                    TipoMovimiento.ENTRADA,
+                    item.getQuantity(),
+                    "Cancelación pedido #" + guardado.getId(),
+                    guardado.getId());
+        }
     }
 }
 
