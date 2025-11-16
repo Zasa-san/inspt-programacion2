@@ -120,14 +120,6 @@ public class CartController {
             return "redirect:/";
         }
 
-        try {
-            pedidoService.crearPedidoDesdeCarrito(List.copyOf(items));
-            cart.clear();
-            redirectAttrs.addFlashAttribute("cartMessage", "Pedido registrado correctamente.");
-        } catch (IllegalArgumentException ex) {
-            redirectAttrs.addFlashAttribute("cartError", ex.getMessage());
-        }
-
-        return "redirect:/";
+        return "redirect:/checkout";
     }
 }
