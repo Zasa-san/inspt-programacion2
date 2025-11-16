@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.backend.services.users.exceptions;
+package inspt_programacion2_kfc.backend.exceptions;
 
 public class UserPasswordResetFailedException extends UserServiceException {
 

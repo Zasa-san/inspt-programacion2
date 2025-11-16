@@ -3,6 +3,7 @@ package inspt_programacion2_kfc.backend.services.users;
 import java.util.Objects;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
-import inspt_programacion2_kfc.backend.services.users.exceptions.UserCreationFailedException;
-import inspt_programacion2_kfc.backend.services.users.exceptions.UserPasswordResetFailedException;
+import inspt_programacion2_kfc.backend.exceptions.UserCreationFailedException;
+import inspt_programacion2_kfc.backend.exceptions.UserPasswordResetFailedException;
 
+@Slf4j
 @Service
 @Transactional
 public class UserService {
@@ -49,18 +51,19 @@ public class UserService {
             newUser.setRole(role);
             newUser.setEnabled(true);
             try {
+                log.info("Usuario {} guardado correctamente.", newUser.getUsername());
                 return userRepository.save(newUser);
             } catch (DataIntegrityViolationException ex) {
-                throw new UserCreationFailedException("Could not create user " + username, ex);
+                throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
             }
         } else if (resetIfExists) {
             User existing = dbUser.get();
             existing.setPassword(passwordEncoder.encode(rawPassword));
             try {
+                log.info("Clave reestablecida correctamente para el usuario {}", existing.getUsername());
                 return userRepository.save(existing);
             } catch (DataIntegrityViolationException ex) {
-
-                throw new UserPasswordResetFailedException("Could not reset password for user " + username, ex);
+                throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
             }
         }
         return dbUser.get();
@@ -128,14 +131,13 @@ public class UserService {
      *
      * @param id id del usuario
      * @param enabled nuevo estado
-     * @return usuario actualizado
      */
-    public User toggleEnabled(Long id, boolean enabled) {
+    public void toggleEnabled(Long id, boolean enabled) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
 
         user.setEnabled(enabled);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }

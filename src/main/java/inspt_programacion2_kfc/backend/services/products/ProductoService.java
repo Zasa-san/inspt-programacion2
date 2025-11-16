@@ -29,16 +29,16 @@ public class ProductoService {
         return productoRepository.findById(id);
     }
 
-    public ProductoEntity save(ProductoEntity producto) {
-        return productoRepository.save(producto);
+    public void save(ProductoEntity producto) {
+        productoRepository.save(producto);
     }
 
     public void deleteById(Long id) {
         productoRepository.deleteById(id);
     }
 
-    public ProductoEntity update(ProductoEntity producto) {
-        return productoRepository.save(producto);
+    public void update(ProductoEntity producto) {
+        productoRepository.save(producto);
     }
 
     public void toggleAvailability(Long id) {

@@ -2,6 +2,7 @@ package inspt_programacion2_kfc.config;
 
 import javax.sql.DataSource;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,13 +14,13 @@ import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.users.UserService;
 
+@Slf4j
 public class DataLoaderCli {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(inspt_programacion2_kfc.InsptProgramacion2KfcApplication.class);
         ConfigurableApplicationContext ctx = app.run(args);
         String message = null;
-        Throwable error = null;
 
         try {
             UserService service = ctx.getBean(UserService.class);
@@ -69,8 +70,7 @@ public class DataLoaderCli {
 
             message = "Se ha inicializado el usuario por defecto y productos de ejemplo.";
         } catch (BeansException e) {
-            message = "Error al inicializado la base de datos: " + e.getMessage();
-            error = e;
+            log.error("Error inicializando la bdd", e);
         } finally {
             try {
                 DataSource ds = ctx.getBean(DataSource.class);
@@ -78,11 +78,11 @@ public class DataLoaderCli {
                     try {
                         hikariDataSource.close();
                     } catch (Exception ex) {
-                        // ignore and continue
+                        log.error("Error inicializando la bdd", ex);
                     }
                 }
             } catch (BeansException t) {
-                // ignore and continue
+                log.error("Error inicializando la bdd", t);
             }
 
             SpringApplication.exit(ctx, () -> 0);
@@ -91,9 +91,7 @@ public class DataLoaderCli {
                 System.out.println(message);
                 System.exit(0);
             }
-            if (error != null) {
-                error.printStackTrace(System.err);
-            }
+
             System.exit(1);
         }
     }

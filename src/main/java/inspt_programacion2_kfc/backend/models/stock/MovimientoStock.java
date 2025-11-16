@@ -39,7 +39,7 @@ public class MovimientoStock {
     @Column(nullable = false)
     private LocalDateTime fecha = LocalDateTime.now();
 
-    @Column(nullable = true, length = 255)
+    @Column(length = 255)
     private String motivo;
 
     @Column(name = "pedido_id", nullable = true)

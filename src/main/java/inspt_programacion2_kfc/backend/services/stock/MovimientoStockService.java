@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.stock.MovimientoStockRepository;
 
 @Service
+@Slf4j
 public class MovimientoStockService {
 
     private final MovimientoStockRepository movimientoStockRepository;
@@ -33,6 +35,7 @@ public class MovimientoStockService {
         mov.setMotivo(motivo);
         mov.setPedidoId(pedidoId);
         movimientoStockRepository.save(mov);
+        log.info("Stock del producto id {} actualizado correctamente - idpedido {}", producto.getId(), pedidoId);
     }
 
     public int calcularStockProducto(Long productoId) {
