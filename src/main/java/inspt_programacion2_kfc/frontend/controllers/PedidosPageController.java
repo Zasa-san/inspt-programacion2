@@ -41,11 +41,22 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 
-    @PostMapping("/pedidos/{id}/pagar")
-    public String marcarComoPagado(@PathVariable Long id, RedirectAttributes redirectAttrs) {
+    @PostMapping("/pedidos/{id}/entregar")
+    public String entregarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            pedidoService.marcarComoPagado(id);
-            redirectAttrs.addFlashAttribute("successMessage", "Pedido " + id + " marcado como pagado.");
+            pedidoService.marcarEntregado(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Entrega del pedido " + id + " confirmada.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/pedidos";
+    }
+
+    @PostMapping("/pedidos/{id}/pagar")
+    public String pagarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
+        try {
+            pedidoService.marcarPagado(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Pago del pedido " + id + " confirmado.");
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
         }
