@@ -35,13 +35,7 @@
         </div>
 
         <div class="field" th:if="${product.imgUrl != null}">
-          <label class="label">Imagen actual</label>
           <div class="control">
-            <figure class="image is-128x128">
-              <img th:src="@{${product.imgUrl}}" alt="Imagen del producto" />
-            </figure>
-          </div>
-          <div class="control mt-2">
             <label class="checkbox">
               <input type="checkbox" name="removeImage" value="true">
               Eliminar imagen actual
@@ -88,6 +82,8 @@
       </form>
     </div>
   </section>
+
+  <script th:src="@{/js/products/imageHandler.js}"></script>
 </body>
 
 </html>

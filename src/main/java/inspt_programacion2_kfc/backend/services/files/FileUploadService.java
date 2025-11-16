@@ -18,7 +18,7 @@ public class FileUploadService {
     private String uploadDir;
 
     public String saveFile(MultipartFile file, String subdirectory) throws IOException {
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new IOException("No se puede guardar un archivo vacío");
         }
 

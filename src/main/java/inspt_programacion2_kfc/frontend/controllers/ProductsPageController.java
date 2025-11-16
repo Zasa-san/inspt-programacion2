@@ -69,7 +69,7 @@ public class ProductsPageController {
             p.setDescription(description);
             p.setPrice(price);
 
-            if (imageFile != null && !imageFile.isEmpty()) {
+            if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
                 String imageUrl = fileUploadService.saveFile(imageFile, "products");
                 p.setImgUrl(imageUrl);
             }
@@ -129,8 +129,7 @@ public class ProductsPageController {
                 p.setImgUrl(null);
             }
 
-            if (imageFile != null && !imageFile.isEmpty()) {
-                // Delete old image if exists
+            if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
                 deleteProductImage(p);
                 String imageUrl = fileUploadService.saveFile(imageFile, "products");
                 p.setImgUrl(imageUrl);
