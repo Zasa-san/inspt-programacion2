@@ -34,7 +34,7 @@
               <td th:text="${p.name}">Nombre</td>
               <td th:text="${p.description}">Descripción</td>
               <td class="has-text-right">
-                $ <span th:text="${p.price}">0</span>
+                $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
               </td>
               <td class="has-text-centered">
                 <span th:text="${stocks[p.id]}">0</span>
@@ -78,8 +78,8 @@
       </div>
     </div>
   </section>
+
+  <script th:src="@{/js/products/preciHandler.js}" defer></script>
 </body>
 
 </html>
-
-

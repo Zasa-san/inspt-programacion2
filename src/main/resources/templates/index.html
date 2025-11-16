@@ -57,7 +57,7 @@
                   <p class="title is-5" th:text="${p.name}">Nombre producto</p>
                   <p class="subtitle is-6" th:text="${p.description}">Descripción</p>
                   <p class="has-text-weight-semibold">
-                    $ <span th:text="${p.price}">0</span>
+                    $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
                   </p>
 
                   <!-- Sin stock -->
@@ -114,7 +114,7 @@
                     <td th:text="${item.producto.name}">Producto</td>
                     <td class="has-text-centered" th:text="${item.quantity}">1</td>
                     <td class="has-text-right">
-                      $ <span th:text="${item.subtotal}">0</span>
+                      $ <span class="price-format" th:attr="data-price=${item.subtotal}">0</span>
                     </td>
                     <td class="has-text-right">
                       <form th:action="@{/cart/remove}" method="post">
@@ -131,7 +131,7 @@
                   <tr>
                     <th colspan="2">Total</th>
                     <th class="has-text-right">
-                      $ <span th:text="${cartTotal}">0</span>
+                      $ <span class="price-format" th:attr="data-price=${cartTotal}">0</span>
                     </th>
                     <th></th>
                   </tr>
@@ -161,6 +161,8 @@
       </div>
     </div>
   </section>
+
+  <script th:src="@{/js/products/preciHandler.js}" defer></script>
 </body>
 
 </html>

@@ -1,12 +1,15 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
@@ -17,6 +20,26 @@ public class PedidosPageController {
 
     public PedidosPageController(PedidoService pedidoService) {
         this.pedidoService = pedidoService;
+    }
+
+    @ModelAttribute("CREADO")
+    public EstadoPedido creado() {
+        return EstadoPedido.CREADO;
+    }
+
+    @ModelAttribute("PAGADO")
+    public EstadoPedido pagado() {
+        return EstadoPedido.PAGADO;
+    }
+
+    @ModelAttribute("ENTREGADO")
+    public EstadoPedido entregado() {
+        return EstadoPedido.ENTREGADO;
+    }
+
+    @ModelAttribute("CANCELADO")
+    public EstadoPedido cancelado() {
+        return EstadoPedido.CANCELADO;
     }
 
     @GetMapping("/pedidos")
@@ -30,6 +53,7 @@ public class PedidosPageController {
         return "pedidos/index";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
     @PostMapping("/pedidos/{id}/cancel")
     public String cancelarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
@@ -41,6 +65,7 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SOPORTE')")
     @PostMapping("/pedidos/{id}/entregar")
     public String entregarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
@@ -52,10 +77,11 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
     @PostMapping("/pedidos/{id}/pagar")
     public String pagarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            pedidoService.marcarPagado(id);
+            pedidoService.marcarComoPagado(id);
             redirectAttrs.addFlashAttribute("successMessage", "Pago del pedido " + id + " confirmado.");
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());

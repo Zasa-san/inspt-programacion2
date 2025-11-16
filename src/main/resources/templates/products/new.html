@@ -28,10 +28,13 @@
         </div>
 
         <div class="field">
-          <label class="label">Precio (centavos)</label>
+          <label class="label">Precio</label>
           <div class="control">
-            <input class="input" type="number" name="price" min="0" required />
+            <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50" pattern="[0-9]+(,[0-9]{1,2})?"
+              required />
+            <input type="hidden" name="price" id="priceHidden" />
           </div>
+          <p class="help">Usar coma para decimales. Ej: 55 o 55,00 o 55,5</p>
         </div>
 
         <div class="field">
@@ -71,7 +74,8 @@
     </div>
   </section>
 
-  <script th:src="@{/js/products/imageHandler.js}"></script>
+  <script th:src="@{/js/products/imageHandler.js}" defer></script>
+  <script th:src="@{/js/products/preciHandler.js}" defer></script>
 </body>
 
 </html>

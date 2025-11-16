@@ -2,7 +2,6 @@ package inspt_programacion2_kfc.frontend.controllers;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import inspt_programacion2_kfc.backend.services.orders.PedidoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.services.ProductService;
@@ -22,12 +20,10 @@ import jakarta.servlet.http.HttpSession;
 public class CartController {
 
     private final ProductService productService;
-    private final PedidoService pedidoService;
     private final MovimientoStockService movimientoStockService;
 
-    public CartController(ProductService productService, PedidoService pedidoService, MovimientoStockService movimientoStockService) {
+    public CartController(ProductService productService, MovimientoStockService movimientoStockService) {
         this.productService = productService;
-        this.pedidoService = pedidoService;
         this.movimientoStockService = movimientoStockService;
     }
 
