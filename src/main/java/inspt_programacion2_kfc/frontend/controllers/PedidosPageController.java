@@ -40,4 +40,15 @@ public class PedidosPageController {
         }
         return "redirect:/pedidos";
     }
+
+    @PostMapping("/pedidos/{id}/pagar")
+    public String marcarComoPagado(@PathVariable Long id, RedirectAttributes redirectAttrs) {
+        try {
+            pedidoService.marcarComoPagado(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Pedido " + id + " marcado como pagado.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/pedidos";
+    }
 }

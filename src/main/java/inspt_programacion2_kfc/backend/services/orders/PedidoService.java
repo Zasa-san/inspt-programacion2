@@ -108,6 +108,23 @@ public class PedidoService {
                     guardado.getId());
         }
     }
+
+    @Transactional
+    public void marcarComoPagado(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado: " + id));
+
+        if (pedido.getEstado() == EstadoPedido.CANCELADO) {
+            throw new IllegalArgumentException("No se puede marcar como pagado un pedido cancelado.");
+        }
+        if (pedido.getEstado() == EstadoPedido.PAGADO) {
+            throw new IllegalArgumentException("El pedido ya está marcado como pagado.");
+        }
+        if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
+            throw new IllegalArgumentException("El pedido ya está entregado.");
+        }
+
+        pedido.setEstado(EstadoPedido.PAGADO);
+        pedidoRepository.save(pedido);
+    }
 }
-
-
