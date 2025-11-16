@@ -35,12 +35,12 @@ public class PedidoService {
     }
 
     @Transactional
-    public Pedido crearPedidoDesdeCarrito(List<CartItem> items) {
+    public void crearPedidoDesdeCarrito(List<CartItem> items) {
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("El carrito está vacío.");
         }
 
-        // Primero validamos stock disponible para todos los productos del carrito
+        // Se valida el stock
         for (CartItem cartItem : items) {
             Long productoId = cartItem.getProducto().getId();
             int stockActual = movimientoStockService.calcularStockProducto(productoId);
@@ -71,7 +71,6 @@ public class PedidoService {
         pedido.setTotal(total);
         Pedido guardado = pedidoRepository.save(pedido);
 
-        // Registramos salidas de stock para cada producto del pedido
         for (ItemPedido item : guardado.getItems()) {
             movimientoStockService.registrarMovimiento(
                     item.getProducto(),
@@ -81,7 +80,6 @@ public class PedidoService {
                     guardado.getId());
         }
 
-        return guardado;
     }
 
     @Transactional
@@ -104,7 +102,7 @@ public class PedidoService {
                     item.getProducto(),
                     TipoMovimiento.ENTRADA,
                     item.getQuantity(),
-                    "Cancelación pedido #" + guardado.getId(),
+                    "Cancelación del pedido #" + guardado.getId(),
                     guardado.getId());
         }
     }

@@ -128,14 +128,13 @@ public class UserService {
      *
      * @param id id del usuario
      * @param enabled nuevo estado
-     * @return usuario actualizado
      */
-    public User toggleEnabled(Long id, boolean enabled) {
+    public void toggleEnabled(Long id, boolean enabled) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
 
         user.setEnabled(enabled);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }

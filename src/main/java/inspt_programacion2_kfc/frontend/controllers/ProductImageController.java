@@ -47,7 +47,7 @@ public class ProductImageController {
             }
             int idx = original.lastIndexOf('.');
             String ext = idx >= 0 ? original.substring(idx) : "";
-            String filename = UUID.randomUUID().toString() + ext;
+            String filename = UUID.randomUUID() + ext;
 
             Path dir = Path.of(uploadDir, "products");
             Files.createDirectories(dir);

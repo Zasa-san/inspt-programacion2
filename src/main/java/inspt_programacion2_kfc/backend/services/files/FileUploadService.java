@@ -34,7 +34,7 @@ public class FileUploadService {
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-        String filename = UUID.randomUUID().toString() + extension;
+        String filename = UUID.randomUUID() + extension;
 
         // Save file
         Path filePath = uploadPath.resolve(filename);
