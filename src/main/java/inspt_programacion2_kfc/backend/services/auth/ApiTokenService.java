@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import inspt_programacion2_kfc.backend.repositories.auth.ApiTokenRepository;
 
 @Service
 @Transactional
+@Slf4j
 public class ApiTokenService {
 
     private final ApiTokenRepository repo;
@@ -50,6 +52,8 @@ public class ApiTokenService {
         }
         entity.setRevoked(false);
         repo.save(entity);
+        log.info("Token de usuario guardado correctamente.");
+
         return token;
     }
 
