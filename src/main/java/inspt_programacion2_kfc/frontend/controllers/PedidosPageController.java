@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,6 +53,7 @@ public class PedidosPageController {
         return "pedidos/index";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
     @PostMapping("/pedidos/{id}/cancel")
     public String cancelarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
@@ -63,6 +65,7 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SOPORTE')")
     @PostMapping("/pedidos/{id}/entregar")
     public String entregarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
@@ -74,6 +77,7 @@ public class PedidosPageController {
         return "redirect:/pedidos";
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
     @PostMapping("/pedidos/{id}/pagar")
     public String pagarPedido(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {

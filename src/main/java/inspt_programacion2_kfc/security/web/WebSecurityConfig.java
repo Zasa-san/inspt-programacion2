@@ -25,7 +25,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/login", "/access-denied", "/css/**", "/js/**", "/img/**", "/uploads/**", "/favicon.ico", "/cart/**", "/checkout/**").permitAll()
                 .requestMatchers("/users/**").hasRole(Role.ROLE_ADMIN.getRoleName())
-                .requestMatchers("/products/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
+                .requestMatchers("/products/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/stock/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/pedidos/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_VENDEDOR.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/api/**").authenticated()
