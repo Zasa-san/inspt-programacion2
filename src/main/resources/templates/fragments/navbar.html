@@ -24,9 +24,10 @@
         <!-- Links para ADMIN -->
         <th:block sec:authorize="hasRole('ADMIN')">
           <a class="navbar-item" th:href="@{/}">Inicio</a>
-          <a class="navbar-item" th:href="@{/products}">Productos</a>
           <a class="navbar-item" th:href="@{/users}">Usuarios</a>
+          <a class="navbar-item" th:href="@{/products}">Productos</a>
           <a class="navbar-item" th:href="@{/stock}">Stock</a>
+          <a class="navbar-item" th:href="@{/pedidos}">Pedidos</a>
         </th:block>
 
         <!-- Links para SOPORTE -->
