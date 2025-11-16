@@ -24,8 +24,8 @@ public class DataLoaderCli {
         try {
             UserService service = ctx.getBean(UserService.class);
             var env = ctx.getEnvironment();
-            String username = env.getProperty("app.default-user.username", "Gerente1");
-            String password = env.getProperty("app.default-user.password", "Gerente1");
+            String username = env.getProperty("app.default-user.username", "admin");
+            String password = env.getProperty("app.default-user.password", "admin");
             String roleStr = env.getProperty("app.default-user.role", "ROLE_ADMIN");
             Role role = Role.valueOf(roleStr);
             service.create(username, password, role, true);
