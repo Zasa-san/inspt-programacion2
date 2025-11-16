@@ -36,6 +36,15 @@ public class PedidoService {
 
     @Transactional
     public void crearPedidoDesdeCarrito(List<CartItem> items) {
+        crearPedidoDesdeCarrito(items, EstadoPedido.CREADO);
+    }
+
+    /**
+     * Crea un pedido a partir del carrito, validando stock y permitiendo
+     * especificar el estado inicial (por ejemplo CREADO o PAGADO).
+     */
+    @Transactional
+    public void crearPedidoDesdeCarrito(List<CartItem> items, EstadoPedido estadoInicial) {
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("El carrito está vacío.");
         }
@@ -51,6 +60,7 @@ public class PedidoService {
         }
 
         Pedido pedido = new Pedido();
+        pedido.setEstado(estadoInicial);
 
         int total = 0;
         for (CartItem cartItem : items) {
@@ -79,7 +89,6 @@ public class PedidoService {
                     "Venta pedido #" + guardado.getId(),
                     guardado.getId());
         }
-
     }
 
     @Transactional
@@ -102,9 +111,35 @@ public class PedidoService {
                     item.getProducto(),
                     TipoMovimiento.ENTRADA,
                     item.getQuantity(),
-                    "Cancelación del pedido #" + guardado.getId(),
+                    "Cancelación pedido #" + guardado.getId(),
                     guardado.getId());
         }
+    }
+
+    @Transactional
+    public void marcarPagado(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+
+        if (pedido.getEstado() != EstadoPedido.CREADO) {
+            throw new IllegalArgumentException("Sólo se pueden marcar como PAGADO los pedidos en estado CREADO.");
+        }
+
+        pedido.setEstado(EstadoPedido.PAGADO);
+        pedidoRepository.save(pedido);
+    }
+
+    @Transactional
+    public void marcarEntregado(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+
+        if (pedido.getEstado() != EstadoPedido.PAGADO) {
+            throw new IllegalArgumentException("Sólo se pueden marcar como ENTREGADO los pedidos en estado PAGADO.");
+        }
+
+        pedido.setEstado(EstadoPedido.ENTREGADO);
+        pedidoRepository.save(pedido);
     }
 }
 
