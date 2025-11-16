@@ -60,7 +60,14 @@
                     $ <span th:text="${p.price}">0</span>
                   </p>
 
-                  <form th:action="@{/cart/add}" method="post" class="mt-3">
+                  <!-- Sin stock -->
+                  <div th:if="${stockMap[p.id] == null || stockMap[p.id] == 0}" class="notification is-warning mt-3">
+                    <strong>Sin stock disponible</strong>
+                  </div>
+
+                  <!-- Con stock -->
+                  <form th:if="${stockMap[p.id] != null && stockMap[p.id] > 0}" th:action="@{/cart/add}" method="post"
+                    class="mt-3">
                     <input type="hidden" name="productId" th:value="${p.id}" />
                     <div class="field has-addons">
                       <div class="control is-expanded">
@@ -82,67 +89,69 @@
 
         <!-- Carrito -->
         <div class="column" id="carrito">
-          <h2 class="title is-4">Carrito</h2>
+          <div style="position: sticky; top: 20px;">
+            <h2 class="title is-4">Carrito</h2>
 
-          <div th:if="${cartMessage != null}" class="notification is-success" th:text="${cartMessage}"></div>
-          <div th:if="${cartError != null}" class="notification is-danger" th:text="${cartError}"></div>
+            <div th:if="${cartMessage != null}" class="notification is-success" th:text="${cartMessage}"></div>
+            <div th:if="${cartError != null}" class="notification is-danger" th:text="${cartError}"></div>
 
-          <div th:if="${#lists.isEmpty(cartItems)}">
-            <p>No hay productos en el carrito.</p>
-          </div>
+            <div th:if="${#lists.isEmpty(cartItems)}">
+              <p>No hay productos en el carrito.</p>
+            </div>
 
-          <div th:if="${!#lists.isEmpty(cartItems)}">
-            <table class="table is-fullwidth is-striped">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th class="has-text-centered">Cant.</th>
-                  <th class="has-text-right">Subtotal</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="item : ${cartItems}">
-                  <td th:text="${item.producto.name}">Producto</td>
-                  <td class="has-text-centered" th:text="${item.quantity}">1</td>
-                  <td class="has-text-right">
-                    $ <span th:text="${item.subtotal}">0</span>
-                  </td>
-                  <td class="has-text-right">
-                    <form th:action="@{/cart/remove}" method="post">
-                      <input type="hidden" name="productId" th:value="${item.producto.id}" />
-                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                      <button type="submit" class="button is-small is-light is-danger">
-                        Quitar
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="2">Total</th>
-                  <th class="has-text-right">
-                    $ <span th:text="${cartTotal}">0</span>
-                  </th>
-                  <th></th>
-                </tr>
-              </tfoot>
-            </table>
+            <div th:if="${!#lists.isEmpty(cartItems)}">
+              <table class="table is-fullwidth is-striped">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th class="has-text-centered">Cant.</th>
+                    <th class="has-text-right">Subtotal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="item : ${cartItems}">
+                    <td th:text="${item.producto.name}">Producto</td>
+                    <td class="has-text-centered" th:text="${item.quantity}">1</td>
+                    <td class="has-text-right">
+                      $ <span th:text="${item.subtotal}">0</span>
+                    </td>
+                    <td class="has-text-right">
+                      <form th:action="@{/cart/remove}" method="post">
+                        <input type="hidden" name="productId" th:value="${item.producto.id}" />
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="button is-small is-light is-danger">
+                          Quitar
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="2">Total</th>
+                    <th class="has-text-right">
+                      $ <span th:text="${cartTotal}">0</span>
+                    </th>
+                    <th></th>
+                  </tr>
+                </tfoot>
+              </table>
 
-            <form th:action="@{/cart/checkout}" method="post" class="mb-3">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-              <button type="submit" class="button is-primary is-fullwidth mb-2">
-                Confirmar pedido
-              </button>
-            </form>
+              <form th:action="@{/cart/checkout}" method="post" class="mb-3">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="button is-primary is-fullwidth mb-2">
+                  Confirmar pedido
+                </button>
+              </form>
 
-            <form th:action="@{/cart/clear}" method="post">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-              <button type="submit" class="button is-warning is-light">
-                Vaciar carrito
-              </button>
-            </form>
+              <form th:action="@{/cart/clear}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="button is-warning is-light">
+                  Vaciar carrito
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

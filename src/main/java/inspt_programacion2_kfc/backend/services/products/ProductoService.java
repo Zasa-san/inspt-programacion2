@@ -21,6 +21,10 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<ProductoEntity> findAllAvailable() {
+        return productoRepository.findByAvailableTrue();
+    }
+
     public Optional<ProductoEntity> findById(Long id) {
         return productoRepository.findById(id);
     }
@@ -28,6 +32,21 @@ public class ProductoService {
     public ProductoEntity save(ProductoEntity producto) {
         return productoRepository.save(producto);
     }
+
+    public void deleteById(Long id) {
+        productoRepository.deleteById(id);
+    }
+
+    public ProductoEntity update(ProductoEntity producto) {
+        return productoRepository.save(producto);
+    }
+
+    public void toggleAvailability(Long id) {
+        Optional<ProductoEntity> producto = productoRepository.findById(id);
+        if (producto.isPresent()) {
+            ProductoEntity p = producto.get();
+            p.setAvailable(!p.isAvailable());
+            productoRepository.save(p);
+        }
+    }
 }
-
-

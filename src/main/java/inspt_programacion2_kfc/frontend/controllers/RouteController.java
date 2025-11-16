@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import inspt_programacion2_kfc.backend.services.products.ProductoService;
+import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.services.ProductService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
@@ -19,6 +21,12 @@ public class RouteController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private MovimientoStockService movimientoStockService;
+
+    @Autowired
+    private ProductoService productoService;
 
     @SuppressWarnings("unchecked")
     private List<CartItem> getCartItems(HttpSession session) {
@@ -36,7 +44,13 @@ public class RouteController {
         model.addAttribute("page", page);
 
         // Productos disponibles para el cliente
-        model.addAttribute("products", productService.findAll());
+        var products = productService.findAll();
+        model.addAttribute("products", products);
+
+        // Calculate stock for all available products
+        var productosEntities = productoService.findAllAvailable();
+        var stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
+        model.addAttribute("stockMap", stockMap);
 
         // Carrito actual en sesión
         List<CartItem> cartItems = getCartItems(session);

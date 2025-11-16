@@ -19,11 +19,11 @@ public class ProductService {
     }
 
     public List<Producto> findAll() {
-        return productoService.findAll()
+        return productoService.findAllAvailable()
                 .stream()
                 .map(p -> {
                     String img = p.getImgUrl();
-                    if (img != null && img.isBlank()) {
+                    if (img == null || img.isBlank()) {
                         img = "/img/producto-default.png";
                     }
                     return new Producto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), img);
@@ -35,7 +35,7 @@ public class ProductService {
         return productoService.findById(id)
                 .map(p -> {
                     String img = p.getImgUrl();
-                    if (img != null && img.isBlank()) {
+                    if (img == null || img.isBlank()) {
                         img = "/img/producto-default.png";
                     }
                     return new Producto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), img);

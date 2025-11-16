@@ -31,4 +31,7 @@ public class ProductoEntity {
 
     @Column(nullable = true)
     private String imgUrl;
+
+    @Column(nullable = false)
+    private boolean available = true;
 }

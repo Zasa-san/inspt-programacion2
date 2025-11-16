@@ -1,10 +1,9 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.services.ProductService;
 import jakarta.servlet.http.HttpSession;
@@ -23,10 +23,12 @@ public class CartController {
 
     private final ProductService productService;
     private final PedidoService pedidoService;
+    private final MovimientoStockService movimientoStockService;
 
-    public CartController(ProductService productService, PedidoService pedidoService) {
+    public CartController(ProductService productService, PedidoService pedidoService, MovimientoStockService movimientoStockService) {
         this.productService = productService;
         this.pedidoService = pedidoService;
+        this.movimientoStockService = movimientoStockService;
     }
 
     @SuppressWarnings("unchecked")
@@ -57,8 +59,26 @@ public class CartController {
             quantity = 1;
         }
 
+        // Check available stock
+        int availableStock = movimientoStockService.calcularStockProducto(productId);
+
         Map<Long, CartItem> cart = getCart(session);
         CartItem item = cart.get(productId);
+        int currentCartQuantity = (item != null) ? item.getQuantity() : 0;
+        int totalRequested = currentCartQuantity + quantity;
+
+        if (availableStock <= 0) {
+            redirectAttrs.addFlashAttribute("cartError", "Producto sin stock disponible.");
+            return "redirect:/";
+        }
+
+        if (totalRequested > availableStock) {
+            int maxCanAdd = availableStock - currentCartQuantity;
+            redirectAttrs.addFlashAttribute("cartError",
+                    "Stock insuficiente. Máximo disponible para agregar: " + maxCanAdd);
+            return "redirect:/";
+        }
+
         if (item == null) {
             item = new CartItem(productOpt.get(), quantity);
             cart.put(productId, item);
@@ -111,5 +131,3 @@ public class CartController {
         return "redirect:/";
     }
 }
-
-
