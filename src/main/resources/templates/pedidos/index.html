@@ -52,7 +52,7 @@
                   th:text="${p.estado}">OTRO</span>
               </td>
               <td class="has-text-right">
-                $ <span th:text="${p.total}">0</span>
+                $ <span class="price-format" th:attr="data-price=${p.total}">0</span>
               </td>
               <td class="has-text-centered" th:text="${#lists.size(p.items)}">0</td>
               <td>
@@ -60,7 +60,7 @@
                   <li th:each="it : ${p.items}">
                     <span th:text="${it.producto.name}">Producto</span>
                     x <span th:text="${it.quantity}">1</span>
-                    - $ <span th:text="${it.subtotal}">0</span>
+                    - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
                   </li>
                 </ul>
               </td>
@@ -80,6 +80,8 @@
       </div>
     </div>
   </section>
+
+  <script th:src="@{/js/products/preciHandler.js}" defer></script>
 </body>
 
 </html>

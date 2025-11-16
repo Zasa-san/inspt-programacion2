@@ -28,7 +28,7 @@
             <tr>
               <th>Nombre</th>
               <th>Descripción</th>
-              <th class="has-text-right">Precio (centavos)</th>
+              <th class="has-text-right">Precio</th>
               <th>Imagen</th>
               <th>Estado</th>
               <th class="has-text-centered">Acciones</th>
@@ -38,7 +38,9 @@
             <tr th:each="p : ${products}">
               <td th:text="${p.name}">Nombre</td>
               <td th:text="${p.description}">Descripción</td>
-              <td class="has-text-right" th:text="${p.price}">0</td>
+              <td class="has-text-right">
+                $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
+              </td>
               <td>
                 <span th:if="${p.imgUrl != null}">
                   <img th:src="@{${p.imgUrl}}" alt="img" style="height:48px; width:48px; object-fit:cover;" />
@@ -87,6 +89,8 @@
       </div>
     </div>
   </section>
+
+  <script th:src="@{/js/products/preciHandler.js}" defer></script>
 </body>
 
 </html>
