@@ -1,6 +1,7 @@
 package inspt_programacion2_kfc.backend.services.orders;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +66,7 @@ public class PedidoService {
         int total = 0;
         for (CartItem cartItem : items) {
             Long productoId = cartItem.getProducto().getId();
-            ProductoEntity producto = productoRepository.findById(productoId)
+            ProductoEntity producto = productoRepository.findById(Objects.requireNonNull(productoId))
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + productoId));
 
             ItemPedido item = new ItemPedido();
@@ -93,7 +94,7 @@ public class PedidoService {
 
     @Transactional
     public void cancelarPedido(Long id) {
-        Pedido pedido = pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado: " + id));
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
@@ -118,7 +119,7 @@ public class PedidoService {
 
     @Transactional
     public void marcarEntregado(Long id) {
-        Pedido pedido = pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
 
         if (pedido.getEstado() != EstadoPedido.PAGADO) {
@@ -131,7 +132,7 @@ public class PedidoService {
 
     @Transactional
     public void marcarComoPagado(Long id) {
-        Pedido pedido = pedidoRepository.findById(id)
+        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado: " + id));
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {

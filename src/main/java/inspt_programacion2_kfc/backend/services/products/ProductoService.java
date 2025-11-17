@@ -1,6 +1,7 @@
 package inspt_programacion2_kfc.backend.services.products;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -26,23 +27,23 @@ public class ProductoService {
     }
 
     public Optional<ProductoEntity> findById(Long id) {
-        return productoRepository.findById(id);
+        return productoRepository.findById(Objects.requireNonNull(id));
     }
 
     public void save(ProductoEntity producto) {
-        productoRepository.save(producto);
+        productoRepository.save(Objects.requireNonNull(producto));
     }
 
     public void deleteById(Long id) {
-        productoRepository.deleteById(id);
+        productoRepository.deleteById(Objects.requireNonNull(id));
     }
 
     public void update(ProductoEntity producto) {
-        productoRepository.save(producto);
+        productoRepository.save(Objects.requireNonNull(producto));
     }
 
     public void toggleAvailability(Long id) {
-        Optional<ProductoEntity> producto = productoRepository.findById(id);
+        Optional<ProductoEntity> producto = productoRepository.findById(Objects.requireNonNull(id));
         if (producto.isPresent()) {
             ProductoEntity p = producto.get();
             p.setAvailable(!p.isAvailable());
