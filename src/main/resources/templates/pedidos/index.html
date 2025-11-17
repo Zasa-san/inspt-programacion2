@@ -45,8 +45,11 @@
               </td>
               <td class="has-text-centered">
                 <ul>
+                  <li th:if="${#lists.isEmpty(p.items)}">
+                    Productos borrados
+                  </li>
                   <li th:each="it : ${p.items}">
-                    <span th:text="${it.producto.name}">Producto</span>
+                    <span th:text="${it.producto != null} ? ${it.producto.name} : 'Producto borrado'">Producto</span>
                     x <span th:text="${it.quantity}">1</span>
                     - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
                   </li>
