@@ -8,6 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.models.dto.users.UserRequestDTO;
 import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
@@ -15,9 +18,6 @@ import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.services.users.UserService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UsersPageController {
@@ -33,27 +33,54 @@ public class UsersPageController {
         PageMetadata page = new PageMetadata("Usuarios");
         model.addAttribute("page", page);
 
-        var users = userService.findAll();
-        List<UserResponseDTO> dtos = users.stream().map(u -> new UserResponseDTO(
-                u.getId(),
-                u.getUsername(),
-                u.getRole().toString(),
-                u.isEnabled()
-        )).collect(Collectors.toList());
+        User currentUser = null;
+        boolean isAdmin = false;
 
-        model.addAttribute("users", dtos);
-
-        // ID del usuario actualmente autenticado, para ocultar el botón de eliminarse a sí mismo
         if (authentication != null && authentication.getPrincipal() instanceof User) {
-            User currentUser = (User) authentication.getPrincipal();
+            currentUser = (User) authentication.getPrincipal();
+            isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
             model.addAttribute("currentUserId", currentUser.getId());
         }
+
+        var users = userService.findAll();
+        List<UserResponseDTO> dtos;
+
+        // Si es admin, ve todos los usuarios. Si no, solo ve su propio usuario
+        if (isAdmin) {
+            dtos = users.stream().map(u -> new UserResponseDTO(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getRole().toString(),
+                    u.isEnabled()
+            )).collect(Collectors.toList());
+        } else {
+            // No-admin solo ve su propio usuario
+            final User finalCurrentUser = currentUser;
+            dtos = users.stream()
+                    .filter(u -> finalCurrentUser != null && u.getId().equals(finalCurrentUser.getId()))
+                    .map(u -> new UserResponseDTO(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getRole().toString(),
+                    u.isEnabled()
+            )).collect(Collectors.toList());
+        }
+
+        model.addAttribute("users", dtos);
+        model.addAttribute("isAdmin", isAdmin);
 
         return "users/index";
     }
 
     @GetMapping("/users/new")
-    public String newUserPage(Model model) {
+    public String newUserPage(Model model, Authentication authentication) {
+        // Solo admin puede crear usuarios
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            if (currentUser.getRole() != Role.ROLE_ADMIN) {
+                return "redirect:/access-denied";
+            }
+        }
+
         PageMetadata page = new PageMetadata("Nuevo usuario");
         model.addAttribute("page", page);
 
@@ -65,6 +92,19 @@ public class UsersPageController {
 
     @GetMapping("/users/edit/{id}")
     public String editUserPage(@PathVariable Long id, Model model, Authentication authentication) {
+        User currentUser = null;
+        boolean isAdmin = false;
+
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            currentUser = (User) authentication.getPrincipal();
+            isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+        }
+
+        // No-admin solo puede editar su propio usuario
+        if (!isAdmin && (currentUser == null || !currentUser.getId().equals(id))) {
+            return "redirect:/access-denied";
+        }
+
         PageMetadata page = new PageMetadata("Editar usuario");
         model.addAttribute("page", page);
 
@@ -80,11 +120,9 @@ public class UsersPageController {
         model.addAttribute("userId", id);
 
         // Indica si se está editando al mismo usuario que está logueado
-        boolean editingSelf = false;
-        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
-            editingSelf = currentUser.getId() != null && currentUser.getId().equals(id);
-        }
+        boolean editingSelf = currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id);
         model.addAttribute("editingSelf", editingSelf);
+        model.addAttribute("isAdmin", isAdmin);
 
         return "users/edit";
     }
@@ -93,8 +131,18 @@ public class UsersPageController {
     public String createUserFromForm(
             @RequestParam String username,
             @RequestParam String password,
-            @RequestParam String role, RedirectAttributes redirectAttrs
+            @RequestParam String role,
+            RedirectAttributes redirectAttrs,
+            Authentication authentication
     ) {
+        // Solo admin puede crear usuarios
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            if (currentUser.getRole() != Role.ROLE_ADMIN) {
+                redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para crear usuarios.");
+                return "redirect:/access-denied";
+            }
+        }
+
         try {
             userService.create(username, password, Role.valueOf(role), false);
         } catch (Exception e) {
@@ -112,15 +160,27 @@ public class UsersPageController {
             RedirectAttributes redirectAttrs,
             Authentication authentication) {
         try {
+            User currentUser = null;
+            boolean isAdmin = false;
+
+            if (authentication != null && authentication.getPrincipal() instanceof User) {
+                currentUser = (User) authentication.getPrincipal();
+                isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+            }
+
+            // No-admin solo puede editar su propio usuario
+            if (!isAdmin && (currentUser == null || !currentUser.getId().equals(id))) {
+                redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para editar este usuario.");
+                return "redirect:/access-denied";
+            }
+
             Role newRole = Role.valueOf(role);
 
             // Si el usuario edita su propio perfil, no se permite cambiar el rol
-            if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
-                if (currentUser.getId() != null && currentUser.getId().equals(id)) {
-                    var existingUserOpt = userService.findById(id);
-                    if (existingUserOpt.isPresent()) {
-                        newRole = existingUserOpt.get().getRole();
-                    }
+            if (currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+                var existingUserOpt = userService.findById(id);
+                if (existingUserOpt.isPresent()) {
+                    newRole = existingUserOpt.get().getRole();
                 }
             }
 
@@ -142,12 +202,25 @@ public class UsersPageController {
     @PostMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttrs, Authentication authentication) {
         try {
-            if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
-                if (currentUser.getId() != null && currentUser.getId().equals(id)) {
-                    redirectAttrs.addFlashAttribute("errorMessage",
-                            "No podés eliminar tu propio usuario estando logueado.");
-                    return "redirect:/users";
-                }
+            User currentUser = null;
+            boolean isAdmin = false;
+
+            if (authentication != null && authentication.getPrincipal() instanceof User) {
+                currentUser = (User) authentication.getPrincipal();
+                isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+            }
+
+            // Solo admin puede eliminar usuarios
+            if (!isAdmin) {
+                redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para eliminar usuarios.");
+                return "redirect:/access-denied";
+            }
+
+            // Admin no puede auto-eliminarse
+            if (currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+                redirectAttrs.addFlashAttribute("errorMessage",
+                        "No podés eliminar tu propio usuario estando logueado.");
+                return "redirect:/users";
             }
 
             userService.delete(id);
@@ -161,14 +234,27 @@ public class UsersPageController {
 
     @PostMapping("/users/toggle/{id}")
     public String toggleUserEnabled(@PathVariable Long id,
-                                    @RequestParam boolean enabled, RedirectAttributes redirectAttrs, Authentication authentication) {
+            @RequestParam boolean enabled, RedirectAttributes redirectAttrs, Authentication authentication) {
         try {
-            if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
-                if (currentUser.getId() != null && currentUser.getId().equals(id)) {
-                    redirectAttrs.addFlashAttribute("errorMessage",
-                            "No podes deshabilitar tu propio usuario estando logueado.");
-                    return "redirect:/users";
-                }
+            User currentUser = null;
+            boolean isAdmin = false;
+
+            if (authentication != null && authentication.getPrincipal() instanceof User) {
+                currentUser = (User) authentication.getPrincipal();
+                isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
+            }
+
+            // Solo admin puede cambiar el estado de usuarios
+            if (!isAdmin) {
+                redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para cambiar el estado de usuarios.");
+                return "redirect:/access-denied";
+            }
+
+            // Admin no puede auto-desactivarse
+            if (!enabled && currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+                redirectAttrs.addFlashAttribute("errorMessage",
+                        "No podes deshabilitar tu propio usuario estando logueado.");
+                return "redirect:/users";
             }
 
             userService.toggleEnabled(id, enabled);

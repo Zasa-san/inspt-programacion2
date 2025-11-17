@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.security.web;
+package inspt_programacion2_kfc.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,14 +17,14 @@ import inspt_programacion2_kfc.backend.models.users.Role;
 @Configuration
 @EnableMethodSecurity
 @Order(2)
-public class WebSecurityConfig {
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/login", "/access-denied", "/css/**", "/js/**", "/img/**", "/uploads/**", "/favicon.ico", "/cart/**", "/checkout/**").permitAll()
-                .requestMatchers("/users/**").hasRole(Role.ROLE_ADMIN.getRoleName())
+                .requestMatchers("/users/**").authenticated()
                 .requestMatchers("/products/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/stock/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/pedidos/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_VENDEDOR.getRoleName(), Role.ROLE_SOPORTE.getRoleName())

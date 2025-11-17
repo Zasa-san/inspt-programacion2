@@ -50,8 +50,8 @@
                     <!-- Se envia el rol actual en un campo oculto -->
                     <input type="hidden" name="role" th:value="${user.role}" />
                   </div>
-                  <!-- Para otros usuarios el rol se puede editar -->
-                  <div class="select is-fullwidth" th:unless="${editingSelf}">
+                  <!-- Para admin editando otros usuarios, puede cambiar el rol -->
+                  <div class="select is-fullwidth" th:if="${!editingSelf and isAdmin}">
                     <select name="role">
                       <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.name()}"
                         th:selected="${r.name()==user.role}"></option>
