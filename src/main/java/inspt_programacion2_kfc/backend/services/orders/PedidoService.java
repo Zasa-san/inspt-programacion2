@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import inspt_programacion2_kfc.backend.models.orders.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;
@@ -14,7 +15,6 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
-import inspt_programacion2_kfc.frontend.models.CartItem;
 
 @Service
 public class PedidoService {
@@ -36,7 +36,7 @@ public class PedidoService {
     }
 
     @Transactional
-    public void crearPedidoDesdeCarrito(List<CartItem> items) {
+    public void crearPedidoDesdeCarrito(List<CartItemDto> items) {
         crearPedidoDesdeCarrito(items, EstadoPedido.CREADO);
     }
 
@@ -45,18 +45,18 @@ public class PedidoService {
      * especificar el estado inicial (por ejemplo CREADO o PAGADO).
      */
     @Transactional
-    public void crearPedidoDesdeCarrito(List<CartItem> items, EstadoPedido estadoInicial) {
+    public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial) {
         if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("El carrito está vacío.");
         }
 
         // Se valida el stock
-        for (CartItem cartItem : items) {
-            Long productoId = cartItem.getProducto().getId();
+        for (CartItemDto cartItem : items) {
+            Long productoId = cartItem.getProductoId();
             int stockActual = movimientoStockService.calcularStockProducto(productoId);
             if (stockActual < cartItem.getQuantity()) {
-                throw new IllegalArgumentException("No hay stock suficiente para el producto: "
-                        + cartItem.getProducto().getName());
+                String nombre = cartItem.getProductoName() != null ? cartItem.getProductoName() : "";
+                throw new IllegalArgumentException("No hay stock suficiente para el producto: " + nombre);
             }
         }
 
@@ -64,8 +64,8 @@ public class PedidoService {
         pedido.setEstado(estadoInicial);
 
         int total = 0;
-        for (CartItem cartItem : items) {
-            Long productoId = cartItem.getProducto().getId();
+        for (CartItemDto cartItem : items) {
+            Long productoId = cartItem.getProductoId();
             ProductoEntity producto = productoRepository.findById(Objects.requireNonNull(productoId))
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + productoId));
 

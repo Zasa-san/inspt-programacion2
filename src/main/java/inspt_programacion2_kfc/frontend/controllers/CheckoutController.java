@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import inspt_programacion2_kfc.backend.models.orders.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
@@ -75,7 +76,10 @@ public class CheckoutController {
         }
 
         try {
-            pedidoService.crearPedidoDesdeCarrito(List.copyOf(items), EstadoPedido.CREADO);
+            List<CartItemDto> dtoItems = items.stream()
+                    .map(ci -> new CartItemDto(ci.getProducto().getId(), ci.getQuantity(), ci.getProducto().getName()))
+                    .toList();
+            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pedido registrado. Pagá en caja al retirar.");
         } catch (IllegalArgumentException ex) {
@@ -116,7 +120,10 @@ public class CheckoutController {
         }
 
         try {
-            pedidoService.crearPedidoDesdeCarrito(List.copyOf(items), EstadoPedido.PAGADO);
+            List<CartItemDto> dtoItems = items.stream()
+                    .map(ci -> new CartItemDto(ci.getProducto().getId(), ci.getQuantity(), ci.getProducto().getName()))
+                    .toList();
+            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pago realizado y pedido registrado correctamente.");
         } catch (IllegalArgumentException ex) {
