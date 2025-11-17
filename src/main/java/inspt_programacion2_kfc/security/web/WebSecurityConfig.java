@@ -28,7 +28,6 @@ public class WebSecurityConfig {
                 .requestMatchers("/products/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/stock/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/pedidos/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_VENDEDOR.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
-                .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
