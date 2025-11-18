@@ -51,8 +51,6 @@ El sistema cuenta con tres roles principales de usuarios:
 
 #### **ROLE_VENDEDOR (Vendedor)**
 - Gestión de pedidos (crear, modificar estado)
-- Visualización de productos disponibles
-- Acceso al carrito de compras y checkout
 - Consulta de historial de pedidos
 - Sin acceso a gestión de productos ni usuarios
 
@@ -467,16 +465,21 @@ spring.servlet.multipart.max-request-size=15MB
     │                    │                                │
     │               [ADMIN]────────────────┐              │
     │                    │                 │              │
-    │  ┌─────────────────────────────────────────┐       │
-    │  │     Gestión de Pedidos                  │◄──────┤
-    │  └─────────────────────────────────────────┘       │
-    │                    ▲                 ▲              │
     │                    │                 │              │
-    │               [VENDEDOR]        [SOPORTE]──┐        │
-    │                    │                 │     │        │
     │  ┌─────────────────────────────────────────┐       │
-    │  │     Gestión de Stock                    │◄──────┘
+    │  │     Gestión de Stock                    │◄──────┤
     │  └─────────────────────────────────────────┘       │
+    │                    ▲                                │
+    │                    │                                │
+    │               [SOPORTE]                             │
+    │                                                     │
+    │  ┌─────────────────────────────────────────┐       │
+    │  │   Gestión de Pedidos (Ver y Modificar)  │       │
+    │  └─────────────────────────────────────────┘       │
+    │              ▲           ▲           ▲              │
+    │              │           │           │              │
+    │         [ADMIN]     [VENDEDOR]  [SOPORTE]          │
+    │                                                     │
     │                                                     │
     │  ┌─────────────────────────────────────────┐       │
     │  │     Ver Catálogo de Productos           │       │
@@ -493,7 +496,7 @@ spring.servlet.multipart.max-request-size=15MB
     │  └─────────────────────────────────────────┘       │
     │                    ▲                                │
     │                    │                                │
-    │                [CLIENTE]                            │
+    │    [CLIENTE sin autenticación]                      │
     │                                                     │
     └─────────────────────────────────────────────────────┘
 ```
@@ -863,9 +866,7 @@ http://localhost:8080
 4. Hacer clic en "Iniciar Sesión"
 
 #### 7.3.2 Funcionalidades Disponibles
-- **Gestión de Pedidos:** Acceso completo
-- **Carrito y Checkout:** Puede realizar pedidos como cliente
-- **Visualización de Productos:** Solo lectura
+- **Gestión de Pedidos:** Acceso completo (visualización, creación y modificación de estado)
 
 #### 7.3.3 Gestión de Pedidos
 1. Acceder a "Pedidos" desde el menú de navegación (`/pedidos`)
@@ -887,12 +888,7 @@ http://localhost:8080
    - Por estado (Todos, Creado, En Proceso, etc.)
    - Por rango de fechas
 
-#### 7.3.4 Crear Pedido Manualmente
-1. Desde la página principal, agregar productos al carrito
-2. Ir a Checkout
-3. Ingresar nombre del cliente
-4. Confirmar pedido
-5. El pedido quedará registrado con el vendedor como creador
+**Nota importante:** El vendedor NO puede crear pedidos desde el carrito de compras ya que esta funcionalidad está reservada para clientes sin autenticación. El vendedor solo gestiona los pedidos ya creados.
 
 **Capturas conceptuales:**
 - Dashboard de pedidos con tabla
@@ -1233,5 +1229,3 @@ inspt-programacion2-kfc/
 - `MYSQL_DB`: Nombre de la base de datos (default: inspt_programacion2_kfc)
 - `MYSQL_USER`: Usuario de MySQL (default: root)
 - `MYSQL_PASSWORD`: Contraseña de MySQL (default: vacío)
-
-**Fin del documento**
