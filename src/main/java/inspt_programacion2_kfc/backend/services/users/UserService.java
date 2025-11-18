@@ -3,6 +3,7 @@ package inspt_programacion2_kfc.backend.services.users;
 import java.util.Objects;
 import java.util.Optional;
 
+import inspt_programacion2_kfc.backend.exceptions.UserAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +45,11 @@ public class UserService {
      */
     public User create(String username, String rawPassword, Role role, boolean resetIfExists) {
         Optional<User> dbUser = userRepository.findByUsername(username);
+
+        if (!dbUser.isEmpty() && dbUser.get().getUsername().equalsIgnoreCase(username)) {
+            throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
+        }
+
         if (dbUser.isEmpty()) {
             User newUser = new User();
             newUser.setUsername(username);

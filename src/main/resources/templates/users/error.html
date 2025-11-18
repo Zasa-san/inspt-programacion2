@@ -9,11 +9,8 @@
   <section class="section">
     <div class="container">
       <h1 class="title">Error</h1>
-      <div class="notification is-danger" th:if="${errorMessage}">
+      <div class="notification is-danger">
         <p th:text="${errorMessage}">Ocurrió un error</p>
-      </div>
-      <div th:if="${!errorMessage}">
-        <p>Ocurrió un error inesperado.</p>
       </div>
 
       <p>
