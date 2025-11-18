@@ -514,7 +514,6 @@ spring.servlet.multipart.max-request-size=15MB
   4. Puede editar productos existentes
   5. Puede eliminar productos
   6. Puede marcar productos como disponibles/no disponibles
-- **Postcondiciones:** Los cambios se reflejan en la base de datos y en el catálogo público
 
 #### **CU-02: Gestión de Usuarios (ADMIN)**
 - **Actor:** Administrador
@@ -527,7 +526,6 @@ spring.servlet.multipart.max-request-size=15MB
   4. Edita usuarios existentes
   5. Elimina usuarios
   6. Habilita/deshabilita usuarios
-- **Postcondiciones:** Los usuarios creados/modificados pueden autenticarse con sus credenciales
 
 #### **CU-03: Ver Catálogo (CLIENTE)**
 - **Actor:** Cliente (no autenticado)
@@ -537,7 +535,6 @@ spring.servlet.multipart.max-request-size=15MB
   1. El cliente accede a la página principal `/`
   2. Visualiza productos disponibles con imagen, nombre, descripción y precio
   3. Puede ver detalles de cada producto
-- **Postcondiciones:** Ninguna
 
 #### **CU-04: Agregar al Carrito (CLIENTE)**
 - **Actor:** Cliente (no autenticado)
@@ -549,7 +546,6 @@ spring.servlet.multipart.max-request-size=15MB
   3. Hace clic en "Agregar al carrito"
   4. El producto se añade a la sesión del carrito
   5. Puede modificar cantidades o eliminar items del carrito
-- **Postcondiciones:** Los items permanecen en la sesión hasta completar el pedido
 
 #### **CU-05: Realizar Pedido - Checkout (CLIENTE)**
 - **Actor:** Cliente (no autenticado) o Usuario autenticado
@@ -558,12 +554,13 @@ spring.servlet.multipart.max-request-size=15MB
 - **Flujo Principal:**
   1. El cliente accede a `/checkout`
   2. Revisa los productos y el total
-  3. Ingresa nombre del cliente (si no está autenticado)
+  3. Selecciona método de pago:
+     - "Pagar en caja": Registra pedido en estado CREADO
+     - "Pagar ahora": Ingresa datos de tarjeta (demo) y registra pedido en estado PAGADO
   4. Confirma el pedido
-  5. El sistema crea el pedido en estado "CREADO"
+  5. El sistema crea el pedido con el estado correspondiente
   6. Se registran movimientos de stock (salida) por cada producto
   7. El carrito se vacía
-- **Postcondiciones:** Pedido registrado en base de datos, stock actualizado
 
 #### **CU-06: Gestión de Pedidos (VENDEDOR, SOPORTE, ADMIN)**
 - **Actor:** Vendedor, Soporte, Administrador
@@ -574,7 +571,6 @@ spring.servlet.multipart.max-request-size=15MB
   2. Visualiza lista de todos los pedidos
   3. Puede ver detalles de cada pedido (items, total, cliente, fecha)
   4. Puede cambiar el estado del pedido (CREADO → PAGADO → ENTREGADO o CANCELADO)
-- **Postcondiciones:** Estados actualizados en base de datos
 
 #### **CU-07: Gestión de Stock (SOPORTE, ADMIN)**
 - **Actor:** Soporte, Administrador
@@ -586,7 +582,6 @@ spring.servlet.multipart.max-request-size=15MB
   3. Puede registrar nuevos movimientos (ENTRADA o SALIDA)
   4. Especifica producto, tipo, cantidad y motivo
   5. El sistema registra el movimiento con fecha actual
-- **Postcondiciones:** Movimiento registrado en base de datos
 
 #### **CU-08: Autenticación (TODOS LOS USUARIOS)**
 - **Actor:** Usuario registrado
@@ -599,7 +594,6 @@ spring.servlet.multipart.max-request-size=15MB
   4. Si son válidas, establece sesión autenticada
   5. Redirige a página principal
   6. El usuario tiene acceso a funcionalidades según su rol
-- **Postcondiciones:** Sesión autenticada con permisos según rol
 
 ---
 
@@ -664,16 +658,6 @@ spring.servlet.multipart.max-request-size=15MB
          │
 ┌─────────────────────┐
 │     PRODUCTOS       │
-└─────────────────────┘
-
-┌─────────────────────┐
-│    API_TOKEN        │
-├─────────────────────┤
-│ PK  id             │
-│     token           │
-│     description     │
-│     enabled         │
-│     created_at      │
 └─────────────────────┘
 ```
 
@@ -742,15 +726,6 @@ spring.servlet.multipart.max-request-size=15MB
 - **Relaciones:**
   - Muchos a uno con PRODUCTOS
 
-#### **Tabla: API_TOKEN**
-- **Descripción:** Tokens de API para autenticación programática (funcionalidad futura)
-- **Campos:**
-  - `id` (BIGINT, PK): Identificador único
-  - `token` (VARCHAR, UNIQUE): Token de acceso
-  - `description` (VARCHAR): Descripción del token
-  - `enabled` (BOOLEAN): Si el token está activo
-  - `created_at` (TIMESTAMP): Fecha de creación
-
 ### 6.3 Ejemplo de Datos Cargados
 
 #### Usuarios por defecto:
@@ -768,345 +743,64 @@ INSERT INTO productos (name, description, price, img_url, available) VALUES
 ('Alitas Picantes', '8 alitas con salsa BBQ', 850, '/uploads/products/alitas.jpg', 1),
 ('Hamburguesa XXL', 'Hamburguesa doble con queso', 950, '/uploads/products/hamburguesa.jpg', 1);
 ```
-
-#### Pedido de ejemplo:
-```sql
--- Pedido
-INSERT INTO pedidos (created_at, estado, total, customer_name, user_id) VALUES
-('2025-11-17 14:30:00', 'PAGADO', 2050, 'Juan Pérez', 2);
-
--- Items del pedido
-INSERT INTO item_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES
-(1, 1, 1, 1200, 1200),
-(1, 2, 1, 850, 850);
-```
-
-#### Movimientos de stock:
-```sql
--- Entrada de stock
-INSERT INTO movimientos_stock (producto_id, tipo, cantidad, fecha, motivo) VALUES
-(1, 'ENTRADA', 100, '2025-11-15 10:00:00', 'Reposición semanal');
-
--- Salida por venta
-INSERT INTO movimientos_stock (producto_id, tipo, cantidad, fecha, motivo, pedido_id) VALUES
-(1, 'SALIDA', 1, '2025-11-17 14:30:00', 'Venta - Pedido #1', 1);
-```
-
 ---
 
 ## 7. Manual de Usuario
 
 ### 7.1 Acceso al Sistema
 
-#### URL de acceso:
-```
-http://localhost:8080
-```
+**URL:** `http://localhost:8080`
 
-#### Credenciales por defecto:
+**Credenciales por defecto:**
+- Admin: `admin` / `admin`
+- Vendedor: `vendedor1` / `vendedor123`
+- Soporte: `soporte1` / `soporte123`
 
-**Administrador:**
-- Usuario: `admin`
-- Contraseña: `admin`
+### 7.2 Flujo para Clientes sin Autenticación
 
-**Vendedor:**
-- Usuario: `vendedor1`
-- Contraseña: `vendedor123`
+#### Realizar un Pedido
 
-**Soporte:**
-- Usuario: `soporte1`
-- Contraseña: `soporte123`
+1. **Ver catálogo:** Acceder a la página principal y visualizar productos disponibles con imagen, nombre, descripción y precio
+2. **Agregar al carrito:** Seleccionar cantidad y hacer clic en "Agregar al Carrito"
+3. **Gestionar carrito:** En `/cart` visualizar items, modificar cantidades o eliminar productos
+4. **Checkout:** En `/checkout` revisar el resumen y seleccionar método de pago:
+   - **Pagar en caja:** Registra pedido en estado CREADO para pagar al retirar
+   - **Pagar ahora:** Ingresar datos de tarjeta (demo) y registra pedido en estado PAGADO
+5. **Confirmación:** El sistema registra el pedido y vacía el carrito
 
-### 7.2 Manual para CLIENTE (Sin Autenticación)
+### 7.3 Flujos para Usuarios Autenticados
 
-#### 7.2.1 Visualizar Catálogo
-1. Acceder a `http://localhost:8080`
-2. La página principal muestra todos los productos disponibles
-3. Cada producto muestra:
-   - Imagen
-   - Nombre
-   - Descripción
-   - Precio
+Los usuarios autenticados acceden a funcionalidades según sus permisos:
 
-#### 7.2.2 Agregar Productos al Carrito
-1. En la página principal, seleccionar la cantidad deseada del producto
-2. Hacer clic en el botón "Agregar al Carrito"
-3. El contador del carrito (en la barra de navegación) se actualizará
-4. Para ver el contenido del carrito, hacer clic en el ícono del carrito
+#### 7.3.1 Gestión de Usuarios (ADMIN)
+**Ruta:** `/users`
 
-#### 7.2.3 Gestionar el Carrito
-1. En la vista del carrito (`/cart`):
-   - Ver todos los productos agregados
-   - Modificar cantidades
-   - Eliminar productos
-   - Ver el total actualizado
-2. Hacer clic en "Proceder al Checkout" para realizar el pedido
+- **Listar:** Visualizar tabla con username, rol y estado
+- **Crear:** Completar formulario con username, password, rol (ADMIN/VENDEDOR/SOPORTE) y estado
+- **Editar:** Modificar datos de usuario existente (password opcional)
+- **Eliminar:** Confirmar eliminación del usuario
 
-#### 7.2.4 Realizar un Pedido (Checkout)
-1. En la página de checkout (`/checkout`):
-   - Revisar el resumen del pedido
-   - Ingresar el nombre del cliente
-   - Verificar el total
-2. Hacer clic en "Confirmar Pedido"
-3. El sistema confirmará el pedido y vaciará el carrito
-4. Se generará un número de pedido
+#### 7.3.2 Gestión de Productos (ADMIN)
+**Ruta:** `/products`
 
-**Capturas conceptuales:**
-- Página principal con grid de productos
-- Vista del carrito con lista de items
-- Formulario de checkout con resumen
+- **Listar:** Visualizar tabla con imagen, nombre, descripción, precio y disponibilidad
+- **Crear:** Completar formulario con nombre, descripción, precio, imagen (JPG/PNG, máx 15MB) y disponibilidad
+- **Editar:** Modificar datos del producto y opcionalmente cambiar imagen
+- **Eliminar:** Confirmar eliminación permanente del producto
 
-### 7.3 Manual para VENDEDOR (ROLE_VENDEDOR)
+#### 7.3.3 Gestión de Pedidos (ADMIN, VENDEDOR, SOPORTE)
+**Ruta:** `/pedidos`
 
-#### 7.3.1 Iniciar Sesión
-1. Acceder a `http://localhost:8080/login`
-2. Ingresar usuario: `vendedor1`
-3. Ingresar contraseña
-4. Hacer clic en "Iniciar Sesión"
+- **Listar:** Visualizar todos los pedidos con número, fecha, cliente, total y estado
+- **Ver detalles:** Acceder a items del pedido con cantidades y precios
+- **Cambiar estado:** Actualizar estado del pedido (CREADO → PAGADO → ENTREGADO o CANCELADO)
 
-#### 7.3.2 Funcionalidades Disponibles
-- **Gestión de Pedidos:** Visualización y modificación de estado de pedidos existentes
+#### 7.3.4 Gestión de Stock (ADMIN, SOPORTE)
+**Ruta:** `/stock`
 
-#### 7.3.3 Gestión de Pedidos
-1. Acceder a "Pedidos" desde el menú de navegación (`/pedidos`)
-2. Visualizar lista de todos los pedidos con:
-   - Número de pedido
-   - Fecha y hora
-   - Cliente
-   - Total
-   - Estado actual
-3. **Ver detalles de un pedido:**
-   - Hacer clic en el pedido
-   - Ver items incluidos con cantidades y precios
-4. **Cambiar estado de pedido:**
-   - Seleccionar nuevo estado del dropdown
-   - Estados disponibles: CREADO → PAGADO → ENTREGADO
-   - También puede marcar como CANCELADO
-   - Hacer clic en "Actualizar Estado"
-
-### 7.4 Manual para SOPORTE (ROLE_SOPORTE)
-
-#### 7.4.1 Iniciar Sesión
-1. Acceder a `http://localhost:8080/login`
-2. Ingresar usuario: `soporte1`
-3. Ingresar contraseña
-4. Hacer clic en "Iniciar Sesión"
-
-#### 7.4.2 Funcionalidades Disponibles
-- **Gestión de Pedidos:** Visualización y modificación de estado (igual que VENDEDOR)
-- **Gestión de Stock:** Acceso completo
-
-#### 7.4.3 Gestión de Stock
-1. Acceder a "Stock" desde el menú de navegación (`/stock`)
-2. **Visualizar movimientos de stock:**
-   - Lista de todos los movimientos históricos
-   - Información mostrada:
-     - Producto
-     - Tipo (ENTRADA / SALIDA)
-     - Cantidad
-     - Fecha y hora
-     - Motivo
-     - Pedido relacionado (si aplica)
-3. **Registrar nuevo movimiento:**
-   - Hacer clic en "Nuevo Movimiento"
-   - Seleccionar producto del dropdown
-   - Seleccionar tipo de movimiento (ENTRADA o SALIDA)
-   - Ingresar cantidad
-   - Ingresar motivo (ej: "Reposición mensual", "Producto dañado")
-   - Hacer clic en "Registrar"
-
-#### 7.4.4 Consultar Inventario Actual
-1. En la página de stock, ver el balance actual por producto
-2. Suma de entradas menos suma de salidas
-3. Identificar productos con bajo stock
-
-**Capturas conceptuales:**
-- Tabla de movimientos de stock
-- Formulario de registro de nuevo movimiento
-- Vista de inventario actual por producto
-
-### 7.5 Manual para ADMINISTRADOR (ROLE_ADMIN)
-
-#### 7.5.1 Iniciar Sesión
-1. Acceder a `http://localhost:8080/login`
-2. Ingresar usuario: `admin`
-3. Ingresar contraseña: `admin`
-4. Hacer clic en "Iniciar Sesión"
-
-#### 7.5.2 Funcionalidades Disponibles
-- **Gestión de Productos:** CRUD completo
-- **Gestión de Usuarios:** CRUD completo
-- **Gestión de Pedidos:** Acceso completo
-- **Gestión de Stock:** Acceso completo
-
-#### 7.5.3 Gestión de Productos
-
-**Listar Productos:**
-1. Acceder a "Productos" desde el menú (`/products`)
-2. Visualizar tabla con todos los productos:
-   - ID
-   - Imagen miniatura
-   - Nombre
-   - Descripción
-   - Precio
-   - Disponibilidad
-   - Acciones (Editar, Eliminar)
-
-**Crear Nuevo Producto:**
-1. Hacer clic en "Nuevo Producto"
-2. Completar el formulario:
-   - Nombre del producto (requerido)
-   - Descripción (requerido)
-   - Precio en pesos (se convierte automáticamente a centavos)
-   - Imagen (archivo JPG, PNG, máximo 15MB)
-   - Disponible (checkbox)
-3. Hacer clic en "Guardar"
-4. El producto aparecerá en el catálogo
-
-**Editar Producto:**
-1. Hacer clic en el botón "Editar" del producto deseado
-2. Modificar los campos necesarios
-3. Opcionalmente cambiar la imagen (la anterior se elimina)
-4. Hacer clic en "Actualizar"
-
-**Eliminar Producto:**
-1. Hacer clic en el botón "Eliminar"
-2. Confirmar la eliminación
-3. El producto y su imagen se eliminarán permanentemente
-4. NOTA: Si el producto está en pedidos, puede generar errores de integridad
-
-**Marcar Producto como No Disponible:**
-1. Editar el producto
-2. Desmarcar checkbox "Disponible"
-3. El producto no aparecerá en el catálogo público
-
-**Capturas conceptuales:**
-- Tabla de productos con acciones
-- Formulario de creación/edición de producto
-- Vista previa de imagen cargada
-
-#### 7.5.4 Gestión de Usuarios
-
-**Listar Usuarios:**
-1. Acceder a "Usuarios" desde el menú (`/users`)
-2. Visualizar tabla con usuarios:
-   - ID
-   - Username
-   - Rol
-   - Estado (Habilitado/Deshabilitado)
-   - Acciones (Editar, Eliminar)
-
-**Crear Nuevo Usuario:**
-1. Hacer clic en "Nuevo Usuario"
-2. Completar el formulario:
-   - Username (único, requerido)
-   - Password (requerido, mínimo 4 caracteres)
-   - Seleccionar Rol:
-     - ADMIN
-     - VENDEDOR
-     - SOPORTE
-   - Habilitado (checkbox)
-3. Hacer clic en "Crear Usuario"
-4. La contraseña se encriptará automáticamente
-
-**Editar Usuario:**
-1. Hacer clic en "Editar" del usuario deseado
-2. Modificar campos:
-   - Username (debe seguir siendo único)
-   - Password (dejar vacío para no cambiar)
-   - Rol
-   - Estado habilitado
-3. Hacer clic en "Actualizar"
-
-**Eliminar Usuario:**
-1. Hacer clic en "Eliminar"
-2. Confirmar eliminación
-3. ADVERTENCIA: Los pedidos creados por este usuario quedarán huérfanos
-
-**Deshabilitar Usuario:**
-1. Editar usuario
-2. Desmarcar "Habilitado"
-3. El usuario no podrá iniciar sesión
-
-**Capturas conceptuales:**
-- Tabla de usuarios con filtros
-- Formulario de creación de usuario
-- Formulario de edición con validaciones
-
-#### 7.5.5 Acceso a Todas las Funcionalidades
-
-El administrador tiene acceso completo a:
-- **Pedidos:** Gestión completa (ver sección 7.3.3)
-- **Stock:** Gestión completa (ver sección 7.4.3)
-- **Productos:** CRUD completo (sección 7.5.3)
-- **Usuarios:** CRUD completo (sección 7.5.4)
-
-#### 7.5.6 Panel de Administración
-
-El menú de navegación del administrador muestra:
-- Inicio (catálogo público)
-- Productos
-- Stock
-- Pedidos
-- Usuarios
-- Perfil (ver/editar propio perfil)
-- Cerrar Sesión
-
-### 7.6 Funcionalidades Comunes
-
-#### Modo Oscuro (Tema Dark Mode)
-1. En la barra de navegación, hacer clic en el icono de luna/sol
-2. El tema cambiará entre claro y oscuro
-3. La preferencia se guarda en el navegador
-
-#### Cerrar Sesión
-1. Hacer clic en "Cerrar Sesión" en el menú
-2. La sesión se cerrará y se redirigirá al login
-
-#### Cambiar Contraseña Propia
-1. Acceder a la sección de perfil/usuarios
-2. Editar el propio usuario
-3. Ingresar nueva contraseña
-4. Guardar cambios
-
-#### Manejo de Errores
-- **Error 403 (Acceso Denegado):** Se muestra una página informando que no tiene permisos
-- **Error 404:** Página no encontrada
-- **Errores de validación:** Se muestran en el formulario con mensajes específicos
-- **Errores del servidor:** Se muestra mensaje genérico
-
-### 7.7 Pantallas Principales
-
-#### Página Principal (/)
-- Header con logo y menú de navegación
-- Grid responsive de productos
-- Botones de "Agregar al Carrito"
-- Footer con información
-
-#### Login (/login)
-- Formulario centrado con campos de usuario y contraseña
-- Enlace de "¿Olvidaste tu contraseña?" (si está implementado)
-- Botón de "Iniciar Sesión"
-
-#### Dashboard de Productos (/products)
-- Tabla con listado de productos
-- Botones de acción (Nuevo, Editar, Eliminar)
-
-#### Dashboard de Pedidos (/pedidos)
-- Tabla con pedidos ordenados por fecha
-- Acceso a detalle de cada pedido
-- Selector de cambio de estado
-
-#### Dashboard de Stock (/stock)
-- Tabla de movimientos
-- Formulario de registro de movimiento
-- Resumen de inventario actual
-
-#### Dashboard de Usuarios (/users)
-- Tabla de usuarios registrados
-- Botones de acción (Nuevo, Editar, Eliminar)
-- Indicadores de estado (habilitado/deshabilitado)
-- Badges de roles con colores distintivos
+- **Listar movimientos:** Visualizar historial con producto, tipo (ENTRADA/SALIDA), cantidad, fecha, motivo y pedido relacionado
+- **Registrar movimiento:** Seleccionar producto, tipo, ingresar cantidad y motivo
+- **Consultar inventario:** Ver balance actual por producto (entradas menos salidas)
 
 ---
 
@@ -1137,75 +831,3 @@ El sistema desarrollado cumple con los objetivos planteados:
 - ✅ Jetty como servidor de aplicaciones embebido
 - ✅ Bulma CSS para diseño responsive
 - ✅ Lombok para reducción de código boilerplate
-
-## Anexos
-
-### A. Instrucciones de Instalación y Ejecución
-
-Ver archivo `README.md` en la raíz del proyecto para instrucciones detalladas de:
-- Requisitos del sistema
-- Configuración de base de datos
-- Compilación con Maven
-- Ejecución de la aplicación
-- Variables de entorno disponibles
-
-### B. Estructura de Directorios Completa
-
-```
-inspt-programacion2-kfc/
-├── db/
-│   └── init_mysql_inspt_programacion2_kfc.sql
-├── src/
-│   └── main/
-│       ├── java/inspt_programacion2_kfc/
-│       │   ├── backend/
-│       │   │   ├── exceptions/
-│       │   │   ├── models/
-│       │   │   ├── repositories/
-│       │   │   └── services/
-│       │   ├── config/
-│       │   ├── frontend/
-│       │   │   ├── controllers/
-│       │   │   ├── models/
-│       │   │   ├── services/
-│       │   │   └── utils/
-│       │   └── security/
-│       └── resources/
-│           ├── application.properties
-│           ├── static/
-│           └── templates/
-├── uploads/
-│   └── products/
-├── pom.xml
-├── mvnw
-├── mvnw.cmd
-└── README.md
-```
-
-### C. Dependencias del Proyecto (pom.xml)
-
-- spring-boot-starter-data-jpa
-- spring-boot-starter-security
-- spring-boot-starter-thymeleaf
-- spring-boot-starter-validation
-- spring-boot-starter-web
-- spring-boot-starter-jetty
-- thymeleaf-extras-springsecurity6
-- mysql-connector-j
-- lombok
-
-### D. Puertos y URLs
-
-- **Puerto por defecto:** 8080
-- **URL base:** http://localhost:8080
-- **Login:** http://localhost:8080/login
-- **Recursos estáticos:** http://localhost:8080/css/*, /js/*, /img/*
-- **Uploads:** http://localhost:8080/uploads/*
-
-### E. Variables de Entorno Configurables
-
-- `MYSQL_HOST`: Host del servidor MySQL (default: localhost)
-- `MYSQL_PORT`: Puerto de MySQL (default: 3306)
-- `MYSQL_DB`: Nombre de la base de datos (default: inspt_programacion2_kfc)
-- `MYSQL_USER`: Usuario de MySQL (default: root)
-- `MYSQL_PASSWORD`: Contraseña de MySQL (default: vacío)
