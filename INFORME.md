@@ -50,7 +50,7 @@ El sistema cuenta con tres roles principales de usuarios:
 - Configuración del sistema
 
 #### **ROLE_VENDEDOR (Vendedor)**
-- Gestión de pedidos (crear, modificar estado)
+- Gestión de pedidos (visualizar y modificar estado)
 - Consulta de historial de pedidos
 - Sin acceso a gestión de productos ni usuarios
 
@@ -571,10 +571,9 @@ spring.servlet.multipart.max-request-size=15MB
 - **Precondiciones:** Usuario autenticado con rol autorizado
 - **Flujo Principal:**
   1. El usuario accede a `/pedidos`
-  2. Visualiza lista de pedidos con filtros
+  2. Visualiza lista de todos los pedidos
   3. Puede ver detalles de cada pedido (items, total, cliente, fecha)
-  4. Puede cambiar el estado del pedido (CREADO → EN_PROCESO → COMPLETADO → ENTREGADO o CANCELADO)
-  5. Puede filtrar por estado o fecha
+  4. Puede cambiar el estado del pedido (CREADO → PAGADO → ENTREGADO o CANCELADO)
 - **Postcondiciones:** Estados actualizados en base de datos
 
 #### **CU-07: Gestión de Stock (SOPORTE, ADMIN)**
@@ -709,7 +708,7 @@ spring.servlet.multipart.max-request-size=15MB
 - **Campos:**
   - `id` (BIGINT, PK): Identificador único
   - `created_at` (TIMESTAMP): Fecha y hora de creación
-  - `estado` (VARCHAR): Estado actual (CREADO, EN_PROCESO, COMPLETADO, ENTREGADO, CANCELADO)
+  - `estado` (VARCHAR): Estado actual (CREADO, PAGADO, ENTREGADO, CANCELADO)
   - `total` (INT): Total del pedido en centavos
   - `customer_name` (VARCHAR): Nombre del cliente
   - `user_id` (BIGINT, FK): Usuario que creó el pedido (puede ser NULL si es cliente no autenticado)
@@ -774,7 +773,7 @@ INSERT INTO productos (name, description, price, img_url, available) VALUES
 ```sql
 -- Pedido
 INSERT INTO pedidos (created_at, estado, total, customer_name, user_id) VALUES
-('2025-11-17 14:30:00', 'COMPLETADO', 2050, 'Juan Pérez', 2);
+('2025-11-17 14:30:00', 'PAGADO', 2050, 'Juan Pérez', 2);
 
 -- Items del pedido
 INSERT INTO item_pedido (pedido_id, producto_id, cantidad, precio_unitario, subtotal) VALUES
@@ -866,7 +865,7 @@ http://localhost:8080
 4. Hacer clic en "Iniciar Sesión"
 
 #### 7.3.2 Funcionalidades Disponibles
-- **Gestión de Pedidos:** Acceso completo (visualización, creación y modificación de estado)
+- **Gestión de Pedidos:** Visualización y modificación de estado de pedidos existentes
 
 #### 7.3.3 Gestión de Pedidos
 1. Acceder a "Pedidos" desde el menú de navegación (`/pedidos`)
@@ -881,19 +880,9 @@ http://localhost:8080
    - Ver items incluidos con cantidades y precios
 4. **Cambiar estado de pedido:**
    - Seleccionar nuevo estado del dropdown
-   - Estados disponibles: CREADO → EN_PROCESO → COMPLETADO → ENTREGADO
+   - Estados disponibles: CREADO → PAGADO → ENTREGADO
    - También puede marcar como CANCELADO
    - Hacer clic en "Actualizar Estado"
-5. **Filtrar pedidos:**
-   - Por estado (Todos, Creado, En Proceso, etc.)
-   - Por rango de fechas
-
-**Nota importante:** El vendedor NO puede crear pedidos desde el carrito de compras ya que esta funcionalidad está reservada para clientes sin autenticación. El vendedor solo gestiona los pedidos ya creados.
-
-**Capturas conceptuales:**
-- Dashboard de pedidos con tabla
-- Vista de detalle de pedido con items
-- Selector de estado de pedido
 
 ### 7.4 Manual para SOPORTE (ROLE_SOPORTE)
 
@@ -904,9 +893,8 @@ http://localhost:8080
 4. Hacer clic en "Iniciar Sesión"
 
 #### 7.4.2 Funcionalidades Disponibles
-- **Gestión de Pedidos:** Acceso completo (igual que VENDEDOR)
+- **Gestión de Pedidos:** Visualización y modificación de estado (igual que VENDEDOR)
 - **Gestión de Stock:** Acceso completo
-- **Productos:** Solo lectura
 
 #### 7.4.3 Gestión de Stock
 1. Acceder a "Stock" desde el menú de navegación (`/stock`)
@@ -926,10 +914,6 @@ http://localhost:8080
    - Ingresar cantidad
    - Ingresar motivo (ej: "Reposición mensual", "Producto dañado")
    - Hacer clic en "Registrar"
-4. **Filtrar movimientos:**
-   - Por producto
-   - Por tipo de movimiento
-   - Por rango de fechas
 
 #### 7.4.4 Consultar Inventario Actual
 1. En la página de stock, ver el balance actual por producto
@@ -937,7 +921,7 @@ http://localhost:8080
 3. Identificar productos con bajo stock
 
 **Capturas conceptuales:**
-- Tabla de movimientos de stock con filtros
+- Tabla de movimientos de stock
 - Formulario de registro de nuevo movimiento
 - Vista de inventario actual por producto
 
@@ -1107,19 +1091,15 @@ El menú de navegación del administrador muestra:
 #### Dashboard de Productos (/products)
 - Tabla con listado de productos
 - Botones de acción (Nuevo, Editar, Eliminar)
-- Filtros y búsqueda
-- Paginación (si hay muchos productos)
 
 #### Dashboard de Pedidos (/pedidos)
 - Tabla con pedidos ordenados por fecha
-- Filtros por estado y fecha
 - Acceso a detalle de cada pedido
 - Selector de cambio de estado
 
 #### Dashboard de Stock (/stock)
 - Tabla de movimientos
 - Formulario de registro de movimiento
-- Filtros por producto, tipo y fecha
 - Resumen de inventario actual
 
 #### Dashboard de Usuarios (/users)
