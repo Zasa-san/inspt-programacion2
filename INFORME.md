@@ -8,6 +8,7 @@
 - Castellano Mauricio
 - Schneider Bruno
 - Borrajo Santiago
+- Graterol Jean
 
 **Curso y año:** [2.603] - 2025
 
