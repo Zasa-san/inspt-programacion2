@@ -2,7 +2,7 @@
 ## Trabajo Final
 ### Espacio de entrega para el grupo 12, tema 13.
 
-- #### Consigna del desarrollo: <a href="consigna-desarrollo.pdf" download>consigna-desarrollo.pdf</a>
+- #### Informe del programa: <a href="INFORME.md">INFORME.md</a>
 
 ## Requisitos para ejecutar el proyecto
 - Java: JDK 21.
