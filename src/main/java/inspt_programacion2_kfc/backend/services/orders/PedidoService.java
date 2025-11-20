@@ -3,6 +3,7 @@ package inspt_programacion2_kfc.backend.services.orders;
 import java.util.List;
 import java.util.Objects;
 
+import inspt_programacion2_kfc.backend.exceptions.cart.CartEmptyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +48,7 @@ public class PedidoService {
     @Transactional
     public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial) {
         if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("El carrito está vacío.");
+            throw new CartEmptyException("El carrito está vacío.");
         }
 
         // Se valida el stock

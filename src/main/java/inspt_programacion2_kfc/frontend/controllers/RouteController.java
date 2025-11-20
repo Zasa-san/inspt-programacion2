@@ -25,6 +25,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class RouteController {
 
+    private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+
     @Autowired
     private ProductService productService;
 
@@ -72,13 +74,20 @@ public class RouteController {
     public String login(Model model, Authentication authentication, HttpServletRequest request,
             HttpServletResponse response) {
         //TODO TESTEAR BIEN LOGUEO Y RETROCESO
-        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        if (isAuthenticated(authentication) && request.getParameter("justLoggedOut") == null) {
+            logoutHandler.logout(request, response, authentication);
+            return "redirect:/login?justLoggedOut=1";
         }
 
         PageMetadata page = new PageMetadata("Iniciar sesión");
         model.addAttribute("page", page);
         return "login";
+    }
+
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
     }
 
     @GetMapping("/access-denied")
