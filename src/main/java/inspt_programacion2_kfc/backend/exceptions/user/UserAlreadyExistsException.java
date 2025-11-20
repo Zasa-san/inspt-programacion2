@@ -1,6 +1,6 @@
-package inspt_programacion2_kfc.backend.exceptions;
+package inspt_programacion2_kfc.backend.exceptions.user;
 
-public class UserAlreadyExistsException extends UserServiceException {
+public class UserAlreadyExistsException extends UserException {
 
     public UserAlreadyExistsException(String message) {
         super(message);

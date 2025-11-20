@@ -1,6 +1,6 @@
-package inspt_programacion2_kfc.backend.exceptions;
+package inspt_programacion2_kfc.backend.exceptions.user;
 
-public class UserCreationFailedException extends UserServiceException {
+public class UserCreationFailedException extends UserException {
 
     public UserCreationFailedException(String message) {
         super(message);

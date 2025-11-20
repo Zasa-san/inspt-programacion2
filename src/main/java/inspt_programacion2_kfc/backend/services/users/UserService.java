@@ -1,20 +1,21 @@
 package inspt_programacion2_kfc.backend.services.users;
 
-import java.util.Objects;
-import java.util.Optional;
-
-import inspt_programacion2_kfc.backend.exceptions.UserAlreadyExistsException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserCreationFailedException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserNotFoundException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserPasswordResetFailedException;
+import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import inspt_programacion2_kfc.backend.models.users.Role;
-import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
-import inspt_programacion2_kfc.backend.exceptions.UserCreationFailedException;
-import inspt_programacion2_kfc.backend.exceptions.UserPasswordResetFailedException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,21 +33,19 @@ public class UserService {
     /**
      * Crea un usuario nuevo o actualiza la contraseña de uno existente.
      *
-     * @throws UserCreationFailedException si no se pudo crear el usuario
-     * @throws UserPasswordResetFailedException si no se pudo resetear la
-     * contraseña
-     * @param username nombre de usuario (único)
-     * @param rawPassword contraseña en texto plano (se encripta internamente)
-     * @param role rol a asignar (enum {@link Role})
+     * @param username      nombre de usuario (único)
+     * @param rawPassword   contraseña en texto plano (se encripta internamente)
+     * @param role          rol a asignar (enum {@link Role})
      * @param resetIfExists si true, resetea la contraseña si el usuario ya
-     * existe
-     * @return el usuario creado o existente (con contraseña actualizada si se
-     * solicitó)
+     *                      existe
+     * @throws UserCreationFailedException      si no se pudo crear el usuario
+     * @throws UserPasswordResetFailedException si no se pudo resetear la
+     *                                          contraseña
      */
-    public User create(String username, String rawPassword, Role role, boolean resetIfExists) {
+    public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
         Optional<User> dbUser = userRepository.findByUsername(username);
 
-        if (!dbUser.isEmpty() && dbUser.get().getUsername().equalsIgnoreCase(username)) {
+        if (dbUser.isPresent() && dbUser.get().getUsername().equalsIgnoreCase(username)) {
             throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
         }
 
@@ -58,7 +57,7 @@ public class UserService {
             newUser.setEnabled(true);
             try {
                 log.info("Usuario {} guardado correctamente.", newUser.getUsername());
-                return userRepository.save(newUser);
+                userRepository.save(newUser);
             } catch (DataIntegrityViolationException ex) {
                 throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
             }
@@ -67,12 +66,11 @@ public class UserService {
             existing.setPassword(passwordEncoder.encode(rawPassword));
             try {
                 log.info("Clave reestablecida correctamente para el usuario {}", existing.getUsername());
-                return userRepository.save(existing);
+                userRepository.save(existing);
             } catch (DataIntegrityViolationException ex) {
                 throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
             }
         }
-        return dbUser.get();
     }
 
     /**
@@ -80,7 +78,7 @@ public class UserService {
      *
      * @return lista de usuarios
      */
-    public java.util.List<User> findAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
@@ -90,33 +88,36 @@ public class UserService {
      * @param id id del usuario
      * @return usuario si existe
      */
-    public java.util.Optional<User> findById(Long id) {
+    public Optional<User> findById(Long id) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         return userRepository.findById(id);
+    }
+
+    public boolean existsByUsername(String username) {
+        Objects.requireNonNull(username, "Username no puede ser NULL");
+        return userRepository.findByUsername(username).isPresent();
     }
 
     /**
      * Actualiza los datos de un usuario existente. Si la contraseña es null o
      * vacía, no se modifica.
      *
-     * @param id id del usuario a actualizar
-     * @param username nuevo username
+     * @param id          id del usuario a actualizar
+     * @param username    nuevo username
      * @param rawPassword nueva contraseña en texto plano
-     * @param role nuevo rol
-     * @return usuario actualizado
+     * @param role        nuevo rol
      */
-    public User update(Long id, String username, String rawPassword, Role role) {
+    public void update(Long id, String username, String rawPassword, Role role) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+                .orElseThrow(() -> new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id)));
 
         user.setUsername(username);
         if (rawPassword != null && !rawPassword.isBlank()) {
             user.setPassword(passwordEncoder.encode(rawPassword));
         }
         user.setRole(role);
-
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     /**
@@ -127,7 +128,7 @@ public class UserService {
     public void delete(Long id) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuario no encontrado: " + id);
+            throw new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id));
         }
         userRepository.deleteById(id);
     }
@@ -141,7 +142,7 @@ public class UserService {
     public void toggleEnabled(Long id, boolean enabled) {
         Objects.requireNonNull(id, "ID no puede ser NULL");
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+                .orElseThrow(() -> new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id)));
 
         user.setEnabled(enabled);
         userRepository.save(user);

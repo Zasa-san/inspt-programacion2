@@ -1,6 +1,6 @@
-package inspt_programacion2_kfc.backend.exceptions;
+package inspt_programacion2_kfc.backend.exceptions.user;
 
-public class UserPasswordResetFailedException extends UserServiceException {
+public class UserPasswordResetFailedException extends UserException {
 
     public UserPasswordResetFailedException(String message) {
         super(message);

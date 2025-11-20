@@ -9,11 +9,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.services.ProductService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -63,7 +69,13 @@ public class RouteController {
     }
 
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login(Model model, Authentication authentication, HttpServletRequest request,
+            HttpServletResponse response) {
+        //TODO TESTEAR BIEN LOGUEO Y RETROCESO
+        if (authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+
         PageMetadata page = new PageMetadata("Iniciar sesión");
         model.addAttribute("page", page);
         return "login";

@@ -43,7 +43,8 @@ public class SecurityConfig {
                     }
                 })
                 )
-                .logout(withDefaults());
+                .logout(withDefaults())
+                .headers(headers -> headers.cacheControl(withDefaults()));
 
         return http.build();
     }

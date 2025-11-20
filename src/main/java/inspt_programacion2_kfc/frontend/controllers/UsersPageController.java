@@ -3,6 +3,7 @@ package inspt_programacion2_kfc.frontend.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -120,7 +121,7 @@ public class UsersPageController {
         model.addAttribute("userId", id);
 
         // Indica si se está editando al mismo usuario que está logueado
-        boolean editingSelf = currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id);
+        boolean editingSelf = currentUser.getId() != null && currentUser.getId().equals(id);
         model.addAttribute("editingSelf", editingSelf);
         model.addAttribute("isAdmin", isAdmin);
 
@@ -168,6 +169,10 @@ public class UsersPageController {
                 isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
             }
 
+            if (userService.existsByUsername(username)) {
+                throw new UserAlreadyExistsException("Ya existe un usuario con el nombre ingresado, intente con otro.");
+            }
+
             // No-admin solo puede editar su propio usuario
             if (!isAdmin && (currentUser == null || !currentUser.getId().equals(id))) {
                 redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para editar este usuario.");
@@ -177,7 +182,7 @@ public class UsersPageController {
             Role newRole = Role.valueOf(role);
 
             // Si el usuario edita su propio perfil, no se permite cambiar el rol
-            if (currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+            if (currentUser.getId() != null && currentUser.getId().equals(id)) {
                 var existingUserOpt = userService.findById(id);
                 if (existingUserOpt.isPresent()) {
                     newRole = existingUserOpt.get().getRole();
