@@ -59,8 +59,8 @@ public class ProductImageController {
 
             String publicPath = "/uploads/products/" + filename;
 
-            Optional<ProductoEntity> opt = productoService.findById(id);
-            if (opt.isEmpty()) {
+            ProductoEntity producto = productoService.findById(id);
+            if (producto == null) {
                 // remove uploaded file if product not found
                 try {
                     Files.deleteIfExists(target);
@@ -69,9 +69,8 @@ public class ProductImageController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("product not found");
             }
 
-            ProductoEntity p = opt.get();
-            p.setImgUrl(publicPath);
-            productoService.save(p);
+            producto.setImgUrl(publicPath);
+            productoService.save(producto);
 
             return ResponseEntity.ok(publicPath);
         } catch (IOException e) {

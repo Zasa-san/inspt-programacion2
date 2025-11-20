@@ -1,8 +1,5 @@
 package inspt_programacion2_kfc.backend.models.users;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 public enum Role {
     ROLE_SOPORTE,
     ROLE_VENDEDOR,
@@ -15,10 +12,6 @@ public enum Role {
     public String getRoleName() {
         String n = name();
         return n.startsWith("ROLE_") ? n.substring(5) : n;
-    }
-
-    public GrantedAuthority asAuthority() {
-        return new SimpleGrantedAuthority(authority());
     }
 
     @Override

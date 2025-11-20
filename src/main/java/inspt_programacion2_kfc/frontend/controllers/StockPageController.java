@@ -2,6 +2,7 @@ package inspt_programacion2_kfc.frontend.controllers;
 
 import java.util.Map;
 
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,14 +47,14 @@ public class StockPageController {
             @RequestParam(name = "motivo", required = false) String motivo,
             RedirectAttributes redirectAttrs) {
 
-        var productoOpt = productoService.findById(productoId);
-        if (productoOpt.isEmpty()) {
+        ProductoEntity producto = productoService.findById(productoId);
+        if (producto == null) {
             redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
             return "redirect:/stock";
         }
 
         try {
-            movimientoStockService.registrarMovimiento(productoOpt.get(), tipo, cantidad, motivo, null);
+            movimientoStockService.registrarMovimiento(producto, tipo, cantidad, motivo, null);
             redirectAttrs.addFlashAttribute("successMessage", "Movimiento registrado correctamente.");
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());

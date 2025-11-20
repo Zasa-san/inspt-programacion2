@@ -57,7 +57,7 @@ public class RouteController {
 
         // Calculate stock for all available products
         var productosEntities = productoService.findAllAvailable();
-        var stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
+        Map<Long, Integer> stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
         model.addAttribute("stockMap", stockMap);
 
         // Carrito actual en sesión

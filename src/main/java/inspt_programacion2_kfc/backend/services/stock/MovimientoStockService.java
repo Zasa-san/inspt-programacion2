@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +27,10 @@ public class MovimientoStockService {
     @Transactional
     public void registrarMovimiento(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
         if (cantidad <= 0) {
-            throw new IllegalArgumentException("La cantidad debe ser mayor a cero.");
+            throw new StockException("La cantidad debe ser mayor a cero.");
         }
-        MovimientoStock mov = new MovimientoStock();
-        mov.setProducto(producto);
-        mov.setTipo(tipo);
-        mov.setCantidad(cantidad);
-        mov.setMotivo(motivo);
-        mov.setPedidoId(pedidoId);
-        movimientoStockRepository.save(mov);
+
+        movimientoStockRepository.save(new MovimientoStock(producto, tipo, cantidad, motivo, pedidoId));
         log.info("Stock del producto id {} actualizado correctamente - idpedido {}", producto.getId(), pedidoId);
     }
 

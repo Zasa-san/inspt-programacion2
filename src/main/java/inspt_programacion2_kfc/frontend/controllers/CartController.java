@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import inspt_programacion2_kfc.frontend.models.Producto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,8 +46,8 @@ public class CartController {
             HttpSession session,
             RedirectAttributes redirectAttrs) {
 
-        var productOpt = productService.findById(productId);
-        if (productOpt.isEmpty()) {
+        Producto producto = productService.findById(productId);
+        if (producto == null) {
             redirectAttrs.addFlashAttribute("cartError", "Producto no encontrado.");
             return "redirect:/";
         }
@@ -75,7 +76,7 @@ public class CartController {
         }
 
         if (item == null) {
-            item = new CartItem(productOpt.get(), quantity);
+            item = new CartItem(producto, quantity);
             cart.put(productId, item);
         } else {
             item.increment(quantity);

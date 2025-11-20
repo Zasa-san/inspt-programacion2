@@ -26,8 +26,9 @@ public class ProductoService {
         return productoRepository.findByAvailableTrue();
     }
 
-    public Optional<ProductoEntity> findById(Long id) {
-        return productoRepository.findById(Objects.requireNonNull(id));
+    public ProductoEntity findById(Long id) {
+        Optional<ProductoEntity> producto = productoRepository.findById(id);
+        return producto.orElse(null);
     }
 
     public void save(ProductoEntity producto) {

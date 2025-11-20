@@ -2,6 +2,7 @@ package inspt_programacion2_kfc.frontend.controllers;
 
 import java.io.IOException;
 
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,17 +65,19 @@ public class ProductsPageController {
             RedirectAttributes redirectAttrs) {
 
         try {
-            ProductoEntity p = new ProductoEntity();
-            p.setName(name);
-            p.setDescription(description);
-            p.setPrice(price);
+            ProductoEntity producto = new ProductoEntity();
+            producto.setName(name);
+            producto.setDescription(description);
+            producto.setPrice(price);
 
             if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
                 String imageUrl = fileUploadService.saveFile(imageFile, "products");
-                p.setImgUrl(imageUrl);
+                producto.setImgUrl(imageUrl);
+            } else {
+                producto.setImgUrl(AppConstants.DEFAULT_IMG_URL);
             }
 
-            productoService.save(p);
+            productoService.save(producto);
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (IOException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
@@ -92,13 +95,13 @@ public class ProductsPageController {
         PageMetadata page = new PageMetadata("Editar producto");
         model.addAttribute("page", page);
 
-        var producto = productoService.findById(id);
-        if (producto.isEmpty()) {
+        ProductoEntity producto = productoService.findById(id);
+        if (producto == null) {
             redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
             return "redirect:/products";
         }
 
-        model.addAttribute("product", producto.get());
+        model.addAttribute("product", producto);
         return "products/edit";
     }
 
@@ -113,29 +116,28 @@ public class ProductsPageController {
             RedirectAttributes redirectAttrs) {
 
         try {
-            var productoOpt = productoService.findById(id);
-            if (productoOpt.isEmpty()) {
+            ProductoEntity producto = productoService.findById(id);
+            if (producto == null) {
                 redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
                 return "redirect:/products";
             }
 
-            ProductoEntity p = productoOpt.get();
-            p.setName(name);
-            p.setDescription(description);
-            p.setPrice(price);
+            producto.setName(name);
+            producto.setDescription(description);
+            producto.setPrice(price);
 
             if (removeImage) {
-                deleteProductImage(p);
-                p.setImgUrl(null);
+                deleteProductImage(producto);
+                producto.setImgUrl(null);
             }
 
             if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
-                deleteProductImage(p);
+                deleteProductImage(producto);
                 String imageUrl = fileUploadService.saveFile(imageFile, "products");
-                p.setImgUrl(imageUrl);
+                producto.setImgUrl(imageUrl);
             }
 
-            productoService.update(p);
+            productoService.update(producto);
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (IOException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
@@ -151,9 +153,9 @@ public class ProductsPageController {
     @PostMapping("/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            var producto = productoService.findById(id);
-            if (producto.isPresent()) {
-                deleteProductImage(producto.get());
+            ProductoEntity producto = productoService.findById(id);
+            if (producto != null) {
+                deleteProductImage(producto);
                 productoService.deleteById(id);
                 redirectAttrs.addFlashAttribute("successMessage", "Producto eliminado correctamente.");
             } else {

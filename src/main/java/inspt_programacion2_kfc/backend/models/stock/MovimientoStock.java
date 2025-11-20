@@ -40,7 +40,7 @@ public class MovimientoStock {
     private int cantidad;
 
     @Column(nullable = false)
-    private LocalDateTime fecha = LocalDateTime.now();
+    private LocalDateTime fecha;
 
     @Column(length = 255)
     private String motivo;
@@ -48,6 +48,17 @@ public class MovimientoStock {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "pedido_id", nullable = true)
     private Long pedidoId;
+
+    public MovimientoStock(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
+        this.producto = producto;
+        this.tipo = tipo;
+        this.cantidad = cantidad;
+        this.fecha = LocalDateTime.now();
+        this.motivo = motivo;
+        this.pedidoId = pedidoId;
+    }
+
+    public MovimientoStock(){};
 }
 
 

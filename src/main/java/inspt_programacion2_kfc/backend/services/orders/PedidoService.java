@@ -1,12 +1,12 @@
 package inspt_programacion2_kfc.backend.services.orders;
 
-import java.util.List;
-import java.util.Objects;
-
 import inspt_programacion2_kfc.backend.exceptions.cart.CartEmptyException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import inspt_programacion2_kfc.backend.exceptions.order.OrderAlreadyDeliveredException;
+import inspt_programacion2_kfc.backend.exceptions.order.OrderCancelledException;
+import inspt_programacion2_kfc.backend.exceptions.order.OrderException;
+import inspt_programacion2_kfc.backend.exceptions.order.OrderNotFoundException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
+import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.models.orders.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
@@ -16,6 +16,11 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
@@ -34,6 +39,16 @@ public class PedidoService {
 
     public List<Pedido> findAll() {
         return pedidoRepository.findAll();
+    }
+
+    private Pedido findByIdPedido(Long idPedido) {
+        Optional<Pedido> pedido = pedidoRepository.findById(idPedido);
+        return pedido.orElse(null);
+    }
+
+    private ProductoEntity findByIdProducto(Long idProducto) {
+        Optional<ProductoEntity> producto = productoRepository.findById(idProducto);
+        return producto.orElse(null);
     }
 
     @Transactional
@@ -57,7 +72,7 @@ public class PedidoService {
             int stockActual = movimientoStockService.calcularStockProducto(productoId);
             if (stockActual < cartItem.getQuantity()) {
                 String nombre = cartItem.getProductoName() != null ? cartItem.getProductoName() : "";
-                throw new IllegalArgumentException("No hay stock suficiente para el producto: " + nombre);
+                throw new StockException("No hay stock suficiente para el producto: " + nombre);
             }
         }
 
@@ -67,17 +82,20 @@ public class PedidoService {
         int total = 0;
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
-            ProductoEntity producto = productoRepository.findById(Objects.requireNonNull(productoId))
-                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + productoId));
+            if (productoId == null) throw new ProductException("Producto con id nulo, revise la base de datos.");
 
-            ItemPedido item = new ItemPedido();
-            item.setProducto(producto);
-            item.setQuantity(cartItem.getQuantity());
-            item.setUnitPrice(producto.getPrice());
-            item.setSubtotal(producto.getPrice() * cartItem.getQuantity());
+            ProductoEntity producto = findByIdProducto(productoId);
 
-            total += item.getSubtotal();
-            pedido.addItem(item);
+            if (producto != null) {
+                ItemPedido item = new ItemPedido();
+                item.setProducto(producto);
+                item.setQuantity(cartItem.getQuantity());
+                item.setUnitPrice(producto.getPrice());
+                item.setSubtotal(producto.getPrice() * cartItem.getQuantity());
+                total += item.getSubtotal();
+                pedido.addItem(item);
+            }
+
         }
 
         pedido.setTotal(total);
@@ -95,14 +113,19 @@ public class PedidoService {
 
     @Transactional
     public void cancelarPedido(Long id) {
-        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado: " + id));
+        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+
+        Pedido pedido = findByIdPedido(id);
+
+        if (pedido == null) {
+            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
+        }
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
-            throw new IllegalArgumentException("El pedido ya está cancelado.");
+            throw new OrderCancelledException("El pedido ya está cancelado.");
         }
         if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
-            throw new IllegalArgumentException("No se puede cancelar un pedido ya entregado.");
+            throw new OrderAlreadyDeliveredException("No se puede cancelar un pedido ya entregado.");
         }
 
         pedido.setEstado(EstadoPedido.CANCELADO);
@@ -120,11 +143,16 @@ public class PedidoService {
 
     @Transactional
     public void marcarEntregado(Long id) {
-        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado"));
+        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+
+        Pedido pedido = findByIdPedido(id);
+
+        if (pedido == null) {
+            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
+        }
 
         if (pedido.getEstado() != EstadoPedido.PAGADO) {
-            throw new IllegalArgumentException("Sólo se pueden marcar como ENTREGADO los pedidos en estado PAGADO.");
+            throw new OrderException("Sólo se pueden marcar como ENTREGADO los pedidos en estado PAGADO.");
         }
 
         pedido.setEstado(EstadoPedido.ENTREGADO);
@@ -133,17 +161,22 @@ public class PedidoService {
 
     @Transactional
     public void marcarComoPagado(Long id) {
-        Pedido pedido = pedidoRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new IllegalArgumentException("Pedido no encontrado: " + id));
+        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+
+        Pedido pedido = findByIdPedido(id);
+
+        if (pedido == null) {
+            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
+        }
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
-            throw new IllegalArgumentException("No se puede marcar como pagado un pedido cancelado.");
+            throw new OrderCancelledException("No se puede marcar como pagado un pedido cancelado.");
         }
         if (pedido.getEstado() == EstadoPedido.PAGADO) {
-            throw new IllegalArgumentException("El pedido ya está marcado como pagado.");
+            throw new OrderException("El pedido ya está marcado como pagado.");
         }
         if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
-            throw new IllegalArgumentException("El pedido ya está entregado.");
+            throw new OrderAlreadyDeliveredException("El pedido ya está entregado.");
         }
 
         pedido.setEstado(EstadoPedido.PAGADO);
