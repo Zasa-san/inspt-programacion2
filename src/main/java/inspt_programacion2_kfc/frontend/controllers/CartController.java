@@ -69,9 +69,8 @@ public class CartController {
         }
 
         if (totalRequested > availableStock) {
-            int maxCanAdd = availableStock - currentCartQuantity;
             redirectAttrs.addFlashAttribute("cartError",
-                    "Stock insuficiente. Máximo disponible para agregar: " + maxCanAdd);
+                    "Stock insuficiente.");
             return "redirect:/";
         }
 
@@ -91,10 +90,19 @@ public class CartController {
             @RequestParam("productId") Long productId,
             HttpSession session,
             RedirectAttributes redirectAttrs) {
-
         Map<Long, CartItem> cart = getCart(session);
-        if (cart.remove(productId) != null) {
-            redirectAttrs.addFlashAttribute("cartMessage", "Producto eliminado del carrito.");
+        CartItem item = cart.get(productId);
+
+        if (item != null) {
+            int newQuantity = item.getQuantity() - 1;
+
+            if (newQuantity <= 0) {
+                cart.remove(productId);
+                redirectAttrs.addFlashAttribute("cartMessage", "Producto eliminado del carrito.");
+            } else {
+                item.setQuantity(newQuantity);
+                redirectAttrs.addFlashAttribute("cartMessage", String.format("Se quitó una unidad de %s del carrito.", item.getProducto().getName()));
+            }
         }
         return "redirect:/";
     }
