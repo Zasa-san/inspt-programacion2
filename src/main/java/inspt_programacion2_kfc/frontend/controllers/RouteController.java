@@ -75,7 +75,7 @@ public class RouteController {
     @GetMapping("/login")
     public String login(Model model, Authentication authentication, HttpServletRequest request,
             HttpServletResponse response) {
-        //TODO TESTEAR BIEN LOGUEO Y RETROCESO
+        //TODO TESTEAR BIEN LOGUEO Y RETROCESO, SI DESLOGUEA PROBAR REINICIAR LA APP HASTA QUE FUNCIONE (FIX TEMPORAL)
         if (isAuthenticated(authentication) && request.getParameter("justLoggedOut") == null) {
             logoutHandler.logout(request, response, authentication);
             return "redirect:/login?justLoggedOut=1";
