@@ -34,38 +34,31 @@ public class UsersPageController {
         PageMetadata page = new PageMetadata("Usuarios");
         model.addAttribute("page", page);
 
-        User currentUser = null;
         boolean isAdmin = false;
+        Long currentUserId;
 
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
-            currentUser = (User) authentication.getPrincipal();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
-            model.addAttribute("currentUserId", currentUser.getId());
+            currentUserId = currentUser.getId();
+            model.addAttribute("currentUserId", currentUserId);
+        } else {
+            currentUserId = null;
         }
 
         List<User> users = userService.findAll();
-        List<UserResponseDTO> dtos;
 
-        // Si es admin, ve todos los usuarios. Si no, solo ve su propio usuario
+        List<User> filteredUsers;
         if (isAdmin) {
-            dtos = users.stream().map(u -> new UserResponseDTO(
-                    u.getId(),
-                    u.getUsername(),
-                    u.getRole().toString(),
-                    u.isEnabled()
-            )).collect(Collectors.toList());
+            filteredUsers = users;
         } else {
-            // No-admin solo ve su propio usuario
-            final User finalCurrentUser = currentUser;
-            dtos = users.stream()
-                    .filter(u -> finalCurrentUser != null && u.getId().equals(finalCurrentUser.getId()))
-                    .map(u -> new UserResponseDTO(
-                    u.getId(),
-                    u.getUsername(),
-                    u.getRole().toString(),
-                    u.isEnabled()
-            )).collect(Collectors.toList());
+            filteredUsers = users.stream()
+                    .filter(u -> u.getId().equals(currentUserId))
+                    .collect(Collectors.toList());
         }
+
+        List<UserResponseDTO> dtos = filteredUsers.stream()
+                .map(user -> new UserResponseDTO(user.getId(), user.getUsername(), user.getRole().getRoleName(), user.isEnabled()))
+                .collect(Collectors.toList());
 
         model.addAttribute("users", dtos);
         model.addAttribute("isAdmin", isAdmin);

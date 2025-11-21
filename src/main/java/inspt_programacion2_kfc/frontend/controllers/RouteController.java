@@ -75,11 +75,11 @@ public class RouteController {
     @GetMapping("/login")
     public String login(Model model, Authentication authentication, HttpServletRequest request,
             HttpServletResponse response) {
-        //TODO TESTEAR BIEN LOGUEO Y RETROCESO, SI DESLOGUEA PROBAR REINICIAR LA APP HASTA QUE FUNCIONE (FIX TEMPORAL)
-        if (isAuthenticated(authentication) && request.getParameter("justLoggedOut") == null) {
-            logoutHandler.logout(request, response, authentication);
-            return "redirect:/login?justLoggedOut=1";
-        }
+        //TODO esto desloguea al retroceder luego de loguearse, pero probalo y fijate si te anda bien sino buscamos otra forma
+//        if (isAuthenticated(authentication) && request.getParameter("justLoggedOut") == null) {
+//            logoutHandler.logout(request, response, authentication);
+//            return "redirect:/login?justLoggedOut=1";
+//        }
 
         PageMetadata page = new PageMetadata("Iniciar sesión");
         model.addAttribute("page", page);
