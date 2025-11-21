@@ -7,7 +7,7 @@
   <header th:replace="~{fragments/navbar :: navbar}"></header>
 
   <!-- Hero Section -->
-  <section class="hero is-primary is-medium" sec:authorize="isAnonymous()">
+  <section class="hero is-primary is-medium">
     <div class="hero-body">
       <div class="container has-text-centered">
         <h1 class="title is-1">
@@ -41,7 +41,7 @@
 
   <section class="section">
     <div class="container">
-      <div class="columns mt-5" sec:authorize="isAnonymous()">
+      <div class="columns mt-5">
         <!-- Lista de productos -->
         <div class="column is-two-thirds" id="productos">
           <h2 class="title is-4">Menú</h2>
@@ -71,10 +71,10 @@
                     <input type="hidden" name="productId" th:value="${p.id}" />
                     <div class="field has-addons">
                       <div class="control is-expanded">
-                        <input class="input" type="number" name="quantity" min="1" value="1" />
+                        <input class="input" type="number" name="quantity" min="1" value="1" sec:authorize="isAnonymous()"/>
                       </div>
                       <div class="control">
-                        <button type="submit" class="button is-primary">
+                        <button type="submit" class="button is-primary" sec:authorize="isAnonymous()">
                           Agregar al carrito
                         </button>
                       </div>
@@ -157,7 +157,7 @@
       </div>
 
       <div class="notification is-info mt-5" sec:authorize="isAuthenticated()">
-        Solo los clientes anónimos pueden armar un carrito desde esta página. Cierre sesión para ver el menú de compra.
+        Solo los clientes anónimos pueden armar un carrito desde esta página. Cierre sesión para comprar.
       </div>
     </div>
   </section>

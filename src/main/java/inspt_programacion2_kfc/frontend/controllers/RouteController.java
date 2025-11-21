@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.frontend.models.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,11 +54,11 @@ public class RouteController {
         model.addAttribute("page", page);
 
         // Productos disponibles para el cliente
-        var products = productService.findAll();
+        List<Producto> products = productService.findAll();
         model.addAttribute("products", products);
 
         // Calculate stock for all available products
-        var productosEntities = productoService.findAllAvailable();
+        List<ProductoEntity> productosEntities = productoService.findAllAvailable();
         Map<Long, Integer> stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
         model.addAttribute("stockMap", stockMap);
 

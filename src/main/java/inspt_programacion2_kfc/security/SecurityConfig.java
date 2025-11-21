@@ -21,8 +21,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
+        http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/index", "/login", "/access-denied", "/css/**", "/js/**", "/img/**", "/uploads/**", "/favicon.ico", "/cart/**", "/checkout/**").permitAll()
                 .requestMatchers("/users/**").authenticated()
                 .requestMatchers("/products/**").hasRole(Role.ROLE_ADMIN.getRoleName())

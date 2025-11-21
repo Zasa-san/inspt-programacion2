@@ -26,7 +26,7 @@ public class ProductService {
                 .map(p -> {
                     String img = p.getImgUrl();
                     if (img == null || img.isBlank()) {
-                        img = "/img/producto-default.png";
+                        img = AppConstants.DEFAULT_IMG_URL;
                     }
                     return new Producto(p.getId(), p.getName(), p.getDescription(), p.getPrice(), img);
                 })
