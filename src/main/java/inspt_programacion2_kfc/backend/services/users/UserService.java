@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -84,17 +83,17 @@ public class UserService {
      * @return usuario si existe
      */
     public User findById(Long id) {
-        if (id == null) throw new UserException("El id no puede ser nulo.");
+        if (id == null) throw new UsernameNotFoundException("El id no puede ser nulo.");
         return userRepository.findById(id).orElse(null);
     }
 
     public boolean existsByUsername(String username) {
-        Objects.requireNonNull(username, "Username no puede ser NULL");
+        if (username.isEmpty()) throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
         return userRepository.findByUsername(username).isPresent();
     }
 
     public User findByUsername(String username) {
-        if (username.isEmpty()) throw new UsernameNotFoundException("Usuario no encontrado.");
+        if (username.isEmpty()) throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
         return userRepository.findByUsername(username).orElse(null);
     }
 
@@ -108,9 +107,7 @@ public class UserService {
      * @param role        nuevo rol
      */
     public void update(Long id, String username, String rawPassword, Role role) {
-        Objects.requireNonNull(id, "ID no puede ser NULL");
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id)));
+        User user = findById(id);
 
         user.setUsername(username);
         if (rawPassword != null && !rawPassword.isBlank()) {
@@ -126,9 +123,8 @@ public class UserService {
      * @param id id del usuario a eliminar
      */
     public void delete(Long id) {
-        Objects.requireNonNull(id, "ID no puede ser NULL");
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id));
+            throw new UserNotFoundException(String.format("Usuario con id %s no fue encontrado o no existe ", id));
         }
         userRepository.deleteById(id);
     }
@@ -140,9 +136,7 @@ public class UserService {
      * @param enabled nuevo estado
      */
     public void toggleEnabled(Long id, boolean enabled) {
-        Objects.requireNonNull(id, "ID no puede ser NULL");
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("Usuario con id %s no encontrado: ", id)));
+        User user = findById(id);
 
         user.setEnabled(enabled);
         userRepository.save(user);

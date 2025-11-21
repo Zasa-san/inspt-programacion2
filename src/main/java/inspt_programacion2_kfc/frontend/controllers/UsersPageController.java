@@ -43,7 +43,7 @@ public class UsersPageController {
             model.addAttribute("currentUserId", currentUser.getId());
         }
 
-        var users = userService.findAll();
+        List<User> users = userService.findAll();
         List<UserResponseDTO> dtos;
 
         // Si es admin, ve todos los usuarios. Si no, solo ve su propio usuario
