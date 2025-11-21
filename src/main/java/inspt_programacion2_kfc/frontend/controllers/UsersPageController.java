@@ -109,13 +109,12 @@ public class UsersPageController {
         PageMetadata page = new PageMetadata("Editar usuario");
         model.addAttribute("page", page);
 
-        var userOpt = userService.findById(id);
-        if (userOpt.isEmpty()) {
+        User user = userService.findById(id);
+        if (user == null) {
             return "redirect:/users";
         }
 
-        var u = userOpt.get();
-        UserRequestDTO dto = new UserRequestDTO(u.getUsername(), "", u.getRole().name());
+        UserRequestDTO dto = new UserRequestDTO(user.getUsername(), "", user.getRole().name());
         model.addAttribute("user", dto);
         model.addAttribute("roles", Role.values());
         model.addAttribute("userId", id);
@@ -183,9 +182,9 @@ public class UsersPageController {
 
             // Si el usuario edita su propio perfil, no se permite cambiar el rol
             if (currentUser.getId() != null && currentUser.getId().equals(id)) {
-                var existingUserOpt = userService.findById(id);
-                if (existingUserOpt.isPresent()) {
-                    newRole = existingUserOpt.get().getRole();
+                User existingUser = userService.findById(id);
+                if (existingUser != null) {
+                    newRole = existingUser.getRole();
                 }
             }
 

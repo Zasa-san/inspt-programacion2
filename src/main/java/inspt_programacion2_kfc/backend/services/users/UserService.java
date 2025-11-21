@@ -1,21 +1,18 @@
 package inspt_programacion2_kfc.backend.services.users;
 
-import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserCreationFailedException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserNotFoundException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserPasswordResetFailedException;
+import inspt_programacion2_kfc.backend.exceptions.user.*;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,34 +40,32 @@ public class UserService {
      *                                          contraseña
      */
     public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
-        Optional<User> dbUser = userRepository.findByUsername(username);
-
-        if (dbUser.isPresent() && dbUser.get().getUsername().equalsIgnoreCase(username)) {
-            throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
-        }
-
-        if (dbUser.isEmpty()) {
-            User newUser = new User();
-            newUser.setUsername(username);
-            newUser.setPassword(passwordEncoder.encode(rawPassword));
-            newUser.setRole(role);
-            newUser.setEnabled(true);
+        if (resetIfExists) {
+            User dbUser = findByUsername(username);
+            dbUser.setPassword(passwordEncoder.encode(rawPassword));
             try {
-                log.info("Usuario {} guardado correctamente.", newUser.getUsername());
-                userRepository.save(newUser);
-            } catch (DataIntegrityViolationException ex) {
-                throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
-            }
-        } else if (resetIfExists) {
-            User existing = dbUser.get();
-            existing.setPassword(passwordEncoder.encode(rawPassword));
-            try {
-                log.info("Clave reestablecida correctamente para el usuario {}", existing.getUsername());
-                userRepository.save(existing);
+                log.info("Clave reestablecida correctamente para el usuario {}", dbUser.getUsername());
+                userRepository.save(dbUser);
+                return;
             } catch (DataIntegrityViolationException ex) {
                 throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
             }
         }
+
+        if (existsByUsername(username)) throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
+
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(passwordEncoder.encode(rawPassword));
+        newUser.setRole(role);
+        newUser.setEnabled(true);
+        try {
+            userRepository.save(newUser);
+            log.info("Usuario {} guardado correctamente.", newUser.getUsername());
+        } catch (DataIntegrityViolationException ex) {
+            throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
+        }
+
     }
 
     /**
@@ -88,14 +83,19 @@ public class UserService {
      * @param id id del usuario
      * @return usuario si existe
      */
-    public Optional<User> findById(Long id) {
-        Objects.requireNonNull(id, "ID no puede ser NULL");
-        return userRepository.findById(id);
+    public User findById(Long id) {
+        if (id == null) throw new UserException("El id no puede ser nulo.");
+        return userRepository.findById(id).orElse(null);
     }
 
     public boolean existsByUsername(String username) {
         Objects.requireNonNull(username, "Username no puede ser NULL");
         return userRepository.findByUsername(username).isPresent();
+    }
+
+    public User findByUsername(String username) {
+        if (username.isEmpty()) throw new UsernameNotFoundException("Usuario no encontrado.");
+        return userRepository.findByUsername(username).orElse(null);
     }
 
     /**
