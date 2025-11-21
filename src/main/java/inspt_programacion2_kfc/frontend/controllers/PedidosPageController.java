@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import inspt_programacion2_kfc.backend.models.orders.Pedido;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
+
+import java.util.List;
 
 @Controller
 public class PedidosPageController {
@@ -47,7 +50,7 @@ public class PedidosPageController {
         PageMetadata page = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", page);
 
-        var pedidos = pedidoService.findAll();
+        List<Pedido> pedidos = pedidoService.findAll();
         model.addAttribute("pedidos", pedidos);
 
         return "pedidos/index";

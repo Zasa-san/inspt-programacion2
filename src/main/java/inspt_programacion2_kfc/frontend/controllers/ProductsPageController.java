@@ -1,6 +1,7 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.stereotype.Controller;
@@ -42,7 +43,7 @@ public class ProductsPageController {
         PageMetadata page = new PageMetadata("Productos", "Administración de productos");
         model.addAttribute("page", page);
 
-        var productos = productoService.findAll();
+        List<ProductoEntity> productos = productoService.findAll();
         model.addAttribute("products", productos);
         return "products/index";
     }

@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import java.util.List;
 import java.util.Map;
 
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
@@ -31,7 +32,7 @@ public class StockPageController {
         PageMetadata page = new PageMetadata("Stock de productos", "Gestión de stock por producto");
         model.addAttribute("page", page);
 
-        var productos = productoService.findAll();
+        List<ProductoEntity> productos = productoService.findAll();
         Map<Long, Integer> stocks = movimientoStockService.calcularStockParaProductos(productos);
 
         model.addAttribute("productos", productos);

@@ -221,7 +221,7 @@ public class UsersPageController {
             }
 
             // Admin no puede auto-eliminarse
-            if (currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+            if (currentUser.getId() != null && currentUser.getId().equals(id)) {
                 redirectAttrs.addFlashAttribute("errorMessage",
                         "No podés eliminar tu propio usuario estando logueado.");
                 return "redirect:/users";
@@ -255,7 +255,7 @@ public class UsersPageController {
             }
 
             // Admin no puede auto-desactivarse
-            if (!enabled && currentUser != null && currentUser.getId() != null && currentUser.getId().equals(id)) {
+            if (!enabled && currentUser.getId() != null && currentUser.getId().equals(id)) {
                 redirectAttrs.addFlashAttribute("errorMessage",
                         "No podes deshabilitar tu propio usuario estando logueado.");
                 return "redirect:/users";
