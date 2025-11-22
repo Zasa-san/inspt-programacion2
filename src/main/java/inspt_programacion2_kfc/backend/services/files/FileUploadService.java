@@ -7,10 +7,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -21,7 +23,7 @@ public class FileUploadService {
 
     public String saveFile(MultipartFile file, String subdirectory) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new IOException("No se puede guardar un archivo vacío");
+            throw new ProductImageException("No se puede guardar un archivo vacío");
         }
 
         Path uploadPath = Paths.get(uploadDir, subdirectory);

@@ -44,19 +44,22 @@ public class UserService {
      * contraseña
      */
     public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
-        if (resetIfExists) {
+        boolean userExists = existsByUsername(username);
+
+        if (userExists && resetIfExists) {
             User dbUser = findByUsername(username);
-            dbUser.setPassword(passwordEncoder.encode(rawPassword));
-            try {
-                log.info("Clave reestablecida correctamente para el usuario {}", dbUser.getUsername());
-                userRepository.save(dbUser);
-                return;
-            } catch (DataIntegrityViolationException ex) {
-                throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
+            if (dbUser != null) {
+                dbUser.setPassword(passwordEncoder.encode(rawPassword));
+                try {
+                    userRepository.save(dbUser);
+                    log.info("Clave reestablecida correctamente para el usuario {}", dbUser.getUsername());
+                } catch (DataIntegrityViolationException ex) {
+                    throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
+                }
             }
         }
 
-        if (existsByUsername(username)) {
+        if (userExists && !resetIfExists) {
             throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
         }
 

@@ -2,7 +2,6 @@ package inspt_programacion2_kfc.config;
 
 import javax.sql.DataSource;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,6 +12,7 @@ import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.users.UserService;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DataLoaderCli {
@@ -61,10 +61,10 @@ public class DataLoaderCli {
                 p4.setPrice(150000);
                 p4.setImgUrl("/uploads/products/helado-sundae.jpg");
 
-                productoService.save(p1);
-                productoService.save(p2);
-                productoService.save(p3);
-                productoService.save(p4);
+                productoService.create(p1);
+                productoService.create(p2);
+                productoService.create(p3);
+                productoService.create(p4);
             }
 
             message = "Se ha inicializado el usuario por defecto y productos de ejemplo.";

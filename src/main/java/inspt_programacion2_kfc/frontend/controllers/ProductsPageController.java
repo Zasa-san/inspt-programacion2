@@ -1,9 +1,7 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
-import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.services.files.FileUploadService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
@@ -22,20 +22,9 @@ import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 public class ProductsPageController {
 
     private final ProductoService productoService;
-    private final FileUploadService fileUploadService;
 
-    public ProductsPageController(ProductoService productoService, FileUploadService fileUploadService) {
+    public ProductsPageController(ProductoService productoService) {
         this.productoService = productoService;
-        this.fileUploadService = fileUploadService;
-    }
-
-    /**
-     * Elimina la imagen asociada a un producto, si existe.
-     */
-    private void deleteProductImage(ProductoEntity producto) {
-        if (producto != null && producto.getImgUrl() != null) {
-            fileUploadService.deleteFile(producto.getImgUrl());
-        }
     }
 
     @GetMapping("/products")
@@ -71,19 +60,12 @@ public class ProductsPageController {
             producto.setDescription(description);
             producto.setPrice(price);
 
-            if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
-                String imageUrl = fileUploadService.saveFile(imageFile, "products");
-                producto.setImgUrl(imageUrl);
-            } else {
-                producto.setImgUrl(AppConstants.DEFAULT_IMG_URL);
-            }
-
-            productoService.save(producto);
+            productoService.create(producto, imageFile);
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
-        } catch (IOException e) {
+        } catch (ProductImageException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
             return "redirect:/products/new";
-        } catch (Exception e) {
+        } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al crear producto: " + e.getMessage());
             return "redirect:/products/new";
         }
@@ -117,33 +99,20 @@ public class ProductsPageController {
             RedirectAttributes redirectAttrs) {
 
         try {
-            ProductoEntity producto = productoService.findById(id);
-            if (producto == null) {
-                redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
-                return "redirect:/products";
-            }
+            ProductoEntity updatedData = new ProductoEntity();
+            updatedData.setName(name);
+            updatedData.setDescription(description);
+            updatedData.setPrice(price);
 
-            producto.setName(name);
-            producto.setDescription(description);
-            producto.setPrice(price);
-
-            if (removeImage) {
-                deleteProductImage(producto);
-                producto.setImgUrl(null);
-            }
-
-            if (imageFile != null && !imageFile.isEmpty() && imageFile.getSize() > 0) {
-                deleteProductImage(producto);
-                String imageUrl = fileUploadService.saveFile(imageFile, "products");
-                producto.setImgUrl(imageUrl);
-            }
-
-            productoService.update(producto);
+            productoService.update(id, updatedData, imageFile, removeImage);
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
-        } catch (IOException e) {
+        } catch (ProductNotFoundException e) {
+            redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/products";
+        } catch (ProductImageException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
             return "redirect:/products/edit/" + id;
-        } catch (Exception e) {
+        } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al actualizar producto: " + e.getMessage());
             return "redirect:/products/edit/" + id;
         }
@@ -154,15 +123,11 @@ public class ProductsPageController {
     @PostMapping("/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            ProductoEntity producto = productoService.findById(id);
-            if (producto != null) {
-                deleteProductImage(producto);
-                productoService.deleteById(id);
-                redirectAttrs.addFlashAttribute("successMessage", "Producto eliminado correctamente.");
-            } else {
-                redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
-            }
-        } catch (Exception e) {
+            productoService.delete(id);
+            redirectAttrs.addFlashAttribute("successMessage", "Producto eliminado correctamente.");
+        } catch (ProductNotFoundException e) {
+            redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al eliminar producto: " + e.getMessage());
         }
         return "redirect:/products";
@@ -173,7 +138,7 @@ public class ProductsPageController {
         try {
             productoService.toggleAvailability(id);
             redirectAttrs.addFlashAttribute("successMessage", "Disponibilidad actualizada correctamente.");
-        } catch (Exception e) {
+        } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al actualizar disponibilidad: " + e.getMessage());
         }
         return "redirect:/products";
