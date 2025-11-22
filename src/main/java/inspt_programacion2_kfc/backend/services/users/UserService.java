@@ -1,17 +1,22 @@
 package inspt_programacion2_kfc.backend.services.users;
 
-import inspt_programacion2_kfc.backend.exceptions.user.*;
-import inspt_programacion2_kfc.backend.models.users.Role;
-import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserCreationFailedException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserNotFoundException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserPasswordResetFailedException;
+import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -29,14 +34,14 @@ public class UserService {
     /**
      * Crea un usuario nuevo o actualiza la contraseña de uno existente.
      *
-     * @param username      nombre de usuario (único)
-     * @param rawPassword   contraseña en texto plano (se encripta internamente)
-     * @param role          rol a asignar (enum {@link Role})
+     * @param username nombre de usuario (único)
+     * @param rawPassword contraseña en texto plano (se encripta internamente)
+     * @param role rol a asignar (enum {@link Role})
      * @param resetIfExists si true, resetea la contraseña si el usuario ya
-     *                      existe
-     * @throws UserCreationFailedException      si no se pudo crear el usuario
+     * existe
+     * @throws UserCreationFailedException si no se pudo crear el usuario
      * @throws UserPasswordResetFailedException si no se pudo resetear la
-     *                                          contraseña
+     * contraseña
      */
     public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
         if (resetIfExists) {
@@ -51,7 +56,9 @@ public class UserService {
             }
         }
 
-        if (existsByUsername(username)) throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
+        if (existsByUsername(username)) {
+            throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
+        }
 
         User newUser = new User();
         newUser.setUsername(username);
@@ -83,17 +90,23 @@ public class UserService {
      * @return usuario si existe
      */
     public User findById(Long id) {
-        if (id == null) throw new UsernameNotFoundException("El id no puede ser nulo.");
+        if (id == null) {
+            throw new UserException("El id no puede ser nulo.");
+        }
         return userRepository.findById(id).orElse(null);
     }
 
     public boolean existsByUsername(String username) {
-        if (username.isEmpty()) throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
+        if (username.isEmpty()) {
+            throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
+        }
         return userRepository.findByUsername(username).isPresent();
     }
 
     public User findByUsername(String username) {
-        if (username.isEmpty()) throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
+        if (username.isEmpty()) {
+            throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
+        }
         return userRepository.findByUsername(username).orElse(null);
     }
 
@@ -101,10 +114,10 @@ public class UserService {
      * Actualiza los datos de un usuario existente. Si la contraseña es null o
      * vacía, no se modifica.
      *
-     * @param id          id del usuario a actualizar
-     * @param username    nuevo username
+     * @param id id del usuario a actualizar
+     * @param username nuevo username
      * @param rawPassword nueva contraseña en texto plano
-     * @param role        nuevo rol
+     * @param role nuevo rol
      */
     public void update(Long id, String username, String rawPassword, Role role) {
         User user = findById(id);
@@ -123,6 +136,9 @@ public class UserService {
      * @param id id del usuario a eliminar
      */
     public void delete(Long id) {
+        if (id == null) {
+            throw new UserException("El id no puede ser nulo.");
+        }
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException(String.format("Usuario con id %s no fue encontrado o no existe ", id));
         }
