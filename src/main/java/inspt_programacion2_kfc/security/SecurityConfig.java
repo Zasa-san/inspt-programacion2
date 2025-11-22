@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import inspt_programacion2_kfc.backend.models.users.Role;
 
@@ -28,7 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/stock/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/pedidos/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_VENDEDOR.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .anyRequest().authenticated()
-                )
+        )
                 .formLogin(form -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/", true)
@@ -44,6 +45,9 @@ public class SecurityConfig {
                 )
                 .logout(withDefaults())
                 .headers(headers -> headers.cacheControl(withDefaults()));
+
+            http.addFilterBefore(new NoStoreForLoginFilter(),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
