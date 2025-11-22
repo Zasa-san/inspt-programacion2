@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 
@@ -27,6 +28,9 @@ public class ProductoService {
     }
 
     public ProductoEntity findById(Long id) {
+        if (id == null) {
+            throw new ProductException("ID producto invalido.");
+        }
         Optional<ProductoEntity> producto = productoRepository.findById(id);
         return producto.orElse(null);
     }

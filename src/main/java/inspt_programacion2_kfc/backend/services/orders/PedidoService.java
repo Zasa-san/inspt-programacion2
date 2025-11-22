@@ -1,5 +1,11 @@
 package inspt_programacion2_kfc.backend.services.orders;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import inspt_programacion2_kfc.backend.exceptions.cart.CartEmptyException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderAlreadyDeliveredException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderCancelledException;
@@ -16,11 +22,6 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PedidoService {
@@ -42,11 +43,17 @@ public class PedidoService {
     }
 
     private Pedido findByIdPedido(Long idPedido) {
+        if (idPedido == null) {
+            throw new OrderNotFoundException("ID pedido invalido.");
+        }
         Optional<Pedido> pedido = pedidoRepository.findById(idPedido);
         return pedido.orElse(null);
     }
 
     private ProductoEntity findByIdProducto(Long idProducto) {
+        if (idProducto == null) {
+            throw new ProductException("ID producto invalido.");
+        }
         Optional<ProductoEntity> producto = productoRepository.findById(idProducto);
         return producto.orElse(null);
     }
@@ -82,18 +89,20 @@ public class PedidoService {
         int total = 0;
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
-            if (productoId == null) throw new ProductException("Producto con id nulo, revise la base de datos.");
 
-            ProductoEntity producto = findByIdProducto(productoId);
+            if (productoId != null) {
 
-            if (producto != null) {
-                ItemPedido item = new ItemPedido();
-                item.setProducto(producto);
-                item.setQuantity(cartItem.getQuantity());
-                item.setUnitPrice(producto.getPrice());
-                item.setSubtotal(producto.getPrice() * cartItem.getQuantity());
-                total += item.getSubtotal();
-                pedido.addItem(item);
+                ProductoEntity producto = findByIdProducto(productoId);
+
+                if (producto != null) {
+                    ItemPedido item = new ItemPedido();
+                    item.setProducto(producto);
+                    item.setQuantity(cartItem.getQuantity());
+                    item.setUnitPrice(producto.getPrice());
+                    item.setSubtotal(producto.getPrice() * cartItem.getQuantity());
+                    total += item.getSubtotal();
+                    pedido.addItem(item);
+                }
             }
 
         }
@@ -113,7 +122,9 @@ public class PedidoService {
 
     @Transactional
     public void cancelarPedido(Long id) {
-        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+        if (id == null || id < 0) {
+            throw new OrderNotFoundException("ID pedido invalido.");
+        }
 
         Pedido pedido = findByIdPedido(id);
 
@@ -143,7 +154,9 @@ public class PedidoService {
 
     @Transactional
     public void marcarEntregado(Long id) {
-        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+        if (id == null || id < 0) {
+            throw new OrderNotFoundException("ID pedido invalido.");
+        }
 
         Pedido pedido = findByIdPedido(id);
 
@@ -161,7 +174,9 @@ public class PedidoService {
 
     @Transactional
     public void marcarComoPagado(Long id) {
-        if (id == null || id < 0) throw new OrderNotFoundException("ID pedido invalido.");
+        if (id == null || id < 0) {
+            throw new OrderNotFoundException("ID pedido invalido.");
+        }
 
         Pedido pedido = findByIdPedido(id);
 
