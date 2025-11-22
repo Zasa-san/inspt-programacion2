@@ -46,9 +46,11 @@ public class SecurityConfig {
                 .logout(withDefaults())
                 .headers(headers -> headers.cacheControl(withDefaults()));
 
-            http.addFilterBefore(new NoStoreForLoginFilter(),
+        http.addFilterBefore(new NoStoreForLoginFilter(),
                 UsernamePasswordAuthenticationFilter.class);
 
+        http.addFilterBefore(new AutoLogoutOnLoginFilter(),
+                UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
