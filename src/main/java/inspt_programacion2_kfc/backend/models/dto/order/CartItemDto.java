@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.backend.models.orders;
+package inspt_programacion2_kfc.backend.models.dto.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

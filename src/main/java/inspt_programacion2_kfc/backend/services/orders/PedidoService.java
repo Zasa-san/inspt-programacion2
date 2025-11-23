@@ -13,7 +13,7 @@ import inspt_programacion2_kfc.backend.exceptions.order.OrderException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderNotFoundException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
-import inspt_programacion2_kfc.backend.models.orders.CartItemDto;
+import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;

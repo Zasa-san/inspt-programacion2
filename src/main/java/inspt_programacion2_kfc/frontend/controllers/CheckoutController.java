@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import inspt_programacion2_kfc.backend.models.orders.CartItemDto;
+import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
