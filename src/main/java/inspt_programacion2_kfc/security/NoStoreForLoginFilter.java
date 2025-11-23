@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.security;
 
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +15,7 @@ public class NoStoreForLoginFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        if ("/login".equals(request.getRequestURI())) {
+        if (AppConstants.LOGIN_URL.equals(request.getRequestURI())) {
             // no-store evita que el navegador conserve el formulario de login
             response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
             response.setHeader("Pragma", "no-cache");

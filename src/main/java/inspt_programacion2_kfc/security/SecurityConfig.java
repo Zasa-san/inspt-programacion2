@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.security;
 
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -31,12 +32,12 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         )
                 .formLogin(form -> form
-                .loginPage("/login")
+                .loginPage(AppConstants.LOGIN_URL)
                 .defaultSuccessUrl("/", true)
                 .permitAll()
                 )
                 .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint(AppConstants.LOGIN_URL))
                 .accessDeniedHandler(new AccessDeniedHandlerImpl() {
                     {
                         setErrorPage("/access-denied");

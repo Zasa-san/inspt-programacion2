@@ -2,6 +2,7 @@ package inspt_programacion2_kfc.security;
 
 import java.io.IOException;
 
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,14 +23,14 @@ public class AutoLogoutOnLoginFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        if ("/login".equals(request.getRequestURI()) && "GET".equalsIgnoreCase(request.getMethod())) {
+        if (AppConstants.LOGIN_URL.equals(request.getRequestURI()) && AppConstants.GET_METHOD.equalsIgnoreCase(request.getMethod())) {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
             if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
 
                 logoutHandler.logout(request, response, auth);
-                response.sendRedirect("/login");
+                response.sendRedirect(AppConstants.LOGIN_URL);
                 return;
 
             }
