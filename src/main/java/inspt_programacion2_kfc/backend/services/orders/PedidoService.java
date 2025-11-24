@@ -3,6 +3,7 @@ package inspt_programacion2_kfc.backend.services.orders;
 import java.util.List;
 import java.util.Optional;
 
+import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +28,21 @@ import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
+    private final ItemsPedidoRepository itemsPedidoRepository;
     private final ProductoRepository productoRepository;
     private final MovimientoStockService movimientoStockService;
 
     public PedidoService(PedidoRepository pedidoRepository,
             ProductoRepository productoRepository,
-            MovimientoStockService movimientoStockService) {
+            MovimientoStockService movimientoStockService, ItemsPedidoRepository itemsPedidoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
         this.movimientoStockService = movimientoStockService;
+        this.itemsPedidoRepository = itemsPedidoRepository;
     }
 
-    public List<Pedido> findAll() {
-        return pedidoRepository.findAll();
+    public List<ItemPedido> findAll() {
+        return itemsPedidoRepository.findAll();
     }
 
     private Pedido findByIdPedido(Long idPedido) {
