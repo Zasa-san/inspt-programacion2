@@ -2,6 +2,11 @@ package inspt_programacion2_kfc.backend.models.stock;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,8 +20,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Data
 @Entity
@@ -27,9 +30,10 @@ public class MovimientoStock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = false)
+    @JoinColumn(name = "producto_id", nullable = true)
     private ProductoEntity producto;
 
     @Enumerated(EnumType.STRING)
@@ -58,7 +62,7 @@ public class MovimientoStock {
         this.pedidoId = pedidoId;
     }
 
-    public MovimientoStock(){};
+    public MovimientoStock() {
+    }
+;
 }
-
-
