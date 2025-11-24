@@ -42,24 +42,52 @@ public class StockPageController {
     }
 
     @PostMapping("/stock/movimiento")
-    public String registrarMovimiento(@RequestParam("productoId") Long productoId,
-            @RequestParam("tipo") TipoMovimiento tipo,
-            @RequestParam("cantidad") int cantidad,
-            @RequestParam(name = "motivo", required = false) String motivo,
+    public String registrarMovimientos(
+            @RequestParam("productoId") List<Long> productoIds,
+            @RequestParam("tipo") List<TipoMovimiento> tipos,
+            @RequestParam("cantidad") List<Integer> cantidades,
+            @RequestParam(name = "motivo", required = false) List<String> motivos,
             RedirectAttributes redirectAttrs) {
 
-        ProductoEntity producto = productoService.findById(productoId);
-        if (producto == null) {
-            redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
+        if (productoIds == null || tipos == null || cantidades == null
+                || productoIds.size() != tipos.size()
+                || productoIds.size() != cantidades.size()) {
+            redirectAttrs.addFlashAttribute("errorMessage", "Datos de movimiento incompletos.");
             return "redirect:/stock";
         }
 
-        try {
-            movimientoStockService.registrarMovimiento(producto, tipo, cantidad, motivo, null);
-            redirectAttrs.addFlashAttribute("successMessage", "Movimiento registrado correctamente.");
-        } catch (IllegalArgumentException ex) {
-            redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
+        boolean algunMovimiento = false;
+
+        for (int i = 0; i < productoIds.size(); i++) {
+            int cantidad = cantidades.get(i) != null ? cantidades.get(i) : 0;
+            if (cantidad <= 0) {
+                continue;
+            }
+
+            Long productoId = productoIds.get(i);
+            TipoMovimiento tipo = tipos.get(i);
+            String motivo = (motivos != null && motivos.size() > i) ? motivos.get(i) : null;
+
+            ProductoEntity producto = productoService.findById(productoId);
+            if (producto == null) {
+                continue;
+            }
+
+            try {
+                movimientoStockService.registrarMovimiento(producto, tipo, cantidad, motivo, null);
+                algunMovimiento = true;
+            } catch (IllegalArgumentException ex) {
+                redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
+            }
         }
+
+        if (algunMovimiento) {
+            redirectAttrs.addFlashAttribute("successMessage", "Movimientos registrados correctamente.");
+        } else {
+            redirectAttrs.addFlashAttribute("errorMessage",
+                    "No se registró ningún movimiento (verifique las cantidades ingresadas).");
+        }
+
         return "redirect:/stock";
     }
 }
