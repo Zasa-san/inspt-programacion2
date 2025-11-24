@@ -1,7 +1,10 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;
+import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,11 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
-import inspt_programacion2_kfc.backend.services.orders.PedidoService;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class PedidosPageController {
@@ -51,7 +53,17 @@ public class PedidosPageController {
         PageMetadata page = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", page);
 
-        List<ItemPedido> pedidos = pedidoService.findAll();
+        List<ItemPedido> items = pedidoService.findAll();
+
+        Map<Long, Pedido> pedidosMap = new HashMap<>();
+        for (ItemPedido item : items) {
+            Pedido pedido = item.getPedido();
+            if (pedido != null && pedido.getId() != null && !pedidosMap.containsKey(pedido.getId())) {
+                pedidosMap.put(pedido.getId(), pedido);
+            }
+        }
+
+        List<Pedido> pedidos = new ArrayList<>(pedidosMap.values());
         model.addAttribute("pedidos", pedidos);
 
         return "pedidos/index";
