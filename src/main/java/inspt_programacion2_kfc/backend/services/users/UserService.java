@@ -57,22 +57,20 @@ public class UserService {
                     throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
                 }
             }
-        }
-
-        if (userExists && !resetIfExists) {
+        } else if (userExists && !resetIfExists) {
             throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
-        }
-
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPassword(passwordEncoder.encode(rawPassword));
-        newUser.setRole(role);
-        newUser.setEnabled(true);
-        try {
-            userRepository.save(newUser);
-            log.info("Usuario {} guardado correctamente.", newUser.getUsername());
-        } catch (DataIntegrityViolationException ex) {
-            throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
+        } else {
+            User newUser = new User();
+            newUser.setUsername(username);
+            newUser.setPassword(passwordEncoder.encode(rawPassword));
+            newUser.setRole(role);
+            newUser.setEnabled(true);
+            try {
+                userRepository.save(newUser);
+                log.info("Usuario {} guardado correctamente.", newUser.getUsername());
+            } catch (DataIntegrityViolationException ex) {
+                throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
+            }
         }
 
     }
