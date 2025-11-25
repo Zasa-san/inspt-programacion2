@@ -88,4 +88,12 @@ const loadInitialPrice = (initialPriceCentavos) => {
 $(document).ready(function () {
   formatPricesOnPage();
   initProductForm();
+  // Si existe un input hidden con el precio (en centavos) lo cargamos en el input visible
+  const $priceHidden = $('#priceHidden');
+  if ($priceHidden.length > 0) {
+    const initial = parseInt($priceHidden.val());
+    if (!isNaN(initial)) {
+      loadInitialPrice(initial);
+    }
+  }
 });

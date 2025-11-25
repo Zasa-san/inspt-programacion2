@@ -88,11 +88,6 @@
 
   <script th:src="@{/js/products/imageHandler.js}" defer></script>
   <script th:src="@{/js/products/preciHandler.js}" defer></script>
-  <script th:inline="javascript" defer>
-    document.addEventListener('DOMContentLoaded', function () {
-      loadInitialPrice([[${ product.price }]]);
-    });
-  </script>
 </body>
 
 </html>
