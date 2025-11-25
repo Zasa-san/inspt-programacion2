@@ -1,10 +1,15 @@
 package inspt_programacion2_kfc.backend.models.products;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -34,4 +39,7 @@ public class ProductoEntity {
 
     @Column(nullable = false)
     private boolean available = true;
+
+    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY)
+    private Set<CustomizacionEntity> customizaciones = new HashSet<>();
 }
