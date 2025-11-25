@@ -3,7 +3,6 @@ package inspt_programacion2_kfc.frontend.controllers;
 import java.util.List;
 import java.util.Map;
 
-import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
@@ -59,7 +59,8 @@ public class StockPageController {
         boolean algunMovimiento = false;
 
         for (int i = 0; i < productoIds.size(); i++) {
-            int cantidad = cantidades.get(i) != null ? cantidades.get(i) : 0;
+            Integer cantidadObj = cantidades.get(i);
+            int cantidad = (cantidadObj != null) ? cantidadObj : 0;
             if (cantidad <= 0) {
                 continue;
             }
@@ -91,5 +92,3 @@ public class StockPageController {
         return "redirect:/stock";
     }
 }
-
-
