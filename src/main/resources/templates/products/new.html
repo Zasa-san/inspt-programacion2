@@ -60,6 +60,45 @@
           <p class="help">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
         </div>
 
+        <!-- Sección de Customizaciones -->
+        <div class="box mt-5">
+          <h2 class="subtitle">Tamaños Disponibles (Opcional)</h2>
+          <p class="help mb-4">Marca los tamaños que deseas ofrecer e ingresa el modificador de precio en centavos</p>
+          
+          <div class="field">
+            <label class="checkbox">
+              <input type="checkbox" name="customizationSizes" value="SMALL">
+              <strong>Pequeño</strong>
+            </label>
+            <div class="control mt-2 ml-5">
+              <input class="input is-small" type="number" name="priceSmall" placeholder="Modificador en centavos (Ej: 0, 500, -200)" value="0" />
+              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 500 = +$5.00, -200 = -$2.00</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="checkbox">
+              <input type="checkbox" name="customizationSizes" value="MEDIUM">
+              <strong>Mediano</strong>
+            </label>
+            <div class="control mt-2 ml-5">
+              <input class="input is-small" type="number" name="priceMedium" placeholder="Modificador en centavos (Ej: 0, 500, -200)" value="0" />
+              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 500 = +$5.00, -200 = -$2.00</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="checkbox">
+              <input type="checkbox" name="customizationSizes" value="LARGE">
+              <strong>Grande</strong>
+            </label>
+            <div class="control mt-2 ml-5">
+              <input class="input is-small" type="number" name="priceLarge" placeholder="Modificador en centavos (Ej: 0, 1000, -500)" value="0" />
+              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 1000 = +$10.00, -500 = -$5.00</p>
+            </div>
+          </div>
+        </div>
+
         <div class="field is-grouped">
           <div class="control">
             <button type="submit" class="button is-link">Crear</button>

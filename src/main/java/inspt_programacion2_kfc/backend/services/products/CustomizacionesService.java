@@ -1,12 +1,13 @@
 package inspt_programacion2_kfc.backend.services.products;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import inspt_programacion2_kfc.backend.exceptions.product.CustomizacionNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.CustomizacionesRepository;
 
 @Service
@@ -22,6 +23,10 @@ public class CustomizacionesService {
         return customizationRepository.findAll();
     }
 
+    public CustomizacionEntity findById(Long id) {
+        return customizationRepository.findById(id).orElse(null);
+    }
+
     public CustomizacionEntity create(CustomizacionEntity customizacion) {
         if (customizacion == null) {
             throw new IllegalArgumentException("La customizacion no puede ser nula.");
@@ -35,13 +40,10 @@ public class CustomizacionesService {
             throw new IllegalArgumentException("ID de customizacion invalido.");
         }
 
-        Optional<CustomizacionEntity> existingOpt = customizationRepository.findById(id);
-
-        if (existingOpt.isEmpty()) {
+        CustomizacionEntity existing = findById(id);
+        if (existing == null) {
             throw new CustomizacionNotFoundException(String.format("Customizacion con id %s no encontrada.", id));
         }
-
-        CustomizacionEntity existing = existingOpt.get();
 
         if (updated.getSize() != null) {
             existing.setSize(updated.getSize());
@@ -66,5 +68,20 @@ public class CustomizacionesService {
         }
 
         customizationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteByProducto(ProductoEntity producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("Producto no puede ser nulo.");
+        }
+        customizationRepository.deleteByProducto(producto);
+    }
+
+    public List<CustomizacionEntity> findByProducto(ProductoEntity producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("Producto no puede ser nulo.");
+        }
+        return customizationRepository.findByProducto(producto);
     }
 }

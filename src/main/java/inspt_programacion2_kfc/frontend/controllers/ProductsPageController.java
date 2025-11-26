@@ -14,7 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
+import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.models.products.Size;
+import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
@@ -22,9 +25,11 @@ import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 public class ProductsPageController {
 
     private final ProductoService productoService;
+    private final CustomizacionesService customizacionesService;
 
-    public ProductsPageController(ProductoService productoService) {
+    public ProductsPageController(ProductoService productoService, CustomizacionesService customizacionesService) {
         this.productoService = productoService;
+        this.customizacionesService = customizacionesService;
     }
 
     @GetMapping("/products")
@@ -52,6 +57,10 @@ public class ProductsPageController {
             @RequestParam String description,
             @RequestParam int price,
             @RequestParam(required = false) MultipartFile imageFile,
+            @RequestParam(required = false) List<String> customizationSizes,
+            @RequestParam(defaultValue = "0") int priceSmall,
+            @RequestParam(defaultValue = "0") int priceMedium,
+            @RequestParam(defaultValue = "0") int priceLarge,
             RedirectAttributes redirectAttrs) {
 
         try {
@@ -61,12 +70,17 @@ public class ProductsPageController {
             producto.setPrice(price);
 
             productoService.create(producto, imageFile);
+            handleCustomizations(producto, customizationSizes, priceSmall, priceMedium, priceLarge);
+
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (ProductImageException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
             return "redirect:/products/new";
         } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al crear producto: " + e.getMessage());
+            return "redirect:/products/new";
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("errorMessage", "Error inesperado: " + e.getMessage());
             return "redirect:/products/new";
         }
 
@@ -84,7 +98,41 @@ public class ProductsPageController {
             return "redirect:/products";
         }
 
+        // Cargar customizaciones y preparar datos para el formulario
+        List<CustomizacionEntity> customizaciones = customizacionesService.findByProducto(producto);
+        
+        boolean hasSmall = false;
+        boolean hasMedium = false;
+        boolean hasLarge = false;
+        int priceSmall = 0;
+        int priceMedium = 0;
+        int priceLarge = 0;
+        
+        for (CustomizacionEntity custom : customizaciones) {
+            switch (custom.getSize()) {
+                case SMALL:
+                    hasSmall = true;
+                    priceSmall = custom.getPriceModifier();
+                    break;
+                case MEDIUM:
+                    hasMedium = true;
+                    priceMedium = custom.getPriceModifier();
+                    break;
+                case LARGE:
+                    hasLarge = true;
+                    priceLarge = custom.getPriceModifier();
+                    break;
+            }
+        }
+
         model.addAttribute("product", producto);
+        model.addAttribute("hasSmall", hasSmall);
+        model.addAttribute("hasMedium", hasMedium);
+        model.addAttribute("hasLarge", hasLarge);
+        model.addAttribute("priceSmall", priceSmall);
+        model.addAttribute("priceMedium", priceMedium);
+        model.addAttribute("priceLarge", priceLarge);
+        
         return "products/edit";
     }
 
@@ -96,6 +144,10 @@ public class ProductsPageController {
             @RequestParam int price,
             @RequestParam(required = false) MultipartFile imageFile,
             @RequestParam(required = false) boolean removeImage,
+            @RequestParam(required = false) List<String> customizationSizes,
+            @RequestParam(defaultValue = "0") int priceSmall,
+            @RequestParam(defaultValue = "0") int priceMedium,
+            @RequestParam(defaultValue = "0") int priceLarge,
             RedirectAttributes redirectAttrs) {
 
         try {
@@ -105,6 +157,10 @@ public class ProductsPageController {
             updatedData.setPrice(price);
 
             productoService.update(id, updatedData, imageFile, removeImage);
+            
+            ProductoEntity producto = productoService.findById(id);
+            handleCustomizations(producto, customizationSizes, priceSmall, priceMedium, priceLarge);
+            
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (ProductNotFoundException e) {
             redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
@@ -142,5 +198,32 @@ public class ProductsPageController {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al actualizar disponibilidad: " + e.getMessage());
         }
         return "redirect:/products";
+    }
+
+    private void handleCustomizations(ProductoEntity producto, List<String> customizationSizes, 
+                                      int priceSmall, int priceMedium, int priceLarge) {
+        // Eliminar todas las customizaciones existentes del producto
+        //todo terminar de implementar validacion de existencia
+        List<CustomizacionEntity> customizaciones = customizacionesService.findByProducto(producto);
+        //agregar type
+        customizacionesService.deleteByProducto(producto);
+
+        // Crear nuevas customizaciones si se marcaron
+        if (customizationSizes != null && !customizationSizes.isEmpty()) {
+            for (String sizeStr : customizationSizes) {
+                Size size = Size.valueOf(sizeStr);
+                int priceModifier = switch (size) {
+                    case SMALL -> priceSmall;
+                    case MEDIUM -> priceMedium;
+                    case LARGE -> priceLarge;
+                };
+
+                CustomizacionEntity customizacion = new CustomizacionEntity();
+                customizacion.setProducto(producto);
+                customizacion.setSize(size);
+                customizacion.setPriceModifier(priceModifier);
+                customizacionesService.create(customizacion);
+            }
+        }
     }
 }
