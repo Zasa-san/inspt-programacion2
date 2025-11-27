@@ -1,38 +1,105 @@
 /**
- * Serializa las customizaciones en formato JSON antes de enviar el formulario
+ * Manejo dinámico de customizaciones: agregar, eliminar, serializar
  */
 $(() => {
   const $form = $('form[action*="/products/"]');
+  const $container = $('#customizationsContainer');
+  const $addBtn = $('#addCustomizationBtn');
+  const $noMessage = $('#noCustomizationsMessage');
 
-  if (!$form.length) { return };
+  if (!$form.length || !$container.length) return;
 
+  // Obtener template del DOM
+  const $template = $('#customizationTemplate');
+
+  // Agregar nueva customización
+  $addBtn.on('click', () => {
+    $noMessage.hide();
+    const $newItem = $template.children().first().clone();
+    $container.append($newItem);
+  });
+
+
+  // Validación en tiempo real: mostrar/ocultar mensajes de error
+  $container.on('input change', '.customization-name, .customization-price', function () {
+    const $item = $(this).closest('.customization-item');
+    const $nameInput = $item.find('.customization-name');
+    const $priceInput = $item.find('.customization-price');
+    const $errorMsg = $item.find('.customization-error');
+
+    const nombre = $nameInput.val().trim();
+    const precio = $priceInput.val().trim();
+
+    // Validar: si tiene uno, debe tener el otro
+    if ((nombre && !precio) || (!nombre && precio)) {
+      $nameInput.addClass('is-danger');
+      $priceInput.addClass('is-danger');
+      $errorMsg.show();
+    } else {
+      $nameInput.removeClass('is-danger');
+      $priceInput.removeClass('is-danger');
+      $errorMsg.hide();
+    }
+  });
+
+  // Serializar customizaciones al enviar el formulario
   $form.on('submit', (e) => {
+    // Validar que customizaciones con contenido tengan nombre Y precio
+    let isValid = true;
+    $container.find('.customization-item').each((index, item) => {
+      const $item = $(item);
+      const $nameInput = $item.find('.customization-name');
+      const $priceInput = $item.find('.customization-price');
+      const $errorMsg = $item.find('.customization-error');
+
+      const nombre = $nameInput.val().trim();
+      const precio = $priceInput.val().trim();
+
+      // Si tiene uno pero no el otro, es inválido
+      if ((nombre && !precio) || (!nombre && precio)) {
+        isValid = false;
+        $nameInput.addClass('is-danger');
+        $priceInput.addClass('is-danger');
+        $errorMsg.show();
+      } else {
+        $nameInput.removeClass('is-danger');
+        $priceInput.removeClass('is-danger');
+        $errorMsg.hide();
+      }
+    });
+
+    if (!isValid) {
+      e.preventDefault();
+      // Hacer scroll al primer error
+      const $firstError = $container.find('.customization-error:visible').first();
+      if ($firstError.length) {
+        $firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return false;
+    }
+
     const customizations = [];
     let newCounter = 0;
 
-    // Buscar todos los boxes de customización
-    const $customizationBoxes = $form.find('.box[style*="background-color"]');
+    $container.find('.customization-item').each((index, item) => {
+      const $item = $(item);
+      const $idInput = $item.find('.customization-id');
+      const $nameInput = $item.find('.customization-name');
+      const $priceInput = $item.find('.customization-price');
+      const $enabledCheckbox = $item.find('.customization-enabled');
 
-    $customizationBoxes.each((index, box) => {
-      const $box = $(box);
-      const $checkbox = $box.find('input[type="checkbox"][name="customizationEnabled"]');
-      const $idInput = $box.find('input[name="customizationIds"]');
-      const $nameInput = $box.find('input[name="customizationNames"]');
-      const $priceInput = $box.find('input[name="customizationPrices"]');
-
-      if (!$nameInput.length || !$priceInput.length) { return };
-
-      const enabled = $checkbox.length ? $checkbox.prop('checked') : false;
       const nombre = $nameInput.val().trim();
       const priceModifier = parseInt($priceInput.val()) || 0;
+      const enabled = $enabledCheckbox.prop('checked');
 
-      // Determinar el ID: si tiene valor en el hidden, es existente; sino es nueva
+      // Si no tiene nombre y no está habilitada, ignorar (nueva vacía)
+      if (!nombre && !enabled) return;
+
+      // Determinar el ID: si tiene valor, es existente; sino es nueva
       let id;
-      if ($idInput.length && $idInput.val() && $idInput.val().trim() !== '') {
-        // Customización existente
+      if ($idInput.val() && $idInput.val().trim() !== '') {
         id = $idInput.val();
       } else {
-        // Nueva customización
         id = `NEW_${newCounter}`;
         newCounter++;
       }
@@ -45,7 +112,7 @@ $(() => {
       });
     });
 
-    // Crear un campo hidden con el JSON
+    // Crear campo hidden con el JSON
     $form.find('input[name="customizationsJson"]').remove();
 
     const $jsonInput = $('<input>', {
@@ -54,11 +121,5 @@ $(() => {
       value: JSON.stringify(customizations)
     });
     $form.append($jsonInput);
-
-    // Deshabilitar los campos viejos para evitar conflictos
-    $form.find('input[name="customizationEnabled"]').prop('disabled', true);
-    $form.find('input[name="customizationIds"]').prop('disabled', true);
-    $form.find('input[name="customizationNames"]').prop('disabled', true);
-    $form.find('input[name="customizationPrices"]').prop('disabled', true);
   });
 });

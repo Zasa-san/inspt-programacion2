@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+  <!-- Fragmento para la sección completa de customizaciones -->
+  <div th:fragment="customizationsSection(customizaciones)">
+    <div class="box mt-5">
+      <h2 class="subtitle mb-3">Customizaciones (Opcional)</h2>
+      <p class="help mb-4">Agrega variaciones del producto como tamaños, extras, etc.</p>
+
+      <div id="customizationsContainer">
+        <!-- Customizaciones existentes -->
+        <div th:if="${customizaciones != null and !customizaciones.isEmpty()}">
+          <p class="has-text-weight-semibold mb-2">Customizaciones existentes:</p>
+          <div th:each="custom : ${customizaciones}" class="customization-item box mb-3"
+            style="background-color: #f9f9f9;">
+            <div class="columns is-mobile is-vcentered">
+              <div class="column is-narrow">
+                <label class="checkbox">
+                  <input type="checkbox" class="customization-enabled" checked />
+                  <span class="ml-2">Activa</span>
+                </label>
+              </div>
+              <div class="column">
+                <input type="hidden" class="customization-id" th:value="${custom.id}" />
+                <div class="field">
+                  <label class="label is-small">Nombre</label>
+                  <input class="input customization-name" type="text" th:value="${custom.nombre}"
+                    placeholder="Ej: Pequeño, Con queso extra" />
+                  <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
+                </div>
+              </div>
+              <div class="column is-4">
+                <div class="field">
+                  <label class="label is-small">Precio (centavos)</label>
+                  <input class="input customization-price" type="number" th:value="${custom.priceModifier}"
+                    placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje cuando no hay customizaciones -->
+        <div id="noCustomizationsMessage" th:if="${customizaciones == null or customizaciones.isEmpty()}"
+          class="notification is-info is-light">
+          <p>No hay customizaciones aún. Haz clic en "Agregar customización" para crear una.</p>
+        </div>
+      </div>
+
+      <div class="field mt-4">
+        <button type="button" id="addCustomizationBtn" class="button is-success is-light">
+          <span class="icon">
+            <i class="fas fa-plus"></i>
+          </span>
+          <span>Agregar customización</span>
+        </button>
+      </div>
+
+      <p class="help mt-3">
+        <strong>Ejemplos de precio:</strong> 0 = sin costo, 500 = +$5.00, -200 = -$2.00
+      </p>
+    </div>
+
+    <!-- Template oculto para nuevas customizaciones (usado por jQuery) -->
+    <div id="customizationTemplate" style="display: none;">
+      <div class="customization-item box mb-3" style="background-color: #f0f7ff;">
+        <div class="columns is-mobile is-vcentered">
+          <div class="column is-narrow">
+            <label class="checkbox">
+              <input type="checkbox" class="customization-enabled" checked />
+              <span class="ml-2">Activa</span>
+            </label>
+          </div>
+          <div class="column">
+            <input type="hidden" class="customization-id" value="" />
+            <div class="field">
+              <label class="label is-small">Nombre</label>
+              <input class="input customization-name" type="text" value=""
+                placeholder="Ej: Pequeño, Mediano, Con queso extra" />
+              <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
+            </div>
+          </div>
+          <div class="column is-4">
+            <div class="field">
+              <label class="label is-small">Precio (centavos)</label>
+              <input class="input customization-price" type="number" value="0" placeholder="0" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
