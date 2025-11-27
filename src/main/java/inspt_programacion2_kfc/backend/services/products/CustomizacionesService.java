@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import inspt_programacion2_kfc.backend.exceptions.product.CustomizacionNotFoundException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.CustomizacionesRepository;
@@ -64,7 +65,7 @@ public class CustomizacionesService {
 
     public void delete(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("ID de customizacion invalido.");
+            throw new CustomizacionNotFoundException("ID de customizacion invalido.");
         }
 
         if (!customizationRepository.existsById(id)) {
@@ -77,14 +78,14 @@ public class CustomizacionesService {
     @Transactional
     public void deleteByProducto(ProductoEntity producto) {
         if (producto == null) {
-            throw new IllegalArgumentException("Producto no puede ser nulo.");
+            throw new ProductNotFoundException("Producto no puede ser nulo.");
         }
         customizationRepository.deleteByProducto(producto);
     }
 
     public List<CustomizacionEntity> findByProducto(ProductoEntity producto) {
         if (producto == null) {
-            throw new IllegalArgumentException("Producto no puede ser nulo.");
+            throw new ProductNotFoundException("Producto no puede ser nulo.");
         }
         return customizationRepository.findByProducto(producto);
     }
