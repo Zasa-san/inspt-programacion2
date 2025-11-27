@@ -24,6 +24,9 @@ public class CustomizacionesService {
     }
 
     public CustomizacionEntity findById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID de customizacion invalido.");
+        }
         return customizationRepository.findById(id).orElse(null);
     }
 
@@ -41,12 +44,13 @@ public class CustomizacionesService {
         }
 
         CustomizacionEntity existing = findById(id);
+
         if (existing == null) {
             throw new CustomizacionNotFoundException(String.format("Customizacion con id %s no encontrada.", id));
         }
 
-        if (updated.getSize() != null) {
-            existing.setSize(updated.getSize());
+        if (updated.getNombre() != null) {
+            existing.setNombre(updated.getNombre());
         }
 
         existing.setPriceModifier(updated.getPriceModifier());

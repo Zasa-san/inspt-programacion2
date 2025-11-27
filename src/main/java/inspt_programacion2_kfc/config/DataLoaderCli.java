@@ -10,7 +10,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.models.products.Size;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
@@ -57,13 +56,13 @@ public class DataLoaderCli {
             // Customizaciones para Bucket Familiar
             CustomizacionEntity c21 = new CustomizacionEntity();
             c21.setProducto(p2);
-            c21.setSize(Size.MEDIUM);
+            c21.setNombre("Mediano");
             c21.setPriceModifier(0);
             customizacionesService.create(c21);
 
             CustomizacionEntity c22 = new CustomizacionEntity();
             c22.setProducto(p2);
-            c22.setSize(Size.LARGE);
+            c22.setNombre("Grande");
             c22.setPriceModifier(20000);
             customizacionesService.create(c22);
 
@@ -79,13 +78,13 @@ public class DataLoaderCli {
             // Customizaciones para Tenders Box
             CustomizacionEntity c31 = new CustomizacionEntity();
             c31.setProducto(p3);
-            c31.setSize(Size.SMALL);
+            c31.setNombre("Pequeño");
             c31.setPriceModifier(-5000);
             customizacionesService.create(c31);
 
             CustomizacionEntity c32 = new CustomizacionEntity();
             c32.setProducto(p3);
-            c32.setSize(Size.MEDIUM);
+            c32.setNombre("Mediano");
             c32.setPriceModifier(0);
             customizacionesService.create(c32);
 

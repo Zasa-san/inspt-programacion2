@@ -1,7 +1,10 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +14,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.models.products.Size;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
+import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
 @Controller
@@ -26,10 +33,12 @@ public class ProductsPageController {
 
     private final ProductoService productoService;
     private final CustomizacionesService customizacionesService;
+    private final ObjectMapper objectMapper;
 
-    public ProductsPageController(ProductoService productoService, CustomizacionesService customizacionesService) {
+    public ProductsPageController(ProductoService productoService, CustomizacionesService customizacionesService, ObjectMapper objectMapper) {
         this.productoService = productoService;
         this.customizacionesService = customizacionesService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/products")
@@ -57,10 +66,7 @@ public class ProductsPageController {
             @RequestParam String description,
             @RequestParam int price,
             @RequestParam(required = false) MultipartFile imageFile,
-            @RequestParam(required = false) List<String> customizationSizes,
-            @RequestParam(defaultValue = "0") int priceSmall,
-            @RequestParam(defaultValue = "0") int priceMedium,
-            @RequestParam(defaultValue = "0") int priceLarge,
+            @RequestParam(required = false) String customizationsJson,
             RedirectAttributes redirectAttrs) {
 
         try {
@@ -70,7 +76,9 @@ public class ProductsPageController {
             producto.setPrice(price);
 
             productoService.create(producto, imageFile);
-            handleCustomizations(producto, customizationSizes, priceSmall, priceMedium, priceLarge);
+
+            List<CustomizationDto> customizations = parseCustomizations(customizationsJson);
+            handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (ProductImageException e) {
@@ -98,41 +106,11 @@ public class ProductsPageController {
             return "redirect:/products";
         }
 
-        // Cargar customizaciones y preparar datos para el formulario
         List<CustomizacionEntity> customizaciones = customizacionesService.findByProducto(producto);
-        
-        boolean hasSmall = false;
-        boolean hasMedium = false;
-        boolean hasLarge = false;
-        int priceSmall = 0;
-        int priceMedium = 0;
-        int priceLarge = 0;
-        
-        for (CustomizacionEntity custom : customizaciones) {
-            switch (custom.getSize()) {
-                case SMALL:
-                    hasSmall = true;
-                    priceSmall = custom.getPriceModifier();
-                    break;
-                case MEDIUM:
-                    hasMedium = true;
-                    priceMedium = custom.getPriceModifier();
-                    break;
-                case LARGE:
-                    hasLarge = true;
-                    priceLarge = custom.getPriceModifier();
-                    break;
-            }
-        }
 
         model.addAttribute("product", producto);
-        model.addAttribute("hasSmall", hasSmall);
-        model.addAttribute("hasMedium", hasMedium);
-        model.addAttribute("hasLarge", hasLarge);
-        model.addAttribute("priceSmall", priceSmall);
-        model.addAttribute("priceMedium", priceMedium);
-        model.addAttribute("priceLarge", priceLarge);
-        
+        model.addAttribute("customizaciones", customizaciones);
+
         return "products/edit";
     }
 
@@ -144,10 +122,7 @@ public class ProductsPageController {
             @RequestParam int price,
             @RequestParam(required = false) MultipartFile imageFile,
             @RequestParam(required = false) boolean removeImage,
-            @RequestParam(required = false) List<String> customizationSizes,
-            @RequestParam(defaultValue = "0") int priceSmall,
-            @RequestParam(defaultValue = "0") int priceMedium,
-            @RequestParam(defaultValue = "0") int priceLarge,
+            @RequestParam(required = false) String customizationsJson,
             RedirectAttributes redirectAttrs) {
 
         try {
@@ -157,10 +132,11 @@ public class ProductsPageController {
             updatedData.setPrice(price);
 
             productoService.update(id, updatedData, imageFile, removeImage);
-            
+
             ProductoEntity producto = productoService.findById(id);
-            handleCustomizations(producto, customizationSizes, priceSmall, priceMedium, priceLarge);
-            
+            List<CustomizationDto> customizations = parseCustomizations(customizationsJson);
+            handleCustomizations(producto, customizations);
+
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (ProductNotFoundException e) {
             redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
@@ -200,30 +176,49 @@ public class ProductsPageController {
         return "redirect:/products";
     }
 
-    private void handleCustomizations(ProductoEntity producto, List<String> customizationSizes, 
-                                      int priceSmall, int priceMedium, int priceLarge) {
-        // Eliminar todas las customizaciones existentes del producto
-        //todo terminar de implementar validacion de existencia
-        List<CustomizacionEntity> customizaciones = customizacionesService.findByProducto(producto);
-        //agregar type
-        customizacionesService.deleteByProducto(producto);
+    private void handleCustomizations(ProductoEntity producto, List<CustomizationDto> customizations) {
+        if (customizations == null || customizations.isEmpty()) {
+            return;
+        }
+        for (CustomizationDto dto : customizations) {
+            String idStr = dto.getId();
+            String nombre = dto.getNombre();
+            int priceModifier = Objects.requireNonNullElse(dto.getPriceModifier(), 0);
+            boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
 
-        // Crear nuevas customizaciones si se marcaron
-        if (customizationSizes != null && !customizationSizes.isEmpty()) {
-            for (String sizeStr : customizationSizes) {
-                Size size = Size.valueOf(sizeStr);
-                int priceModifier = switch (size) {
-                    case SMALL -> priceSmall;
-                    case MEDIUM -> priceMedium;
-                    case LARGE -> priceLarge;
-                };
+            if (idStr != null && StringUtils.isNumeric(idStr)) {
+                Long customizationId = Long.valueOf(idStr);
+                if (!enabled) {
+                    customizacionesService.delete(customizationId);
+                } else {
+                    CustomizacionEntity existing = customizacionesService.findById(customizationId);
+                    if (existing != null) {
+                        existing.setNombre(nombre);
+                        existing.setPriceModifier(priceModifier);
+                        customizacionesService.update(customizationId, existing);
+                    }
+                }
+            } else if (idStr != null && idStr.startsWith("NEW_") && enabled && nombre != null && !nombre.trim().isEmpty()) {
 
-                CustomizacionEntity customizacion = new CustomizacionEntity();
-                customizacion.setProducto(producto);
-                customizacion.setSize(size);
-                customizacion.setPriceModifier(priceModifier);
-                customizacionesService.create(customizacion);
+                CustomizacionEntity newCustomization = new CustomizacionEntity();
+                newCustomization.setProducto(producto);
+                newCustomization.setNombre(nombre);
+                newCustomization.setPriceModifier(priceModifier);
+                customizacionesService.create(newCustomization);
             }
+
+        }
+    }
+
+    private List<CustomizationDto> parseCustomizations(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<CustomizationDto>>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error al parsear customizaciones JSON", e);
         }
     }
 }

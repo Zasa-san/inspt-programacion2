@@ -62,41 +62,38 @@
 
         <!-- Sección de Customizaciones -->
         <div class="box mt-5">
-          <h2 class="subtitle">Tamaños Disponibles (Opcional)</h2>
-          <p class="help mb-4">Marca los tamaños que deseas ofrecer e ingresa el modificador de precio en centavos</p>
-          
-          <div class="field">
-            <label class="checkbox">
-              <input type="checkbox" name="customizationSizes" value="SMALL">
-              <strong>Pequeño</strong>
-            </label>
-            <div class="control mt-2 ml-5">
-              <input class="input is-small" type="number" name="priceSmall" placeholder="Modificador en centavos (Ej: 0, 500, -200)" value="0" />
-              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 500 = +$5.00, -200 = -$2.00</p>
+          <h2 class="subtitle mb-3">Customizaciones (Opcional)</h2>
+          <p class="help mb-4">Agrega variaciones del producto. Marca el checkbox para activar cada una.</p>
+
+          <!-- Campos para agregar customizaciones -->
+          <div th:each="i : ${#numbers.sequence(0, 4)}" class="box mb-3" style="background-color: #f0f7ff;">
+            <div class="columns is-mobile is-vcentered">
+              <div class="column is-narrow">
+                <label class="checkbox">
+                  <input type="checkbox" name="customizationEnabled" th:value="${i}" />
+                  <span class="ml-2">Activa</span>
+                </label>
+              </div>
+              <div class="column">
+                <div class="field">
+                  <label class="label is-small">Nombre</label>
+                  <input class="input" type="text" name="customizationNames" value=""
+                    placeholder="Ej: Pequeño, Mediano, Grande, Con queso extra" />
+                </div>
+              </div>
+              <div class="column is-4">
+                <div class="field">
+                  <label class="label is-small">Precio (centavos)</label>
+                  <input class="input" type="number" name="customizationPrices" value="0" placeholder="0" />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="field">
-            <label class="checkbox">
-              <input type="checkbox" name="customizationSizes" value="MEDIUM">
-              <strong>Mediano</strong>
-            </label>
-            <div class="control mt-2 ml-5">
-              <input class="input is-small" type="number" name="priceMedium" placeholder="Modificador en centavos (Ej: 0, 500, -200)" value="0" />
-              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 500 = +$5.00, -200 = -$2.00</p>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="checkbox">
-              <input type="checkbox" name="customizationSizes" value="LARGE">
-              <strong>Grande</strong>
-            </label>
-            <div class="control mt-2 ml-5">
-              <input class="input is-small" type="number" name="priceLarge" placeholder="Modificador en centavos (Ej: 0, 1000, -500)" value="0" />
-              <p class="help is-size-7">Ejemplos: 0 = sin costo extra, 1000 = +$10.00, -500 = -$5.00</p>
-            </div>
-          </div>
+          <p class="help mt-3">
+            <strong>Ejemplos:</strong> 0 = sin costo, 500 = +$5.00, -200 = -$2.00<br />
+            <strong>Tip:</strong> Solo se guardarán las customizaciones que marques como activas
+          </p>
         </div>
 
         <div class="field is-grouped">
@@ -114,7 +111,8 @@
   </section>
 
   <script th:src="@{/js/products/imageHandler.js}" defer></script>
-  <script th:src="@{/js/products/preciHandler.js}" defer></script>
+  <script th:src="@{/js/products/precioHandler.js}" defer></script>
+  <script th:src="@{/js/products/customizationsHandler.js}" defer></script>
 </body>
 
 </html>

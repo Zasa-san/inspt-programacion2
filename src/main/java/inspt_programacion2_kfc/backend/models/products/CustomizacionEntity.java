@@ -5,8 +5,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,9 +28,8 @@ public class CustomizacionEntity {
     @JoinColumn(name = "producto_id", nullable = false)
     private ProductoEntity producto;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "size", nullable = false)
-    private Size size;
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
 
     @Column(name = "modificador", nullable = false)
     private int priceModifier = 0;

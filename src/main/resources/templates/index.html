@@ -71,7 +71,8 @@
                     <input type="hidden" name="productId" th:value="${p.id}" />
                     <div class="field has-addons">
                       <div class="control is-expanded">
-                        <input class="input" type="number" name="quantity" min="1" value="1" sec:authorize="isAnonymous()"/>
+                        <input class="input" type="number" name="quantity" min="1" value="1"
+                          sec:authorize="isAnonymous()" />
                       </div>
                       <div class="control">
                         <button type="submit" class="button is-primary" sec:authorize="isAnonymous()">
@@ -162,7 +163,7 @@
     </div>
   </section>
 
-  <script th:src="@{/js/products/preciHandler.js}" defer></script>
+  <script th:src="@{/js/products/precioHandler.js}" defer></script>
 </body>
 
 </html>
