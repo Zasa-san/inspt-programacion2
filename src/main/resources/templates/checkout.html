@@ -33,10 +33,18 @@
             </thead>
             <tbody>
               <tr th:each="item : ${cartItems}">
-                <td th:text="${item.producto.name}">Producto</td>
+                <td>
+                  <span th:text="${item.producto.name}">Producto</span>
+                  <!-- Mostrar extras si hay -->
+                  <div th:if="${!item.customizaciones.isEmpty()}" class="is-size-7 has-text-grey">
+                    <span th:each="custom, iterStat : ${item.customizaciones}">
+                      <span th:text="${custom.nombre}">Extra</span><span th:if="${!iterStat.last}">, </span>
+                    </span>
+                  </div>
+                </td>
                 <td class="has-text-centered" th:text="${item.quantity}">1</td>
                 <td class="has-text-right">
-                  $ <span th:text="${item.subtotal}">0</span>
+                  $ <span class="price-format" th:attr="data-price=${item.subtotal}">0</span>
                 </td>
               </tr>
             </tbody>
@@ -44,7 +52,7 @@
               <tr>
                 <th colspan="2">Total</th>
                 <th class="has-text-right">
-                  $ <span th:text="${cartTotal}">0</span>
+                  $ <span class="price-format" th:attr="data-price=${cartTotal}">0</span>
                 </th>
               </tr>
             </tfoot>
@@ -125,8 +133,8 @@
       </div>
     </div>
   </section>
+
+  <script th:src="@{/js/products/precioHandler.js}" defer></script>
 </body>
 
 </html>
-
-

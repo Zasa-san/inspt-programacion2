@@ -43,15 +43,24 @@
               <td class="has-text-right">
                 $ <span class="price-format" th:attr="data-price=${p.total}">0</span>
               </td>
-              <td class="has-text-centered">
-                <ul>
+              <td class="has-text-left">
+                <ul style="list-style: none; padding-left: 0;">
                   <li th:if="${#lists.isEmpty(p.items)}">
                     Productos descontinuados
                   </li>
-                  <li th:each="it : ${p.items}">
-                    <span th:text="${it.producto != null ? it.producto.name : 'Producto descontinuado'}">Producto</span>
-                    x <span th:text="${it.quantity}">1</span>
-                    - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
+                  <li th:each="it : ${p.items}" class="mb-2">
+                    <div>
+                      <strong th:text="${it.producto != null ? it.producto.name : 'Producto descontinuado'}">Producto</strong>
+                      x <span th:text="${it.quantity}">1</span>
+                      - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
+                    </div>
+                    <!-- Mostrar extras si hay -->
+                    <div th:if="${it.tieneCustomizaciones()}" class="is-size-7 has-text-grey ml-3">
+                      <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
+                      <span th:each="extra, iterStat : ${it.customizacionesNombres}">
+                        <span th:text="${extra}">Extra</span><span th:if="${!iterStat.last}">, </span>
+                      </span>
+                    </div>
                   </li>
                 </ul>
               </td>

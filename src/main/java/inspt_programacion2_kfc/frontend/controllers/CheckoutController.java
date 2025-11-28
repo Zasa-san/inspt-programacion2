@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
@@ -23,26 +26,28 @@ import jakarta.servlet.http.HttpSession;
 public class CheckoutController {
 
     private final PedidoService pedidoService;
+    private final ObjectMapper objectMapper;
 
-    public CheckoutController(PedidoService pedidoService) {
+    public CheckoutController(PedidoService pedidoService, ObjectMapper objectMapper) {
         this.pedidoService = pedidoService;
+        this.objectMapper = objectMapper;
     }
 
     @SuppressWarnings("unchecked")
     private List<CartItem> getCartItems(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
         if (cartObj instanceof Map) {
-            Map<Long, CartItem> cart = (Map<Long, CartItem>) cartObj;
+            Map<String, CartItem> cart = (Map<String, CartItem>) cartObj;
             return new ArrayList<>(cart.values());
         }
         return List.of();
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Long, CartItem> getCart(HttpSession session) {
+    private Map<String, CartItem> getCart(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
         if (cartObj instanceof Map) {
-            return (Map<Long, CartItem>) cartObj;
+            return (Map<String, CartItem>) cartObj;
         }
         return null;
     }
@@ -63,7 +68,7 @@ public class CheckoutController {
 
     @PostMapping("/checkout/pagar-en-caja")
     public String pagarEnCaja(HttpSession session, RedirectAttributes redirectAttrs) {
-        Map<Long, CartItem> cart = getCart(session);
+        Map<String, CartItem> cart = getCart(session);
         if (cart == null) {
             redirectAttrs.addFlashAttribute("cartError", "No hay productos en el carrito.");
             return "redirect:/";
@@ -77,7 +82,7 @@ public class CheckoutController {
 
         try {
             List<CartItemDto> dtoItems = items.stream()
-                    .map(ci -> new CartItemDto(ci.getProducto().getId(), ci.getQuantity(), ci.getProducto().getName()))
+                    .map(this::toCartItemDto)
                     .toList();
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO);
             cart.clear();
@@ -107,7 +112,7 @@ public class CheckoutController {
             return "redirect:/checkout";
         }
 
-        Map<Long, CartItem> cart = getCart(session);
+        Map<String, CartItem> cart = getCart(session);
         if (cart == null) {
             redirectAttrs.addFlashAttribute("cartError", "No hay productos en el carrito.");
             return "redirect:/";
@@ -121,7 +126,7 @@ public class CheckoutController {
 
         try {
             List<CartItemDto> dtoItems = items.stream()
-                    .map(ci -> new CartItemDto(ci.getProducto().getId(), ci.getQuantity(), ci.getProducto().getName()))
+                    .map(this::toCartItemDto)
                     .toList();
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO);
             cart.clear();
@@ -133,6 +138,27 @@ public class CheckoutController {
 
         return "redirect:/";
     }
+
+    /**
+     * Convierte CartItem a CartItemDto incluyendo customizaciones.
+     */
+    private CartItemDto toCartItemDto(CartItem ci) {
+        String customizacionesJson = null;
+        
+        if (ci.getCustomizaciones() != null && !ci.getCustomizaciones().isEmpty()) {
+            try {
+                customizacionesJson = objectMapper.writeValueAsString(ci.getCustomizaciones());
+            } catch (JsonProcessingException e) {
+                // Si falla, queda null
+            }
+        }
+
+        return new CartItemDto(
+                ci.getProducto().getId(),
+                ci.getQuantity(),
+                ci.getProducto().getName(),
+                ci.getPrecioUnitario(),
+                customizacionesJson
+        );
+    }
 }
-
-
