@@ -1,21 +1,18 @@
 package inspt_programacion2_kfc.backend.services.stock;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.MovimientoStock;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.stock.MovimientoStockRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-@Slf4j
 public class MovimientoStockService {
 
     private final MovimientoStockRepository movimientoStockRepository;
@@ -32,7 +29,6 @@ public class MovimientoStockService {
 
         if (producto != null) {
             movimientoStockRepository.save(new MovimientoStock(producto, tipo, cantidad, motivo, pedidoId));
-            log.info("Stock del producto id {} actualizado correctamente - idpedido {}", producto.getId(), pedidoId);
         }
     }
 

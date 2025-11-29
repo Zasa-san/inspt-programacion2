@@ -34,7 +34,7 @@ public class ProductoEntity {
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = true)
+    @Column
     private String imgUrl;
 
     @Column(nullable = false)

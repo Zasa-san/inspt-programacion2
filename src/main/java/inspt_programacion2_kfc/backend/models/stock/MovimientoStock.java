@@ -33,7 +33,7 @@ public class MovimientoStock {
     @NotFound(action = NotFoundAction.IGNORE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id", nullable = true)
+    @JoinColumn(name = "producto_id")
     private ProductoEntity producto;
 
     @Enumerated(EnumType.STRING)
@@ -50,7 +50,7 @@ public class MovimientoStock {
     private String motivo;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @Column(name = "pedido_id", nullable = true)
+    @Column(name = "pedido_id")
     private Long pedidoId;
 
     public MovimientoStock(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
@@ -64,5 +64,4 @@ public class MovimientoStock {
 
     public MovimientoStock() {
     }
-;
 }

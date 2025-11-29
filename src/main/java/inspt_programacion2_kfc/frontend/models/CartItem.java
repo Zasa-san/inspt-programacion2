@@ -58,7 +58,7 @@ public class CartItem {
                 .map(CustomizacionSeleccionada::getId)
                 .sorted()
                 .toList();
-        return producto.getId() + "_" + ids.toString();
+        return producto.getId() + "_" + ids;
     }
 
 }

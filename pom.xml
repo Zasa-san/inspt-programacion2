@@ -88,7 +88,8 @@
 		<dependency>
     	<groupId>org.apache.commons</groupId>
     	<artifactId>commons-lang3</artifactId>
-		</dependency>
+            <version>3.18.0</version>
+        </dependency>
 	</dependencies>
 
 	<build>

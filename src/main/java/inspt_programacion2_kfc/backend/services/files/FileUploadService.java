@@ -1,5 +1,10 @@
 package inspt_programacion2_kfc.backend.services.files;
 
+import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,15 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class FileUploadService {
 
     @Value("${app.upload-dir:uploads}")
@@ -56,7 +53,7 @@ public class FileUploadService {
                 Files.deleteIfExists(filePath);
             }
         } catch (IOException e) {
-            log.error("Error al borrar la imagen: {} - ", fileUrl, e);
+            System.err.printf("Error al borrar la imagen: %s - %s", fileUrl, e.getMessage());
         }
     }
 }

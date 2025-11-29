@@ -3,7 +3,6 @@ package inspt_programacion2_kfc.backend.services.products;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,8 +38,7 @@ public class ProductoService {
         if (id == null) {
             throw new ProductException("ID producto invalido.");
         }
-        Optional<ProductoEntity> producto = productoRepository.findById(id);
-        return producto.orElse(null);
+        return productoRepository.findById(id).orElse(null);
     }
 
     public void create(ProductoEntity producto, MultipartFile imageFile) {
@@ -66,6 +64,8 @@ public class ProductoService {
     }
 
     public void delete(Long id) {
+        if (id == null) throw new ProductNotFoundException("ID no puede ser NULL.");
+
         ProductoEntity producto = findById(id);
         if (producto == null) {
             throw new ProductNotFoundException("Producto no encontrado con ID: " + id);
@@ -75,10 +75,12 @@ public class ProductoService {
             fileUploadService.deleteFile(producto.getImgUrl());
         }
 
-        productoRepository.deleteById(Objects.requireNonNull(id));
+        productoRepository.deleteById(id);
     }
 
     public void update(Long id, ProductoEntity updatedData, MultipartFile imageFile, boolean removeImage) {
+        if (id == null) throw new ProductNotFoundException("ID no puede ser NULL.");
+
         ProductoEntity existing = findById(id);
         if (existing == null) {
             throw new ProductNotFoundException("Producto no encontrado con ID: " + id);
@@ -109,11 +111,10 @@ public class ProductoService {
     }
 
     public void toggleAvailability(Long id) {
-        Optional<ProductoEntity> producto = productoRepository.findById(Objects.requireNonNull(id));
-        if (producto.isPresent()) {
-            ProductoEntity p = producto.get();
-            p.setAvailable(!p.isAvailable());
-            productoRepository.save(p);
+        ProductoEntity producto = findById(id);
+        if (producto != null) {
+            producto.setAvailable(!producto.isAvailable());
+            productoRepository.save(producto);
         }
     }
 }

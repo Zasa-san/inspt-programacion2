@@ -7,6 +7,8 @@ import inspt_programacion2_kfc.backend.exceptions.order.OrderException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderNotFoundException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
+import inspt_programacion2_kfc.backend.helpers.PedidoHelper;
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
@@ -16,7 +18,6 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
-import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.backend.utils.PedidoUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +32,14 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final ItemsPedidoRepository itemsPedidoRepository;
     private final ProductoRepository productoRepository;
-    private final MovimientoStockService movimientoStockService;
+    private final PedidoHelper pedidoHelper;
 
-    public PedidoService(PedidoRepository pedidoRepository,
-            ProductoRepository productoRepository,
-            MovimientoStockService movimientoStockService, ItemsPedidoRepository itemsPedidoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, ProductoRepository productoRepository,
+                         ItemsPedidoRepository itemsPedidoRepository, PedidoHelper pedidoHelper) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
-        this.movimientoStockService = movimientoStockService;
         this.itemsPedidoRepository = itemsPedidoRepository;
+        this.pedidoHelper = pedidoHelper;
     }
 
     public List<ItemPedido> findAll() {
@@ -82,6 +82,7 @@ public class PedidoService {
         
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
+            // Fusiona los productos por clave en el map y suma las cantidades
             cantidadesPorProducto.merge(productoId, cartItem.getQuantity(), Integer::sum);
             if (cartItem.getProductoName() != null) {
                 nombresPorProducto.putIfAbsent(productoId, cartItem.getProductoName());
@@ -92,12 +93,11 @@ public class PedidoService {
         for (Map.Entry<Long, Integer> entry : cantidadesPorProducto.entrySet()) {
             Long productoId = entry.getKey();
             int cantidadTotal = entry.getValue();
-            int stockActual = movimientoStockService.calcularStockProducto(productoId);
+            int stockActual = pedidoHelper.obtenerStockPorIdProducto(productoId);
             
             if (stockActual < cantidadTotal) {
                 String nombre = nombresPorProducto.getOrDefault(productoId, "");
-                throw new StockException(String.format(
-                        "No hay stock suficiente para el producto: %s", nombre));
+                throw new StockException(String.format("No hay stock suficiente para el producto: %s", nombre));
             }
         }
 
@@ -107,31 +107,19 @@ public class PedidoService {
         int total = 0;
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
-
             if (productoId != null) {
-
                 ProductoEntity producto = findByIdProducto(productoId);
-
                 if (producto != null) {
                     ItemPedido item = PedidoUtils.mapItemPedido(cartItem, producto);
-
                     total += item.getSubtotal();
                     pedido.addItem(item);
                 }
             }
         }
-
         pedido.setTotal(total);
-        Pedido guardado = pedidoRepository.save(pedido);
 
-        for (ItemPedido item : guardado.getItems()) {
-            movimientoStockService.registrarMovimiento(
-                    item.getProducto(),
-                    TipoMovimiento.SALIDA,
-                    item.getQuantity(),
-                    "Venta pedido #" + guardado.getId(),
-                    guardado.getId());
-        }
+        Pedido guardado = pedidoRepository.save(pedido);
+        pedidoHelper.registrarMovimientoStock(guardado, TipoMovimiento.SALIDA, AppConstants.MOVIMIENTO_VENTA);
     }
 
     @Transactional
@@ -145,7 +133,6 @@ public class PedidoService {
         if (pedido == null) {
             throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
         }
-
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new OrderCancelledException("El pedido ya está cancelado.");
         }
@@ -155,15 +142,7 @@ public class PedidoService {
 
         pedido.setEstado(EstadoPedido.CANCELADO);
         Pedido guardado = pedidoRepository.save(pedido);
-
-        for (ItemPedido item : guardado.getItems()) {
-            movimientoStockService.registrarMovimiento(
-                    item.getProducto(),
-                    TipoMovimiento.ENTRADA,
-                    item.getQuantity(),
-                    "Cancelación pedido #" + guardado.getId(),
-                    guardado.getId());
-        }
+        pedidoHelper.registrarMovimientoStock(guardado, TipoMovimiento.ENTRADA, AppConstants.MOVIMIENTO_CANCELACION);
     }
 
     @Transactional

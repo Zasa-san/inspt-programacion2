@@ -35,7 +35,7 @@ public class ItemPedido {
 
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "producto_id", nullable = true, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "producto_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private ProductoEntity producto;
 
     @Column(nullable = false)

@@ -1,24 +1,17 @@
 package inspt_programacion2_kfc.backend.services.users;
 
-import java.util.List;
-
+import inspt_programacion2_kfc.backend.exceptions.user.*;
+import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserCreationFailedException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserNotFoundException;
-import inspt_programacion2_kfc.backend.exceptions.user.UserPasswordResetFailedException;
-import inspt_programacion2_kfc.backend.models.users.Role;
-import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
-@Slf4j
 @Service
 @Transactional
 public class UserService {
@@ -52,12 +45,12 @@ public class UserService {
                 dbUser.setPassword(passwordEncoder.encode(rawPassword));
                 try {
                     userRepository.save(dbUser);
-                    log.info("Clave reestablecida correctamente para el usuario {}", dbUser.getUsername());
+                    System.out.printf("Clave reestablecida correctamente para el usuario %s", dbUser.getUsername());
                 } catch (DataIntegrityViolationException ex) {
                     throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
                 }
             }
-        } else if (userExists && !resetIfExists) {
+        } else if (userExists) {
             throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
         } else {
             User newUser = new User();
@@ -67,7 +60,7 @@ public class UserService {
             newUser.setEnabled(true);
             try {
                 userRepository.save(newUser);
-                log.info("Usuario {} guardado correctamente.", newUser.getUsername());
+                System.out.printf("Usuario %s guardado correctamente.", newUser.getUsername());
             } catch (DataIntegrityViolationException ex) {
                 throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
             }
@@ -141,7 +134,7 @@ public class UserService {
             throw new UserException("El id no puede ser nulo.");
         }
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(String.format("Usuario con id %s no fue encontrado o no existe ", id));
+            throw new UserNotFoundException(String.format("Usuario con id %s no existe ", id));
         }
         userRepository.deleteById(id);
     }
@@ -154,8 +147,9 @@ public class UserService {
      */
     public void toggleEnabled(Long id, boolean enabled) {
         User user = findById(id);
-
-        user.setEnabled(enabled);
-        userRepository.save(user);
+        if (user != null) {
+            user.setEnabled(enabled);
+            userRepository.save(user);
+        }
     }
 }

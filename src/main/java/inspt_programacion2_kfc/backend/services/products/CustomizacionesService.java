@@ -31,15 +31,15 @@ public class CustomizacionesService {
         return customizationRepository.findById(id).orElse(null);
     }
 
-    public CustomizacionEntity create(CustomizacionEntity customizacion) {
+    public void create(CustomizacionEntity customizacion) {
         if (customizacion == null) {
             throw new IllegalArgumentException("La customizacion no puede ser nula.");
         }
 
-        return customizationRepository.save(customizacion);
+        customizationRepository.save(customizacion);
     }
 
-    public CustomizacionEntity update(Long id, CustomizacionEntity updated) {
+    public void update(Long id, CustomizacionEntity updated) {
         if (id == null) {
             throw new IllegalArgumentException("ID de customizacion invalido.");
         }
@@ -60,7 +60,7 @@ public class CustomizacionesService {
             existing.setProducto(updated.getProducto());
         }
 
-        return customizationRepository.save(existing);
+        customizationRepository.save(existing);
     }
 
     public void delete(Long id) {

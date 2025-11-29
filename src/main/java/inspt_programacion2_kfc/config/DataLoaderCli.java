@@ -10,14 +10,12 @@ import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.backend.services.users.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.sql.DataSource;
 
-@Slf4j
 public class DataLoaderCli {
 
     public static void main(String[] args) {
@@ -188,7 +186,7 @@ public class DataLoaderCli {
             message = "Base de datos inicializada con usuarios, productos, customizaciones y stock.";
 
         } catch (BeansException e) {
-            log.error("Error inicializando la bdd", e);
+            System.err.printf("Error inicializando la bdd %s", e.getMessage());
         } finally {
             try {
                 DataSource ds = ctx.getBean(DataSource.class);
@@ -196,11 +194,11 @@ public class DataLoaderCli {
                     try {
                         hikariDataSource.close();
                     } catch (Exception ex) {
-                        log.error("Error cerrando conexión", ex);
+                        System.err.printf("Error cerrando conexión %s", ex.getMessage());
                     }
                 }
             } catch (BeansException t) {
-                log.error("Error obteniendo DataSource", t);
+                System.err.printf("Error obteniendo DataSource %s", t.getMessage());
             }
 
             SpringApplication.exit(ctx, () -> 0);
@@ -214,9 +212,6 @@ public class DataLoaderCli {
         }
     }
 
-    /**
-     * Helper para crear customizaciones de forma más limpia.
-     */
     private static void crearCustomizacion(
             CustomizacionesService service,
             ProductoEntity producto,
