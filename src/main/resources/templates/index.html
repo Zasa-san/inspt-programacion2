@@ -66,22 +66,37 @@
                   </div>
 
                   <!-- Con stock -->
-                  <form th:if="${stockMap[p.id] != null && stockMap[p.id] > 0}" th:action="@{/cart/add}" method="post"
-                    class="mt-3">
-                    <input type="hidden" name="productId" th:value="${p.id}" />
-                    <div class="field has-addons">
-                      <div class="control is-expanded">
-                        <input class="input" type="number" name="quantity" min="1" value="1"
-                          sec:authorize="isAnonymous()" />
+                  <div th:if="${stockMap[p.id] != null && stockMap[p.id] > 0}" class="mt-3" sec:authorize="isAnonymous()">
+                    <!-- Producto SIN customizaciones: form directo -->
+                    <form th:if="${!p.tieneCustomizaciones()}" th:action="@{/cart/add}" method="post">
+                      <input type="hidden" name="productId" th:value="${p.id}" />
+                      <div class="field has-addons">
+                        <div class="control is-expanded">
+                          <input class="input" type="number" name="quantity" min="1" value="1" />
+                        </div>
+                        <div class="control">
+                          <button type="submit" class="button is-primary">
+                            Agregar al carrito
+                          </button>
+                        </div>
                       </div>
-                      <div class="control">
-                        <button type="submit" class="button is-primary" sec:authorize="isAnonymous()">
-                          Agregar al carrito
-                        </button>
-                      </div>
+                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    </form>
+
+                    <!-- Producto CON customizaciones: botón que abre modal -->
+                    <div th:if="${p.tieneCustomizaciones()}">
+                      <button type="button" class="button is-primary is-fullwidth open-customization-modal"
+                              th:data-product-id="${p.id}"
+                              th:data-product-name="${p.name}"
+                              th:data-product-price="${p.price}"
+                              th:data-customizaciones="${customizacionesJsonMap[p.id]}">
+                        <span class="icon">
+                          <i class="fas fa-plus"></i>
+                        </span>
+                        <span>Personalizar y agregar</span>
+                      </button>
                     </div>
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                  </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -112,14 +127,22 @@
                 </thead>
                 <tbody>
                   <tr th:each="item : ${cartItems}">
-                    <td th:text="${item.producto.name}">Producto</td>
+                    <td>
+                      <span th:text="${item.producto.name}">Producto</span>
+                      <!-- Mostrar extras si hay -->
+                      <div th:if="${!item.customizaciones.isEmpty()}" class="is-size-7 has-text-grey">
+                        <span th:each="custom, iterStat : ${item.customizaciones}">
+                          <span th:text="${custom.nombre}">Extra</span><span th:if="${!iterStat.last}">, </span>
+                        </span>
+                      </div>
+                    </td>
                     <td class="has-text-centered" th:text="${item.quantity}">1</td>
                     <td class="has-text-right">
                       $ <span class="price-format" th:attr="data-price=${item.subtotal}">0</span>
                     </td>
                     <td class="has-text-right">
                       <form th:action="@{/cart/remove}" method="post">
-                        <input type="hidden" name="productId" th:value="${item.producto.id}" />
+                        <input type="hidden" name="cartKey" th:value="${item.cartKey}" />
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" class="button is-small is-light is-danger">
                           Quitar
@@ -163,7 +186,87 @@
     </div>
   </section>
 
+  <!-- Modal de Customizaciones -->
+  <div class="modal" id="customizationModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">
+          <span id="modalProductName">Producto</span>
+        </p>
+        <button class="delete" aria-label="close" id="closeModalBtn"></button>
+      </header>
+      <section class="modal-card-body">
+        <form id="customizationForm" th:action="@{/cart/add}" method="post">
+          <input type="hidden" name="productId" id="modalProductId" />
+          <input type="hidden" name="customizacionesIds" id="customizacionesIdsInput" />
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+          <div class="field">
+            <label class="label">Cantidad</label>
+            <div class="control">
+              <input class="input" type="number" name="quantity" id="modalQuantity" min="1" value="1" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Extras (opcional)</label>
+            <div id="customizacionesContainer">
+              <!-- Se llena dinámicamente con JS -->
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="level">
+            <div class="level-left">
+              <div class="level-item">
+                <span class="has-text-weight-bold">Precio base:</span>
+              </div>
+              <div class="level-item">
+                $ <span class="price-format" id="modalBasePrice" data-price="0">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="level">
+            <div class="level-left">
+              <div class="level-item">
+                <span class="has-text-weight-bold">Extras:</span>
+              </div>
+              <div class="level-item">
+                + $ <span class="price-format" id="modalExtrasPrice" data-price="0">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="level has-background-light p-2" style="border-radius: 4px;">
+            <div class="level-left">
+              <div class="level-item">
+                <span class="has-text-weight-bold is-size-5">Total unitario:</span>
+              </div>
+              <div class="level-item">
+                <span class="is-size-5">$ <span class="price-format" id="modalTotalPrice" data-price="0">0</span></span>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" form="customizationForm" class="button is-primary">
+          <span class="icon">
+            <i class="fas fa-cart-plus"></i>
+          </span>
+          <span>Agregar al carrito</span>
+        </button>
+        <button class="button" id="cancelModalBtn">Cancelar</button>
+      </footer>
+    </div>
+  </div>
+
   <script th:src="@{/js/products/precioHandler.js}" defer></script>
+  <script th:src="@{/js/cart/customizationModal.js}" defer></script>
 </body>
 
 </html>

@@ -34,9 +34,9 @@
               </div>
               <div class="column is-4">
                 <div class="field">
-                  <label class="label is-small">Precio (centavos)</label>
+                  <label class="label is-small">Precio extra (centavos)</label>
                   <input class="input customization-price" type="number" th:value="${custom.priceModifier}"
-                    placeholder="0" />
+                    placeholder="0" min="0" />
                 </div>
               </div>
             </div>
@@ -60,7 +60,7 @@
       </div>
 
       <p class="help mt-3">
-        <strong>Ejemplos de precio:</strong> 0 = sin costo, 500 = +$5.00, -200 = -$2.00
+        <strong>Ejemplos de precio:</strong> 0 = sin costo adicional, 500 = +$5.00, 1000 = +$10.00
       </p>
     </div>
 
@@ -85,8 +85,8 @@
           </div>
           <div class="column is-4">
             <div class="field">
-              <label class="label is-small">Precio (centavos)</label>
-              <input class="input customization-price" type="number" value="0" placeholder="0" />
+              <label class="label is-small">Precio extra (centavos)</label>
+              <input class="input customization-price" type="number" value="0" placeholder="0" min="0" />
             </div>
           </div>
         </div>

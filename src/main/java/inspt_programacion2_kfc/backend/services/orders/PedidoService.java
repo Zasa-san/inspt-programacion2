@@ -1,6 +1,8 @@
 package inspt_programacion2_kfc.backend.services.orders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
@@ -76,13 +78,29 @@ public class PedidoService {
             throw new CartEmptyException("El carrito está vacío.");
         }
 
-        // Se valida el stock
+        // Agrupar cantidades por producto para validar stock correctamente
+        // (un producto puede aparecer múltiples veces con diferentes customizaciones)
+        Map<Long, Integer> cantidadesPorProducto = new HashMap<>();
+        Map<Long, String> nombresPorProducto = new HashMap<>();
+        
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
+            cantidadesPorProducto.merge(productoId, cartItem.getQuantity(), Integer::sum);
+            if (cartItem.getProductoName() != null) {
+                nombresPorProducto.putIfAbsent(productoId, cartItem.getProductoName());
+            }
+        }
+        
+        // Validar stock para cada producto (cantidad total)
+        for (Map.Entry<Long, Integer> entry : cantidadesPorProducto.entrySet()) {
+            Long productoId = entry.getKey();
+            int cantidadTotal = entry.getValue();
             int stockActual = movimientoStockService.calcularStockProducto(productoId);
-            if (stockActual < cartItem.getQuantity()) {
-                String nombre = cartItem.getProductoName() != null ? cartItem.getProductoName() : "";
-                throw new StockException("No hay stock suficiente para el producto: " + nombre);
+            
+            if (stockActual < cantidadTotal) {
+                String nombre = nombresPorProducto.getOrDefault(productoId, "");
+                throw new StockException(String.format(
+                        "No hay stock suficiente para el producto: %s", nombre));
             }
         }
 
@@ -101,8 +119,17 @@ public class PedidoService {
                     ItemPedido item = new ItemPedido();
                     item.setProducto(producto);
                     item.setQuantity(cartItem.getQuantity());
-                    item.setUnitPrice(producto.getPrice());
-                    item.setSubtotal(producto.getPrice() * cartItem.getQuantity());
+                    
+                    // Usar precio unitario del carrito (incluye extras) o el del producto si no está definido
+                    int precioUnitario = cartItem.getPrecioUnitario() > 0 
+                            ? cartItem.getPrecioUnitario() 
+                            : producto.getPrice();
+                    item.setUnitPrice(precioUnitario);
+                    item.setSubtotal(precioUnitario * cartItem.getQuantity());
+                    
+                    // Guardar customizaciones seleccionadas como JSON
+                    item.setCustomizacionesJson(cartItem.getCustomizacionesJson());
+                    
                     total += item.getSubtotal();
                     pedido.addItem(item);
                 }

@@ -1,6 +1,7 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
@@ -30,11 +34,14 @@ public class BaseRoutesController {
     @Autowired
     private ProductoService productoService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @SuppressWarnings("unchecked")
     private List<CartItem> getCartItems(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
         if (cartObj instanceof Map) {
-            Map<Long, CartItem> cart = (Map<Long, CartItem>) cartObj;
+            Map<String, CartItem> cart = (Map<String, CartItem>) cartObj;
             return new ArrayList<>(cart.values());
         }
         return List.of();
@@ -47,6 +54,20 @@ public class BaseRoutesController {
 
         List<Producto> products = productService.findAll();
         model.addAttribute("products", products);
+
+        // Generar JSON de customizaciones por producto
+        Map<Long, String> customizacionesJsonMap = new HashMap<>();
+        for (Producto p : products) {
+            if (p.tieneCustomizaciones()) {
+                try {
+                    String json = objectMapper.writeValueAsString(p.getCustomizaciones());
+                    customizacionesJsonMap.put(p.getId(), json);
+                } catch (JsonProcessingException e) {
+                    customizacionesJsonMap.put(p.getId(), "[]");
+                }
+            }
+        }
+        model.addAttribute("customizacionesJsonMap", customizacionesJsonMap);
 
         List<ProductoEntity> productosEntities = productoService.findAllAvailable();
         Map<Long, Integer> stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
