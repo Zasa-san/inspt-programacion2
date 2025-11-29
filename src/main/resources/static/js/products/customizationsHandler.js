@@ -29,12 +29,26 @@ $(() => {
 
     const nombre = $nameInput.val().trim();
     const precio = $priceInput.val().trim();
+    const precioNum = parseInt(precio) || 0;
 
     // Validar: si tiene uno, debe tener el otro
+    // Validar: precio no puede ser negativo
+    let hasError = false;
+    let errorText = '';
+
     if ((nombre && !precio) || (!nombre && precio)) {
+      hasError = true;
+      errorText = 'Ambos campos deben estar completos';
+    } else if (precioNum < 0) {
+      hasError = true;
+      errorText = 'El precio no puede ser negativo';
+      $priceInput.val(0); // Corregir automáticamente
+    }
+
+    if (hasError) {
       $nameInput.addClass('is-danger');
       $priceInput.addClass('is-danger');
-      $errorMsg.show();
+      $errorMsg.text(errorText).show();
     } else {
       $nameInput.removeClass('is-danger');
       $priceInput.removeClass('is-danger');
@@ -44,7 +58,7 @@ $(() => {
 
   // Serializar customizaciones al enviar el formulario
   $form.on('submit', (e) => {
-    // Validar que customizaciones con contenido tengan nombre Y precio
+    // Validar que customizaciones con contenido tengan nombre Y precio >= 0
     let isValid = true;
     $container.find('.customization-item').each((index, item) => {
       const $item = $(item);
@@ -54,13 +68,25 @@ $(() => {
 
       const nombre = $nameInput.val().trim();
       const precio = $priceInput.val().trim();
+      const precioNum = parseInt(precio) || 0;
+
+      let hasError = false;
+      let errorText = '';
 
       // Si tiene uno pero no el otro, es inválido
       if ((nombre && !precio) || (!nombre && precio)) {
+        hasError = true;
+        errorText = 'Ambos campos deben estar completos';
+      } else if (nombre && precioNum < 0) {
+        hasError = true;
+        errorText = 'El precio no puede ser negativo';
+      }
+
+      if (hasError) {
         isValid = false;
         $nameInput.addClass('is-danger');
         $priceInput.addClass('is-danger');
-        $errorMsg.show();
+        $errorMsg.text(errorText).show();
       } else {
         $nameInput.removeClass('is-danger');
         $priceInput.removeClass('is-danger');

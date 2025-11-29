@@ -183,10 +183,11 @@ public class ProductsPageController {
         for (CustomizationDto dto : customizations) {
             String idStr = dto.getId();
             String nombre = dto.getNombre();
-            int priceModifier = Objects.requireNonNullElse(dto.getPriceModifier(), 0);
+            // Asegurar que el precio nunca sea negativo
+            int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
             boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
 
-            if (idStr != null && StringUtils.isNumeric(idStr)) {
+            if (StringUtils.isNumeric(idStr)) {
                 Long customizationId = Long.valueOf(idStr);
                 if (!enabled) {
                     customizacionesService.delete(customizationId);
