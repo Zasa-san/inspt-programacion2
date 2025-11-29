@@ -1,10 +1,14 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
+import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.services.products.ProductoService;
+import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
+import inspt_programacion2_kfc.frontend.helpers.ProductHelper;
+import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,32 +18,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
-import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
-import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
-import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
-import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
-import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
-import inspt_programacion2_kfc.backend.services.products.ProductoService;
-import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
+import java.util.List;
 
 @Controller
 public class ProductsPageController {
 
     private final ProductoService productoService;
-    private final CustomizacionesService customizacionesService;
-    private final ObjectMapper objectMapper;
+    private final ProductHelper productHelper;
 
-    public ProductsPageController(ProductoService productoService, CustomizacionesService customizacionesService, ObjectMapper objectMapper) {
+    public ProductsPageController(ProductoService productoService, ProductHelper productHelper) {
         this.productoService = productoService;
-        this.customizacionesService = customizacionesService;
-        this.objectMapper = objectMapper;
+        this.productHelper = productHelper;
     }
 
     @GetMapping("/products")
@@ -78,8 +67,8 @@ public class ProductsPageController {
 
             productoService.create(producto, imageFile);
 
-            List<CustomizationDto> customizations = parseCustomizations(customizationsJson);
-            handleCustomizations(producto, customizations);
+            List<CustomizationDto> customizations = productHelper.parseCustomizations(customizationsJson);
+            productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (ProductImageException e) {
@@ -107,7 +96,7 @@ public class ProductsPageController {
             return "redirect:/products";
         }
 
-        List<CustomizacionEntity> customizaciones = customizacionesService.findByProducto(producto);
+        List<CustomizacionEntity> customizaciones = productHelper.getCustomizacionesPorProducto(producto);
 
         model.addAttribute("product", producto);
         model.addAttribute("customizaciones", customizaciones);
@@ -135,8 +124,8 @@ public class ProductsPageController {
             productoService.update(id, updatedData, imageFile, removeImage);
 
             ProductoEntity producto = productoService.findById(id);
-            List<CustomizationDto> customizations = parseCustomizations(customizationsJson);
-            handleCustomizations(producto, customizations);
+            List<CustomizationDto> customizations = productHelper.parseCustomizations(customizationsJson);
+            productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (ProductNotFoundException e) {
@@ -177,64 +166,4 @@ public class ProductsPageController {
         return "redirect:/products";
     }
 
-    private void handleCustomizations(ProductoEntity producto, List<CustomizationDto> customizations) {
-        if (customizations == null || customizations.isEmpty()) {
-            return;
-        }
-        for (CustomizationDto dto : customizations) {
-            String idStr = dto.getId();
-            String nombre = dto.getNombre();
-            // Asegurar que el precio nunca sea negativo
-            int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
-            boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
-            TipoCustomizacion tipo = parseTipo(dto.getTipo());
-
-            if (StringUtils.isNumeric(idStr)) {
-                Long customizationId = Long.valueOf(idStr);
-                if (!enabled) {
-                    customizacionesService.delete(customizationId);
-                } else {
-                    CustomizacionEntity existing = customizacionesService.findById(customizationId);
-                    if (existing != null) {
-                        existing.setNombre(nombre);
-                        existing.setPriceModifier(priceModifier);
-                        existing.setTipo(tipo);
-                        customizacionesService.update(customizationId, existing);
-                    }
-                }
-            } else if (idStr != null && idStr.startsWith("NEW_") && enabled && nombre != null && !nombre.trim().isEmpty()) {
-
-                CustomizacionEntity newCustomization = new CustomizacionEntity();
-                newCustomization.setProducto(producto);
-                newCustomization.setNombre(nombre);
-                newCustomization.setPriceModifier(priceModifier);
-                newCustomization.setTipo(tipo);
-                customizacionesService.create(newCustomization);
-            }
-
-        }
-    }
-
-    private TipoCustomizacion parseTipo(String tipo) {
-        if (tipo == null || tipo.isBlank()) {
-            return TipoCustomizacion.MULTIPLE;
-        }
-        try {
-            return TipoCustomizacion.valueOf(tipo.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return TipoCustomizacion.MULTIPLE;
-        }
-    }
-
-    private List<CustomizationDto> parseCustomizations(String json) {
-        if (json == null || json.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            return objectMapper.readValue(json, new TypeReference<List<CustomizationDto>>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error al parsear customizaciones JSON", e);
-        }
-    }
 }
