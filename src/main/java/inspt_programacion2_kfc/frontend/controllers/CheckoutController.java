@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import inspt_programacion2_kfc.backend.exceptions.cart.CartException;
+import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,11 +28,11 @@ import jakarta.servlet.http.HttpSession;
 public class CheckoutController {
 
     private final PedidoService pedidoService;
-    private final ObjectMapper objectMapper;
+    private final CheckoutHelper checkoutHelper;
 
-    public CheckoutController(PedidoService pedidoService, ObjectMapper objectMapper) {
+    public CheckoutController(PedidoService pedidoService, CheckoutHelper checkoutHelper) {
         this.pedidoService = pedidoService;
-        this.objectMapper = objectMapper;
+        this.checkoutHelper = checkoutHelper;
     }
 
     @SuppressWarnings("unchecked")
@@ -82,7 +84,7 @@ public class CheckoutController {
 
         try {
             List<CartItemDto> dtoItems = items.stream()
-                    .map(this::toCartItemDto)
+                    .map(checkoutHelper::toCartItemDto)
                     .toList();
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO);
             cart.clear();
@@ -126,7 +128,7 @@ public class CheckoutController {
 
         try {
             List<CartItemDto> dtoItems = items.stream()
-                    .map(this::toCartItemDto)
+                    .map(checkoutHelper::toCartItemDto)
                     .toList();
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO);
             cart.clear();
@@ -139,26 +141,4 @@ public class CheckoutController {
         return "redirect:/";
     }
 
-    /**
-     * Convierte CartItem a CartItemDto incluyendo customizaciones.
-     */
-    private CartItemDto toCartItemDto(CartItem ci) {
-        String customizacionesJson = null;
-        
-        if (ci.getCustomizaciones() != null && !ci.getCustomizaciones().isEmpty()) {
-            try {
-                customizacionesJson = objectMapper.writeValueAsString(ci.getCustomizaciones());
-            } catch (JsonProcessingException e) {
-                // Si falla, queda null
-            }
-        }
-
-        return new CartItemDto(
-                ci.getProducto().getId(),
-                ci.getQuantity(),
-                ci.getProducto().getName(),
-                ci.getPrecioUnitario(),
-                customizacionesJson
-        );
-    }
 }

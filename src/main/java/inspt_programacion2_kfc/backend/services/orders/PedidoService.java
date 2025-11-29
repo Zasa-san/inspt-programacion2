@@ -1,14 +1,5 @@
 package inspt_programacion2_kfc.backend.services.orders;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import inspt_programacion2_kfc.backend.exceptions.cart.CartEmptyException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderAlreadyDeliveredException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderCancelledException;
@@ -22,9 +13,17 @@ import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
+import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
+import inspt_programacion2_kfc.backend.utils.PedidoUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class PedidoService {
@@ -51,16 +50,14 @@ public class PedidoService {
         if (idPedido == null) {
             throw new OrderNotFoundException("ID pedido invalido.");
         }
-        Optional<Pedido> pedido = pedidoRepository.findById(idPedido);
-        return pedido.orElse(null);
+        return pedidoRepository.findById(idPedido).orElse(null);
     }
 
     private ProductoEntity findByIdProducto(Long idProducto) {
         if (idProducto == null) {
             throw new ProductException("ID producto invalido.");
         }
-        Optional<ProductoEntity> producto = productoRepository.findById(idProducto);
-        return producto.orElse(null);
+        return productoRepository.findById(idProducto).orElse(null);
     }
 
     @Transactional
@@ -116,25 +113,12 @@ public class PedidoService {
                 ProductoEntity producto = findByIdProducto(productoId);
 
                 if (producto != null) {
-                    ItemPedido item = new ItemPedido();
-                    item.setProducto(producto);
-                    item.setQuantity(cartItem.getQuantity());
-                    
-                    // Usar precio unitario del carrito (incluye extras) o el del producto si no está definido
-                    int precioUnitario = cartItem.getPrecioUnitario() > 0 
-                            ? cartItem.getPrecioUnitario() 
-                            : producto.getPrice();
-                    item.setUnitPrice(precioUnitario);
-                    item.setSubtotal(precioUnitario * cartItem.getQuantity());
-                    
-                    // Guardar customizaciones seleccionadas como JSON
-                    item.setCustomizacionesJson(cartItem.getCustomizacionesJson());
-                    
+                    ItemPedido item = PedidoUtils.mapItemPedido(cartItem, producto);
+
                     total += item.getSubtotal();
                     pedido.addItem(item);
                 }
             }
-
         }
 
         pedido.setTotal(total);

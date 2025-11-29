@@ -2,10 +2,6 @@ package inspt_programacion2_kfc.backend.models.dto.order;
 
 import lombok.Data;
 
-/**
- * DTO usado por el backend para crear pedidos a partir del carrito,
- * desacoplado del modelo de frontend.
- */
 @Data
 public class CartItemDto {
 
@@ -20,7 +16,6 @@ public class CartItemDto {
     
     /**
      * JSON con las customizaciones seleccionadas.
-     * Ejemplo: [{"id":1,"nombre":"Queso extra","precio":500}]
      */
     private String customizacionesJson;
 
