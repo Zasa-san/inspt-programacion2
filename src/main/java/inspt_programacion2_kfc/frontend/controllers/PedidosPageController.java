@@ -4,6 +4,7 @@ import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
 import inspt_programacion2_kfc.backend.models.orders.Pedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.frontend.helpers.ItemPedidoHelper;
 import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -23,9 +24,11 @@ import java.util.Map;
 public class PedidosPageController {
 
     private final PedidoService pedidoService;
+    private final ItemPedidoHelper itemPedidoHelper;
 
-    public PedidosPageController(PedidoService pedidoService) {
+    public PedidosPageController(PedidoService pedidoService, ItemPedidoHelper itemPedidoHelper) {
         this.pedidoService = pedidoService;
+        this.itemPedidoHelper = itemPedidoHelper;
     }
 
     @ModelAttribute("CREADO")
@@ -56,15 +59,22 @@ public class PedidosPageController {
         List<ItemPedido> items = pedidoService.findAll();
 
         Map<Long, Pedido> pedidosMap = new HashMap<>();
+        Map<Long, List<String>> customizacionesPorItem = new HashMap<>();
+        
         for (ItemPedido item : items) {
             Pedido pedido = item.getPedido();
             if (pedido != null && pedido.getId() != null && !pedidosMap.containsKey(pedido.getId())) {
                 pedidosMap.put(pedido.getId(), pedido);
             }
+
+            if (itemPedidoHelper.tieneCustomizaciones(item)) {
+                customizacionesPorItem.put(item.getId(), itemPedidoHelper.getCustomizacionesNombres(item));
+            }
         }
 
         List<Pedido> pedidos = new ArrayList<>(pedidosMap.values());
         model.addAttribute("pedidos", pedidos);
+        model.addAttribute("customizacionesPorItem", customizacionesPorItem);
 
         return "pedidos/index";
     }

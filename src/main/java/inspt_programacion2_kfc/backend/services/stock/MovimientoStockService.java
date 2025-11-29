@@ -30,8 +30,10 @@ public class MovimientoStockService {
             throw new StockException("La cantidad debe ser mayor a cero.");
         }
 
-        movimientoStockRepository.save(new MovimientoStock(producto, tipo, cantidad, motivo, pedidoId));
-        log.info("Stock del producto id {} actualizado correctamente - idpedido {}", producto.getId(), pedidoId);
+        if (producto != null) {
+            movimientoStockRepository.save(new MovimientoStock(producto, tipo, cantidad, motivo, pedidoId));
+            log.info("Stock del producto id {} actualizado correctamente - idpedido {}", producto.getId(), pedidoId);
+        }
     }
 
     public int calcularStockProducto(Long productoId) {

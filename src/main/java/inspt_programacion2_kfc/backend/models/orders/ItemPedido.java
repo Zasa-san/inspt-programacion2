@@ -1,16 +1,9 @@
 package inspt_programacion2_kfc.backend.models.orders;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import jakarta.persistence.Column;
@@ -24,7 +17,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
@@ -63,37 +55,4 @@ public class ItemPedido {
 
     @Column(columnDefinition = "TEXT")
     private String customizacionesJson;
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-
-    @Transient
-    public List<String> getCustomizacionesNombres() {
-        if (producto == null || customizacionesJson == null || customizacionesJson.isBlank()) {
-            return List.of();
-        }
-        try {
-            List<Map<String, Object>> customList = objectMapper.readValue(
-                    customizacionesJson, 
-                    new TypeReference<List<Map<String, Object>>>() {});
-            List<String> nombres = new ArrayList<>();
-            for (Map<String, Object> custom : customList) {
-                Object nombre = custom.get("nombre");
-                if (nombre != null) {
-                    nombres.add(nombre.toString());
-                }
-            }
-            return nombres;
-        } catch (Exception e) {
-            return List.of();
-        }
-    }
-
-    @Transient
-    public boolean tieneCustomizaciones() {
-        return producto != null &&
-                customizacionesJson != null &&
-                !customizacionesJson.isBlank() &&
-                !customizacionesJson.equals("[]");
-    }
 }

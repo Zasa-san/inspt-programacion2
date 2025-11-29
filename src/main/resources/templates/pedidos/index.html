@@ -55,9 +55,9 @@
                       - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
                     </div>
                     <!-- Mostrar extras si hay -->
-                    <div th:if="${it.tieneCustomizaciones()}" class="is-size-7 has-text-grey ml-3">
+                    <div th:if="${customizacionesPorItem.containsKey(it.id)}" class="is-size-7 has-text-grey ml-3">
                       <span class="icon is-small"><i class="fas fa-plus-circle"></i></span>
-                      <span th:each="extra, iterStat : ${it.customizacionesNombres}">
+                      <span th:each="extra, iterStat : ${customizacionesPorItem[it.id]}">
                         <span th:text="${extra}">Extra</span><span th:if="${!iterStat.last}">, </span>
                       </span>
                     </div>
