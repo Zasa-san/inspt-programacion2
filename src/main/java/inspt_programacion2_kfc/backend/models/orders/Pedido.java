@@ -44,14 +44,6 @@ public class Pedido {
     @Column(nullable = false)
     private int total;
 
-    @Column(nullable = true)
-    private String customerName;
-
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User creadoPor;
-
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> items = new ArrayList<>();
 
