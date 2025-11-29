@@ -1,5 +1,6 @@
 /**
  * Manejo del modal de customizaciones para agregar productos al carrito
+ * Agrupa las opciones por "grupo" y usa radio/checkbox según "tipo"
  */
 $(() => {
   const $modal = $('#customizationModal');
@@ -33,10 +34,12 @@ $(() => {
       extrasTotal += precio;
     });
 
-    // Sumar radio buttons seleccionados
+    // Sumar radio buttons seleccionados (ignorar los de valor vacío = "Sin selección")
     $customizacionesContainer.find('input[type="radio"]:checked').each(function () {
-      const precio = parseInt($(this).data('price')) || 0;
-      extrasTotal += precio;
+      if ($(this).val()) {
+        const precio = parseInt($(this).data('price')) || 0;
+        extrasTotal += precio;
+      }
     });
 
     const totalUnitario = currentProductPrice + extrasTotal;
@@ -55,9 +58,12 @@ $(() => {
       selectedIds.push(parseInt($(this).val()));
     });
     
-    // Recoger radio buttons seleccionados
+    // Recoger radio buttons seleccionados (ignorar los vacíos)
     $customizacionesContainer.find('input[type="radio"]:checked').each(function () {
-      selectedIds.push(parseInt($(this).val()));
+      const val = $(this).val();
+      if (val) {
+        selectedIds.push(parseInt(val));
+      }
     });
     
     $customizacionesIdsInput.val(JSON.stringify(selectedIds));
@@ -86,65 +92,83 @@ $(() => {
     $modalProductId.val(productId);
     $modalQuantity.val(1);
 
-    // Generar inputs de customizaciones
+    // Generar inputs de customizaciones agrupados por "grupo"
     $customizacionesContainer.empty();
 
     if (currentCustomizaciones.length === 0) {
       $customizacionesContainer.html('<p class="has-text-grey">Este producto no tiene extras disponibles.</p>');
     } else {
-      // Separar por tipo
-      const unicasItems = currentCustomizaciones.filter(c => c.tipo === 'UNICA');
-      const multiplesItems = currentCustomizaciones.filter(c => c.tipo === 'MULTIPLE');
+      // Agrupar por "grupo"
+      const grupos = {};
+      currentCustomizaciones.forEach(custom => {
+        const grupo = custom.grupo || 'Extra';
+        if (!grupos[grupo]) {
+          grupos[grupo] = {
+            tipo: custom.tipo, // Asumimos que todas las del mismo grupo tienen el mismo tipo
+            items: []
+          };
+        }
+        grupos[grupo].items.push(custom);
+      });
 
-      // Renderizar UNICA como radio buttons (solo uno seleccionable)
-      if (unicasItems.length > 0) {
-        const $unicaSection = $('<div class="mb-4"></div>');
-        $unicaSection.append('<p class="has-text-weight-semibold mb-2"><span class="icon"><i class="fas fa-check-circle"></i></span> Elige una opción:</p>');
+      // Renderizar cada grupo
+      Object.keys(grupos).forEach(grupoNombre => {
+        const grupoData = grupos[grupoNombre];
+        const esUnica = grupoData.tipo === 'UNICA';
         
-        // Opción "Sin selección" para tipo UNICA
-        const $noneOption = $(`
-          <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-            <input type="radio" name="unica_${productId}" value="" data-price="0" checked />
-            <span class="ml-2">Sin selección</span>
-            <span class="tag is-light ml-2">+$0,00</span>
-          </label>
+        const $grupoSection = $('<div class="mb-4"></div>');
+        
+        // Título del grupo con icono según tipo
+        const icono = esUnica ? 'fa-dot-circle' : 'fa-check-square';
+        $grupoSection.append(`
+          <p class="has-text-weight-semibold mb-2">
+            <span class="icon"><i class="fas ${icono}"></i></span> 
+            ${grupoNombre}
+          </p>
         `);
-        $unicaSection.append($noneOption);
 
-        unicasItems.forEach(custom => {
-          const precioDisplay = `+$${formatPrice(custom.priceModifier)}`;
-          const $item = $(`
-            <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-              <input type="radio" name="unica_${productId}" value="${custom.id}" data-price="${custom.priceModifier}" />
-              <span class="ml-2">${custom.nombre}</span>
-              <span class="tag is-warning is-light ml-2">${precioDisplay}</span>
-            </label>
-          `);
-          $unicaSection.append($item);
-        });
+        if (esUnica) {
+          // UNICA: Radio buttons - solo uno seleccionable por grupo
+          // La primera opción se selecciona por defecto
+          const radioName = `grupo_${productId}_${grupoNombre.replace(/\s+/g, '_')}`;
 
-        $customizacionesContainer.append($unicaSection);
-      }
+          grupoData.items.forEach((custom, index) => {
+            const precioDisplay = custom.priceModifier > 0 
+              ? `+$${formatPrice(custom.priceModifier)}` 
+              : '$0,00';
+            const tagClass = custom.priceModifier > 0 ? 'is-warning' : 'is-light';
+            const isChecked = index === 0 ? 'checked' : '';
+            
+            const $item = $(`
+              <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
+                <input type="radio" name="${radioName}" value="${custom.id}" data-price="${custom.priceModifier}" ${isChecked} />
+                <span class="ml-2">${custom.nombre}</span>
+                <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
+              </label>
+            `);
+            $grupoSection.append($item);
+          });
+        } else {
+          // MULTIPLE: Checkboxes - múltiples seleccionables
+          grupoData.items.forEach(custom => {
+            const precioDisplay = custom.priceModifier > 0 
+              ? `+$${formatPrice(custom.priceModifier)}` 
+              : '$0,00';
+            const tagClass = custom.priceModifier > 0 ? 'is-info' : 'is-light';
+            
+            const $item = $(`
+              <label class="checkbox is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" value="${custom.id}" data-price="${custom.priceModifier}" />
+                <span class="ml-2">${custom.nombre}</span>
+                <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
+              </label>
+            `);
+            $grupoSection.append($item);
+          });
+        }
 
-      // Renderizar MULTIPLE como checkboxes (múltiples seleccionables)
-      if (multiplesItems.length > 0) {
-        const $multipleSection = $('<div></div>');
-        $multipleSection.append('<p class="has-text-weight-semibold mb-2"><span class="icon"><i class="fas fa-plus-square"></i></span> Extras adicionales:</p>');
-
-        multiplesItems.forEach(custom => {
-          const precioDisplay = `+$${formatPrice(custom.priceModifier)}`;
-          const $item = $(`
-            <label class="checkbox is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-              <input type="checkbox" value="${custom.id}" data-price="${custom.priceModifier}" />
-              <span class="ml-2">${custom.nombre}</span>
-              <span class="tag is-info is-light ml-2">${precioDisplay}</span>
-            </label>
-          `);
-          $multipleSection.append($item);
-        });
-
-        $customizacionesContainer.append($multipleSection);
-      }
+        $customizacionesContainer.append($grupoSection);
+      });
     }
 
     // Resetear y actualizar precios

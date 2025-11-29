@@ -39,6 +39,11 @@ public class ProductHelper {
             int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
             boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
             TipoCustomizacion tipo = parseTipo(dto.getTipo());
+            String grupo = Objects.requireNonNullElse(dto.getGrupo(), "").trim();
+
+            if (enabled && grupo.isEmpty()) {
+                throw new IllegalArgumentException("El grupo es requerido para la customización: " + nombre);
+            }
 
             if (StringUtils.isNumeric(idStr)) {
                 Long customizationId = Long.valueOf(idStr);
@@ -50,6 +55,7 @@ public class ProductHelper {
                         existing.setNombre(nombre);
                         existing.setPriceModifier(priceModifier);
                         existing.setTipo(tipo);
+                        existing.setGrupo(grupo);
                         customizacionesService.update(customizationId, existing);
                     }
                 }
@@ -59,6 +65,7 @@ public class ProductHelper {
                 newCustomization.setNombre(nombre);
                 newCustomization.setPriceModifier(priceModifier);
                 newCustomization.setTipo(tipo);
+                newCustomization.setGrupo(grupo);
                 customizacionesService.create(newCustomization);
             }
         }
@@ -80,8 +87,7 @@ public class ProductHelper {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(json, new TypeReference<List<CustomizationDto>>() {
-            });
+            return objectMapper.readValue(json, new TypeReference<List<CustomizationDto>>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error al parsear customizaciones JSON", e);
         }

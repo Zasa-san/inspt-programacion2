@@ -16,25 +16,32 @@
           <p class="has-text-weight-semibold mb-2">Customizaciones existentes:</p>
           <div th:each="custom : ${customizaciones}" class="customization-item box mb-3"
             style="background-color: #f9f9f9;">
-            <div class="columns is-mobile is-vcentered">
+            <div class="columns is-mobile is-vcentered is-multiline">
               <div class="column is-narrow">
                 <label class="checkbox">
                   <input type="checkbox" class="customization-enabled" checked />
                   <span class="ml-2">Activa</span>
                 </label>
               </div>
-              <div class="column">
+              <div class="column is-4">
                 <input type="hidden" class="customization-id" th:value="${custom.id}" />
                 <div class="field">
                   <label class="label is-small">Nombre</label>
                   <input class="input customization-name" type="text" th:value="${custom.nombre}"
                     placeholder="Ej: Pequeño, Con queso extra" />
-                  <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
+                  <p class="help is-danger customization-error" style="display: none;">Campos incompletos</p>
                 </div>
               </div>
-              <div class="column is-3">
+              <div class="column is-2">
                 <div class="field">
-                  <label class="label is-small">Precio extra (centavos)</label>
+                  <label class="label is-small">Grupo</label>
+                  <input class="input customization-grupo" type="text" th:value="${custom.grupo}"
+                    placeholder="Ej: Tamaño, Extra" />
+                </div>
+              </div>
+              <div class="column is-2">
+                <div class="field">
+                  <label class="label is-small">Precio (cent.)</label>
                   <input class="input customization-price" type="number" th:value="${custom.priceModifier}"
                     placeholder="0" min="0" />
                 </div>
@@ -71,35 +78,42 @@
       </div>
 
       <p class="help mt-3">
-        <strong>Tipo:</strong> <em>Única</em> = solo se puede elegir una (ej: tamaño). <em>Múltiple</em> = se pueden elegir varias (ej: extras).
+        <strong>Grupo:</strong> Agrupa las opciones en el carrito (ej: "Tamaño", "Picante", "Extras").
       </p>
       <p class="help">
-        <strong>Precio:</strong> 0 = sin costo adicional, 500 = +$5.00, 1000 = +$10.00
+        <strong>Tipo:</strong> <em>Única</em> = solo una opción del grupo. <em>Múltiple</em> = varias opciones.
       </p>
     </div>
 
     <!-- Template oculto para nuevas customizaciones (usado por jQuery) -->
     <div id="customizationTemplate" style="display: none;">
       <div class="customization-item box mb-3" style="background-color: #f0f7ff;">
-        <div class="columns is-mobile is-vcentered">
+        <div class="columns is-mobile is-vcentered is-multiline">
           <div class="column is-narrow">
             <label class="checkbox">
               <input type="checkbox" class="customization-enabled" checked />
               <span class="ml-2">Activa</span>
             </label>
           </div>
-          <div class="column">
+          <div class="column is-4">
             <input type="hidden" class="customization-id" value="" />
             <div class="field">
               <label class="label is-small">Nombre</label>
               <input class="input customization-name" type="text" value=""
-                placeholder="Ej: Pequeño, Mediano, Con queso extra" />
-              <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
+                placeholder="Ej: Pequeño, Mediano, Queso extra" />
+              <p class="help is-danger customization-error" style="display: none;">Campos incompletos</p>
             </div>
           </div>
-          <div class="column is-3">
+          <div class="column is-2">
             <div class="field">
-              <label class="label is-small">Precio extra (centavos)</label>
+              <label class="label is-small">Grupo</label>
+              <input class="input customization-grupo" type="text" value="Extra"
+                placeholder="Ej: Tamaño, Extra" />
+            </div>
+          </div>
+          <div class="column is-2">
+            <div class="field">
+              <label class="label is-small">Precio (cent.)</label>
               <input class="input customization-price" type="number" value="0" placeholder="0" min="0" />
             </div>
           </div>

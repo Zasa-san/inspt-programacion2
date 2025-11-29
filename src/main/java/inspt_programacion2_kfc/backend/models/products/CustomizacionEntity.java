@@ -38,6 +38,9 @@ public class CustomizacionEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
-    private TipoCustomizacion tipo = TipoCustomizacion.MULTIPLE;
+    private TipoCustomizacion tipo;
+
+    @Column(name = "grupo", nullable = false)
+    private String grupo;
 
 }

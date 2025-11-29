@@ -19,77 +19,125 @@ $(() => {
     $container.append($newItem);
   });
 
-
   // Validación en tiempo real: mostrar/ocultar mensajes de error
-  $container.on('input change', '.customization-name, .customization-price', function () {
+  $container.on('input change', '.customization-name, .customization-price, .customization-grupo', function () {
     const $item = $(this).closest('.customization-item');
+    validateCustomizationItem($item);
+  });
+
+  // Función de validación de un item
+  function validateCustomizationItem($item) {
     const $nameInput = $item.find('.customization-name');
     const $priceInput = $item.find('.customization-price');
+    const $grupoInput = $item.find('.customization-grupo');
     const $errorMsg = $item.find('.customization-error');
 
     const nombre = $nameInput.val().trim();
     const precio = $priceInput.val().trim();
     const precioNum = parseInt(precio) || 0;
+    const grupo = $grupoInput.val().trim();
 
-    // Validar: si tiene uno, debe tener el otro
-    // Validar: precio no puede ser negativo
     let hasError = false;
     let errorText = '';
 
-    if ((nombre && !precio) || (!nombre && precio)) {
-      hasError = true;
-      errorText = 'Ambos campos deben estar completos';
-    } else if (precioNum < 0) {
-      hasError = true;
-      errorText = 'El precio no puede ser negativo';
-      $priceInput.val(0); // Corregir automáticamente
+    // Si tiene nombre, validar todos los campos
+    if (nombre) {
+      if (!precio) {
+        hasError = true;
+        errorText = 'El precio es requerido';
+        $priceInput.addClass('is-danger');
+      } else {
+        $priceInput.removeClass('is-danger');
+      }
+
+      if (precioNum < 0) {
+        hasError = true;
+        errorText = 'El precio no puede ser negativo';
+        $priceInput.addClass('is-danger');
+        $priceInput.val(0);
+      }
+
+      if (!grupo) {
+        hasError = true;
+        errorText = 'El grupo es requerido';
+        $grupoInput.addClass('is-danger');
+      } else {
+        $grupoInput.removeClass('is-danger');
+      }
+    } else {
+      // Sin nombre, limpiar errores
+      $priceInput.removeClass('is-danger');
+      $grupoInput.removeClass('is-danger');
     }
 
     if (hasError) {
       $nameInput.addClass('is-danger');
-      $priceInput.addClass('is-danger');
       $errorMsg.text(errorText).show();
     } else {
       $nameInput.removeClass('is-danger');
-      $priceInput.removeClass('is-danger');
       $errorMsg.hide();
     }
-  });
+
+    return !hasError;
+  }
 
   // Serializar customizaciones al enviar el formulario
   $form.on('submit', (e) => {
-    // Validar que customizaciones con contenido tengan nombre Y precio >= 0
     let isValid = true;
+
     $container.find('.customization-item').each((index, item) => {
       const $item = $(item);
       const $nameInput = $item.find('.customization-name');
       const $priceInput = $item.find('.customization-price');
+      const $grupoInput = $item.find('.customization-grupo');
       const $errorMsg = $item.find('.customization-error');
+      const $enabledCheckbox = $item.find('.customization-enabled');
 
       const nombre = $nameInput.val().trim();
       const precio = $priceInput.val().trim();
       const precioNum = parseInt(precio) || 0;
+      const grupo = $grupoInput.val().trim();
+      const enabled = $enabledCheckbox.prop('checked');
+
+      // Solo validar si tiene nombre o está habilitada
+      if (!nombre && !enabled) return;
 
       let hasError = false;
       let errorText = '';
 
-      // Si tiene uno pero no el otro, es inválido
-      if ((nombre && !precio) || (!nombre && precio)) {
+      // Limpiar estilos previos
+      $nameInput.removeClass('is-danger');
+      $priceInput.removeClass('is-danger');
+      $grupoInput.removeClass('is-danger');
+
+      if (!nombre) {
         hasError = true;
-        errorText = 'Ambos campos deben estar completos';
-      } else if (nombre && precioNum < 0) {
+        errorText = 'El nombre es requerido';
+        $nameInput.addClass('is-danger');
+      }
+
+      if (!precio && nombre) {
+        hasError = true;
+        errorText = 'El precio es requerido';
+        $priceInput.addClass('is-danger');
+      }
+
+      if (precioNum < 0) {
         hasError = true;
         errorText = 'El precio no puede ser negativo';
+        $priceInput.addClass('is-danger');
+      }
+
+      if (!grupo && nombre) {
+        hasError = true;
+        errorText = 'El grupo es requerido';
+        $grupoInput.addClass('is-danger');
       }
 
       if (hasError) {
         isValid = false;
-        $nameInput.addClass('is-danger');
-        $priceInput.addClass('is-danger');
         $errorMsg.text(errorText).show();
       } else {
-        $nameInput.removeClass('is-danger');
-        $priceInput.removeClass('is-danger');
         $errorMsg.hide();
       }
     });
@@ -114,11 +162,13 @@ $(() => {
       const $priceInput = $item.find('.customization-price');
       const $enabledCheckbox = $item.find('.customization-enabled');
       const $tipoSelect = $item.find('.customization-tipo');
+      const $grupoInput = $item.find('.customization-grupo');
 
       const nombre = $nameInput.val().trim();
       const priceModifier = parseInt($priceInput.val()) || 0;
       const enabled = $enabledCheckbox.prop('checked');
       const tipo = $tipoSelect.val() || 'MULTIPLE';
+      const grupo = $grupoInput.val().trim();
 
       // Si no tiene nombre y no está habilitada, ignorar (nueva vacía)
       if (!nombre && !enabled) return;
@@ -137,7 +187,8 @@ $(() => {
         nombre,
         priceModifier,
         enabled,
-        tipo
+        tipo,
+        grupo
       });
     });
 

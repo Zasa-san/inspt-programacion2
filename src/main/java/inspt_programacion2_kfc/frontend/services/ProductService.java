@@ -45,7 +45,7 @@ public class ProductService {
     private List<Customizacion> mapCustomizaciones(ProductoEntity producto) {
         List<CustomizacionEntity> entities = customizacionesService.findByProducto(producto);
         return entities.stream()
-                .map(c -> new Customizacion(c.getId(), c.getNombre(), c.getPriceModifier(), c.getTipo().name()))
+                .map(c -> new Customizacion(c.getId(), c.getNombre(), c.getPriceModifier(), c.getTipo().name(), c.getGrupo()))
                 .collect(Collectors.toList());
     }
 

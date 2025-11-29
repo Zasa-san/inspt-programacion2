@@ -12,8 +12,9 @@ public class Customizacion {
 
     private final Long id;
     private final String nombre;
-    private final int priceModifier; // en centavos
-    private final String tipo; // "UNICA" o "MULTIPLE"
+    private final int priceModifier;
+    private final String tipo;
+    private final String grupo;
 
 }
 
