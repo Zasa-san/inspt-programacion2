@@ -113,10 +113,12 @@ $(() => {
       const $nameInput = $item.find('.customization-name');
       const $priceInput = $item.find('.customization-price');
       const $enabledCheckbox = $item.find('.customization-enabled');
+      const $tipoSelect = $item.find('.customization-tipo');
 
       const nombre = $nameInput.val().trim();
       const priceModifier = parseInt($priceInput.val()) || 0;
       const enabled = $enabledCheckbox.prop('checked');
+      const tipo = $tipoSelect.val() || 'MULTIPLE';
 
       // Si no tiene nombre y no está habilitada, ignorar (nueva vacía)
       if (!nombre && !enabled) return;
@@ -134,7 +136,8 @@ $(() => {
         id,
         nombre,
         priceModifier,
-        enabled
+        enabled,
+        tipo
       });
     });
 

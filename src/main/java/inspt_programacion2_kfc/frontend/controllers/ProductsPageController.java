@@ -23,6 +23,7 @@ import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
@@ -186,6 +187,7 @@ public class ProductsPageController {
             // Asegurar que el precio nunca sea negativo
             int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
             boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
+            TipoCustomizacion tipo = parseTipo(dto.getTipo());
 
             if (StringUtils.isNumeric(idStr)) {
                 Long customizationId = Long.valueOf(idStr);
@@ -196,6 +198,7 @@ public class ProductsPageController {
                     if (existing != null) {
                         existing.setNombre(nombre);
                         existing.setPriceModifier(priceModifier);
+                        existing.setTipo(tipo);
                         customizacionesService.update(customizationId, existing);
                     }
                 }
@@ -205,9 +208,21 @@ public class ProductsPageController {
                 newCustomization.setProducto(producto);
                 newCustomization.setNombre(nombre);
                 newCustomization.setPriceModifier(priceModifier);
+                newCustomization.setTipo(tipo);
                 customizacionesService.create(newCustomization);
             }
 
+        }
+    }
+
+    private TipoCustomizacion parseTipo(String tipo) {
+        if (tipo == null || tipo.isBlank()) {
+            return TipoCustomizacion.MULTIPLE;
+        }
+        try {
+            return TipoCustomizacion.valueOf(tipo.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return TipoCustomizacion.MULTIPLE;
         }
     }
 

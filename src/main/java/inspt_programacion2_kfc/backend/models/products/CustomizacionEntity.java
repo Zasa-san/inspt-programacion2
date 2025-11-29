@@ -5,6 +5,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,5 +35,9 @@ public class CustomizacionEntity {
 
     @Column(name = "modificador", nullable = false)
     private int priceModifier = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private TipoCustomizacion tipo = TipoCustomizacion.MULTIPLE;
 
 }

@@ -6,6 +6,7 @@ public class CustomizationDto {
     private String nombre;
     private Integer priceModifier;
     private Boolean enabled;
+    private String tipo; // "UNICA" o "MULTIPLE"
 
     public String getId() {
         return id;
@@ -37,5 +38,13 @@ public class CustomizationDto {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }

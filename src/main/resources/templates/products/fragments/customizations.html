@@ -32,11 +32,22 @@
                   <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
                 </div>
               </div>
-              <div class="column is-4">
+              <div class="column is-3">
                 <div class="field">
                   <label class="label is-small">Precio extra (centavos)</label>
                   <input class="input customization-price" type="number" th:value="${custom.priceModifier}"
                     placeholder="0" min="0" />
+                </div>
+              </div>
+              <div class="column is-2">
+                <div class="field">
+                  <label class="label is-small">Tipo</label>
+                  <div class="select is-fullwidth">
+                    <select class="customization-tipo">
+                      <option value="MULTIPLE" th:selected="${custom.tipo.name() == 'MULTIPLE'}">Múltiple</option>
+                      <option value="UNICA" th:selected="${custom.tipo.name() == 'UNICA'}">Única</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
@@ -60,7 +71,10 @@
       </div>
 
       <p class="help mt-3">
-        <strong>Ejemplos de precio:</strong> 0 = sin costo adicional, 500 = +$5.00, 1000 = +$10.00
+        <strong>Tipo:</strong> <em>Única</em> = solo se puede elegir una (ej: tamaño). <em>Múltiple</em> = se pueden elegir varias (ej: extras).
+      </p>
+      <p class="help">
+        <strong>Precio:</strong> 0 = sin costo adicional, 500 = +$5.00, 1000 = +$10.00
       </p>
     </div>
 
@@ -83,10 +97,21 @@
               <p class="help is-danger customization-error" style="display: none;">Ambos campos deben estar completos</p>
             </div>
           </div>
-          <div class="column is-4">
+          <div class="column is-3">
             <div class="field">
               <label class="label is-small">Precio extra (centavos)</label>
               <input class="input customization-price" type="number" value="0" placeholder="0" min="0" />
+            </div>
+          </div>
+          <div class="column is-2">
+            <div class="field">
+              <label class="label is-small">Tipo</label>
+              <div class="select is-fullwidth">
+                <select class="customization-tipo">
+                  <option value="MULTIPLE" selected>Múltiple</option>
+                  <option value="UNICA">Única</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
