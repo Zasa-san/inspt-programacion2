@@ -10,7 +10,6 @@ import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.frontend.models.Customizacion;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
