@@ -7,6 +7,14 @@ $(() => {
   const $addBtn = $('#addCustomizationBtn');
   const $noMessage = $('#noCustomizationsMessage');
 
+  // Cargar precios iniciales
+  $container.find('.customization-price[data-price-custom]').each(function () {
+    const centavos = parseInt($(this).attr('data-price-custom'));
+    if (!isNaN(centavos)) {
+      $(this).val(formatPrice(centavos));
+    }
+  });
+
   if (!$form.length || !$container.length) return;
 
   // Obtener template del DOM
@@ -34,7 +42,7 @@ $(() => {
 
     const nombre = $nameInput.val().trim();
     const precio = $priceInput.val().trim();
-    const precioNum = parseInt(precio) || 0;
+    const precioNum = parsePrice(precio);
     const grupo = $grupoInput.val().trim();
 
     let hasError = false;
@@ -95,7 +103,7 @@ $(() => {
 
       const nombre = $nameInput.val().trim();
       const precio = $priceInput.val().trim();
-      const precioNum = parseInt(precio) || 0;
+      const precioNum = parsePrice(precio);
       const grupo = $grupoInput.val().trim();
       const enabled = $enabledCheckbox.prop('checked');
 
@@ -165,7 +173,7 @@ $(() => {
       const $grupoInput = $item.find('.customization-grupo');
 
       const nombre = $nameInput.val().trim();
-      const priceModifier = parseInt($priceInput.val()) || 0;
+      const priceModifier = parsePrice($priceInput.val());
       const enabled = $enabledCheckbox.prop('checked');
       const tipo = $tipoSelect.val() || 'MULTIPLE';
       const grupo = $grupoInput.val().trim();

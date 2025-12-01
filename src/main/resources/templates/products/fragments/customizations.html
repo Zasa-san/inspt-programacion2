@@ -41,9 +41,9 @@
               </div>
               <div class="column is-2">
                 <div class="field">
-                  <label class="label is-small">Precio (cent.)</label>
-                  <input class="input customization-price" type="number" th:value="${custom.priceModifier}"
-                    placeholder="0" min="0" />
+                  <label class="label is-small">Precio</label>
+                  <input class="input customization-price" type="text"
+                    th:attr="data-price-custom=${custom.priceModifier}" placeholder="0,00" />
                 </div>
               </div>
               <div class="column is-2">
@@ -107,14 +107,13 @@
           <div class="column is-2">
             <div class="field">
               <label class="label is-small">Grupo</label>
-              <input class="input customization-grupo" type="text" value="Extra"
-                placeholder="Ej: Tamaño, Extra" />
+              <input class="input customization-grupo" type="text" value="Extra" placeholder="Ej: Tamaño, Extra" />
             </div>
           </div>
           <div class="column is-2">
             <div class="field">
-              <label class="label is-small">Precio (cent.)</label>
-              <input class="input customization-price" type="number" value="0" placeholder="0" min="0" />
+              <label class="label is-small">Precio</label>
+              <input class="input customization-price" type="text" value="0,00" placeholder="0,00" />
             </div>
           </div>
           <div class="column is-2">
