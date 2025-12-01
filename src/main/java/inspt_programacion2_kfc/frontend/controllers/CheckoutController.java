@@ -31,16 +31,6 @@ public class CheckoutController {
     }
 
     @SuppressWarnings("unchecked")
-    private List<CartItem> getCartItems(HttpSession session) {
-        Object cartObj = session.getAttribute("cart");
-        if (cartObj instanceof Map) {
-            Map<String, CartItem> cart = (Map<String, CartItem>) cartObj;
-            return new ArrayList<>(cart.values());
-        }
-        return List.of();
-    }
-
-    @SuppressWarnings("unchecked")
     private Map<String, CartItem> getCart(HttpSession session) {
         Object cartObj = session.getAttribute("cart");
         if (cartObj instanceof Map) {
@@ -54,7 +44,8 @@ public class CheckoutController {
         PageMetadata page = new PageMetadata("Checkout", "Elegí cómo querés pagar tu pedido");
         model.addAttribute("page", page);
 
-        List<CartItem> cartItems = getCartItems(session);
+        Map<String, CartItem> cart = getCart(session);
+        List<CartItem> cartItems = cart != null ? new ArrayList<>(cart.values()) : List.of();
         int cartTotal = cartItems.stream().mapToInt(CartItem::getSubtotal).sum();
 
         model.addAttribute("cartItems", cartItems);
