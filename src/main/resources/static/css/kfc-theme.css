@@ -149,6 +149,34 @@ body {
   color: var(--kfc-text);
 }
 
+[data-theme="dark"] .input,
+[data-theme="dark"] .textarea,
+[data-theme="dark"] .select select {
+  background-color: var(--kfc-bg-secondary);
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .textarea:focus,
+[data-theme="dark"] .select select:focus {
+  border-color: var(--kfc-red);
+}
+
+[data-theme="dark"] .label {
+  color: var(--kfc-text);
+}
+
+[data-theme="dark"] .checkbox,
+[data-theme="dark"] .radio {
+  color: var(--kfc-text);
+}textarea,
+.select select {
+  background-color: var(--kfc-bg);
+  border-color: var(--kfc-border);
+  color: var(--kfc-text);
+}
+
 [data-theme="dark"] .input:focus,
 [data-theme="dark"] .textarea:focus,
 [data-theme="dark"] .select select:focus {
@@ -258,6 +286,18 @@ a:hover {
 [data-theme="dark"] .modal-card-foot {
   background-color: var(--kfc-bg-card);
   border-color: var(--kfc-border);
+}
+
+[data-theme="dark"] .modal-card-title {
+  color: var(--kfc-text);
+}
+
+[data-theme="dark"] .modal-card-body .label {
+  color: var(--kfc-text);
+}
+
+[data-theme="dark"] .has-background-light {
+  background-color: var(--kfc-bg-secondary) !important;
 }
 
 /* Box Styles */
