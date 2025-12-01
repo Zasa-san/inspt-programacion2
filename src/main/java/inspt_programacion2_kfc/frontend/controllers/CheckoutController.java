@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -102,10 +101,10 @@ public class CheckoutController {
             HttpSession session,
             RedirectAttributes redirectAttrs) {
 
-        if (cardholderName == null || cardholderName.isBlank() ||
-                cardNumber == null || cardNumber.isBlank() ||
-                expiry == null || expiry.isBlank() ||
-                cvv == null || cvv.isBlank()) {
+        if (cardholderName == null || cardholderName.isBlank()
+                || cardNumber == null || cardNumber.isBlank()
+                || expiry == null || expiry.isBlank()
+                || cvv == null || cvv.isBlank()) {
             redirectAttrs.addFlashAttribute("paymentError", "Debes completar todos los datos de pago.");
             return "redirect:/checkout";
         }

@@ -19,7 +19,6 @@ import inspt_programacion2_kfc.backend.models.dto.users.UserResponseDTO;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.services.users.UserService;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
 @Controller
 public class UsersPageController {

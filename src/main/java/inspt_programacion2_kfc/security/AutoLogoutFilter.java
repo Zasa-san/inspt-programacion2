@@ -2,7 +2,6 @@ package inspt_programacion2_kfc.security;
 
 import java.io.IOException;
 
-import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,12 +9,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class AutoLogoutOnLoginFilter extends OncePerRequestFilter {
+public class AutoLogoutFilter extends OncePerRequestFilter {
 
     private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 

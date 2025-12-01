@@ -1,14 +1,7 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
-import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
-import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
-import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
-import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.services.products.ProductoService;
-import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
-import inspt_programacion2_kfc.frontend.helpers.ProductHelper;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
+import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
+import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.services.products.ProductoService;
+import inspt_programacion2_kfc.frontend.helpers.ProductHelper;
+import inspt_programacion2_kfc.frontend.models.Customizacion;
 
 @Controller
 public class ProductsPageController {
@@ -67,7 +67,7 @@ public class ProductsPageController {
 
             productoService.create(producto, imageFile);
 
-            List<CustomizationDto> customizations = productHelper.parseCustomizations(customizationsJson);
+            List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
             productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
@@ -124,7 +124,7 @@ public class ProductsPageController {
             productoService.update(id, updatedData, imageFile, removeImage);
 
             ProductoEntity producto = productoService.findById(id);
-            List<CustomizationDto> customizations = productHelper.parseCustomizations(customizationsJson);
+            List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
             productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");

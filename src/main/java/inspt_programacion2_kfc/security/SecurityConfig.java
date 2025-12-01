@@ -50,7 +50,7 @@ public class SecurityConfig {
         http.addFilterBefore(new NoStoreForLoginFilter(),
                 UsernamePasswordAuthenticationFilter.class);
 
-        http.addFilterBefore(new AutoLogoutOnLoginFilter(),
+        http.addFilterBefore(new AutoLogoutFilter(),
                 UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

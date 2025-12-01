@@ -19,7 +19,6 @@ import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.models.Producto;
 import inspt_programacion2_kfc.frontend.services.ProductService;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 import jakarta.servlet.http.HttpSession;
 
 @Controller

@@ -14,7 +14,6 @@ import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
-import inspt_programacion2_kfc.frontend.utils.PageMetadata;
 
 @Controller
 public class StockPageController {

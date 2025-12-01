@@ -2,19 +2,21 @@ package inspt_programacion2_kfc.frontend.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * DTO simple para mostrar customizaciones disponibles en el frontend.
+ * DTO unificado para manejar customizaciones en el frontend.
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Customizacion {
 
-    private final Long id;
-    private final String nombre;
-    private final int priceModifier;
-    private final String tipo;
-    private final String grupo;
+    private Long id;
+    private String nombre;
+    private Integer priceModifier;
+    private Boolean enabled;
+    private String tipo;
+    private String grupo;
 
 }
-

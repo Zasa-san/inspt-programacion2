@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.frontend.utils;
+package inspt_programacion2_kfc.frontend.controllers;
 
 import lombok.Getter;
 

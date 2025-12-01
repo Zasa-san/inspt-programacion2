@@ -3,11 +3,13 @@ package inspt_programacion2_kfc.frontend.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
-import inspt_programacion2_kfc.frontend.controllers.dto.CustomizationDto;
+import inspt_programacion2_kfc.frontend.models.Customizacion;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -26,14 +28,13 @@ public class ProductHelper {
         this.customizacionesService = customizacionesService;
     }
 
-
-    public void handleCustomizations(ProductoEntity producto, List<CustomizationDto> customizations) {
+    public void handleCustomizations(ProductoEntity producto, List<Customizacion> customizations) {
         if (customizations == null || customizations.isEmpty()) {
             return;
         }
 
-        for (CustomizationDto dto : customizations) {
-            String idStr = dto.getId();
+        for (Customizacion dto : customizations) {
+            Long id = dto.getId();
             String nombre = dto.getNombre();
             // Asegurar que el precio nunca sea negativo
             int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
@@ -45,8 +46,8 @@ public class ProductHelper {
                 throw new IllegalArgumentException("El grupo es requerido para la customización: " + nombre);
             }
 
-            if (StringUtils.isNumeric(idStr)) {
-                Long customizationId = Long.valueOf(idStr);
+            if (id != null && id > 0) {
+                Long customizationId = id;
                 if (!enabled) {
                     customizacionesService.delete(customizationId);
                 } else {
@@ -59,7 +60,8 @@ public class ProductHelper {
                         customizacionesService.update(customizationId, existing);
                     }
                 }
-            } else if (idStr != null && idStr.startsWith("NEW_") && enabled && nombre != null && !nombre.trim().isEmpty()) {
+            } else if (id == null && enabled && nombre != null && !nombre.trim().isEmpty()) {
+                // Nueva customización (id es null)
                 CustomizacionEntity newCustomization = new CustomizacionEntity();
                 newCustomization.setProducto(producto);
                 newCustomization.setNombre(nombre);
@@ -82,12 +84,13 @@ public class ProductHelper {
         }
     }
 
-    public List<CustomizationDto> parseCustomizations(String json) {
+    public List<Customizacion> parseCustomizations(String json) {
         if (json == null || json.trim().isEmpty()) {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(json, new TypeReference<List<CustomizationDto>>() {});
+            return objectMapper.readValue(json, new TypeReference<List<Customizacion>>() {
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error al parsear customizaciones JSON", e);
         }
