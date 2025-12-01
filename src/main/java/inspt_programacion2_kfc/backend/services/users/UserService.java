@@ -1,19 +1,24 @@
 package inspt_programacion2_kfc.backend.services.users;
 
-import inspt_programacion2_kfc.backend.exceptions.user.*;
-import inspt_programacion2_kfc.backend.models.users.Role;
-import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import inspt_programacion2_kfc.backend.exceptions.user.UserAlreadyExistsException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserCreationFailedException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserNotFoundException;
+import inspt_programacion2_kfc.backend.exceptions.user.UserPasswordResetFailedException;
+import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -36,6 +41,7 @@ public class UserService {
      * @throws UserPasswordResetFailedException si no se pudo resetear la
      * contraseña
      */
+    @Transactional
     public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
         boolean userExists = existsByUsername(username);
 
@@ -113,6 +119,7 @@ public class UserService {
      * @param rawPassword nueva contraseña en texto plano
      * @param role nuevo rol
      */
+    @Transactional
     public void update(Long id, String username, String rawPassword, Role role) {
         User user = findById(id);
 
@@ -129,6 +136,7 @@ public class UserService {
      *
      * @param id id del usuario a eliminar
      */
+    @Transactional
     public void delete(Long id) {
         if (id == null) {
             throw new UserException("El id no puede ser nulo.");
@@ -145,6 +153,7 @@ public class UserService {
      * @param id id del usuario
      * @param enabled nuevo estado
      */
+    @Transactional
     public void toggleEnabled(Long id, boolean enabled) {
         User user = findById(id);
         if (user != null) {

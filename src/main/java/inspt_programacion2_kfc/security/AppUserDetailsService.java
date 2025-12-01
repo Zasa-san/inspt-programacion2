@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import inspt_programacion2_kfc.backend.repositories.users.UserRepository;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class AppUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
