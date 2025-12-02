@@ -33,7 +33,7 @@ public class ProductHelper {
         }
 
         for (Customizacion dto : customizations) {
-            Long id = dto.getId();
+            String idStr = dto.getId();
             String nombre = dto.getNombre();
             // Asegurar que el precio nunca sea negativo
             int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
@@ -45,8 +45,20 @@ public class ProductHelper {
                 throw new IllegalArgumentException("El grupo es requerido para la customización: " + nombre);
             }
 
-            if (id != null && id > 0) {
-                Long customizationId = id;
+            // Determinar si es una customización existente o nueva
+            boolean isExisting = idStr != null && !idStr.isEmpty() && !idStr.startsWith("NEW_");
+            Long customizationId = null;
+
+            if (isExisting) {
+                try {
+                    customizationId = Long.parseLong(idStr);
+                } catch (NumberFormatException e) {
+                    // Si no se puede parsear, tratar como nueva
+                    isExisting = false;
+                }
+            }
+
+            if (isExisting && customizationId != null && customizationId > 0) {
                 if (!enabled) {
                     customizacionesService.delete(customizationId);
                 } else {
@@ -59,8 +71,8 @@ public class ProductHelper {
                         customizacionesService.update(customizationId, existing);
                     }
                 }
-            } else if (id == null && enabled && nombre != null && !nombre.trim().isEmpty()) {
-                // Nueva customización (id es null)
+            } else if (enabled && nombre != null && !nombre.trim().isEmpty()) {
+                // Nueva customización (id es null, vacío o "NEW_X")
                 CustomizacionEntity newCustomization = new CustomizacionEntity();
                 newCustomization.setProducto(producto);
                 newCustomization.setNombre(nombre);

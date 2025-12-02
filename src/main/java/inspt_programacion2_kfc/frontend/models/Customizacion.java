@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Customizacion {
 
-    private Long id;
+    private String id;
     private String nombre;
     private Integer priceModifier;
     private Boolean enabled;

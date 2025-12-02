@@ -26,8 +26,8 @@ public class CustomizacionEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "producto_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ProductoEntity producto;
 
     @Column(name = "nombre", nullable = false)

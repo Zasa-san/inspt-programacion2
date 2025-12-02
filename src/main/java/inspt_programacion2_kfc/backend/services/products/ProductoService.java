@@ -64,7 +64,9 @@ public class ProductoService {
     }
 
     public void delete(Long id) {
-        if (id == null) throw new ProductNotFoundException("ID no puede ser NULL.");
+        if (id == null) {
+            throw new ProductNotFoundException("ID no puede ser NULL.");
+        }
 
         ProductoEntity producto = findById(id);
         if (producto == null) {
@@ -79,7 +81,9 @@ public class ProductoService {
     }
 
     public void update(Long id, ProductoEntity updatedData, MultipartFile imageFile, boolean removeImage) {
-        if (id == null) throw new ProductNotFoundException("ID no puede ser NULL.");
+        if (id == null) {
+            throw new ProductNotFoundException("ID no puede ser NULL.");
+        }
 
         ProductoEntity existing = findById(id);
         if (existing == null) {
