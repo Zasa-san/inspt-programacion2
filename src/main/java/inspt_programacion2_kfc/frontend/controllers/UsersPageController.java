@@ -107,7 +107,7 @@ public class UsersPageController {
             return "redirect:/users";
         }
 
-        UserRequestDTO dto = new UserRequestDTO(user.getUsername(), "", user.getRole().name());
+        UserRequestDTO dto = new UserRequestDTO(user.getUsername(), "", user.getDni(), user.getNombre(), user.getApellido(), user.getRole().name());
         model.addAttribute("user", dto);
         model.addAttribute("roles", Role.values());
         model.addAttribute("userId", id);
@@ -122,9 +122,7 @@ public class UsersPageController {
 
     @PostMapping("/users/new")
     public String createUserFromForm(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String role,
+            UserRequestDTO dto,
             RedirectAttributes redirectAttrs,
             Authentication authentication
     ) {
@@ -137,7 +135,8 @@ public class UsersPageController {
         }
 
         try {
-            userService.create(username, password, Role.valueOf(role), false);
+            userService.create(dto.getUsername(), dto.getPassword(), dto.getDni(),
+                    dto.getNombre(), dto.getApellido(), Role.valueOf(dto.getRole()), false);
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/users/error";
@@ -147,9 +146,7 @@ public class UsersPageController {
 
     @PostMapping("/users/edit/{id}")
     public String updateUserFromForm(@PathVariable Long id,
-            @RequestParam String username,
-            @RequestParam(required = false) String password,
-            @RequestParam String role,
+            UserRequestDTO dto,
             RedirectAttributes redirectAttrs,
             Authentication authentication) {
         try {
@@ -161,27 +158,35 @@ public class UsersPageController {
                 isAdmin = currentUser.getRole() == Role.ROLE_ADMIN;
             }
 
-            if (userService.existsByUsername(username)) {
-                throw new UserAlreadyExistsException("Ya existe un usuario con el nombre ingresado, intente con otro.");
-            }
-
             // No-admin solo puede editar su propio usuario
             if (!isAdmin && (currentUser == null || !currentUser.getId().equals(id))) {
                 redirectAttrs.addFlashAttribute("errorMessage", "No tienes permiso para editar este usuario.");
                 return "redirect:/access-denied";
             }
 
-            Role newRole = Role.valueOf(role);
+            User existingUser = userService.findById(id);
+
+            if (existingUser != null && !existingUser.getUsername().equals(dto.getUsername())
+                    && userService.existsByUsername(dto.getUsername())) {
+                throw new UserAlreadyExistsException("Ya existe un usuario con el nombre ingresado, intente con otro.");
+            }
+
+            if (existingUser != null && existingUser.getDni() != dto.getDni()
+                    && userService.existsByDni(dto.getDni())) {
+                throw new UserAlreadyExistsException("Ya existe un usuario con ese DNI.");
+            }
+
+            Role newRole = Role.valueOf(dto.getRole());
 
             // Si el usuario edita su propio perfil, no se permite cambiar el rol
             if (currentUser.getId().equals(id)) {
-                User existingUser = userService.findById(id);
                 if (existingUser != null) {
                     newRole = existingUser.getRole();
                 }
             }
 
-            userService.update(id, username, password, newRole);
+            userService.update(id, dto.getUsername(), dto.getPassword(), dto.getDni(),
+                    dto.getNombre(), dto.getApellido(), newRole);
         } catch (UserException e) {
             redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/users/error";

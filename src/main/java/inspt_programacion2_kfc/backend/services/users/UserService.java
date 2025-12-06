@@ -130,16 +130,22 @@ public class UserService {
      * @param id id del usuario a actualizar
      * @param username nuevo username
      * @param rawPassword nueva contraseña en texto plano
+     * @param dni nuevo DNI
+     * @param nombre nuevo nombre
+     * @param apellido nuevo apellido
      * @param role nuevo rol
      */
     @Transactional
-    public void update(Long id, String username, String rawPassword, Role role) {
+    public void update(Long id, String username, String rawPassword, int dni, String nombre, String apellido, Role role) {
         User user = findById(id);
 
         user.setUsername(username);
         if (rawPassword != null && !rawPassword.isBlank()) {
             user.setPassword(passwordEncoder.encode(rawPassword));
         }
+        user.setDni(dni);
+        user.setNombre(nombre);
+        user.setApellido(apellido);
         user.setRole(role);
         userRepository.save(user);
     }
