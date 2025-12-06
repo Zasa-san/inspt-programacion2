@@ -30,48 +30,57 @@ public class UserService {
     }
 
     /**
-     * Crea un usuario nuevo o actualiza la contraseña de uno existente.
+     * Crea un usuario nuevo con todos sus datos.
      *
      * @param username nombre de usuario (único)
      * @param rawPassword contraseña en texto plano (se encripta internamente)
+     * @param dni documento de identidad (único)
+     * @param nombre nombre del usuario
+     * @param apellido apellido del usuario
      * @param role rol a asignar (enum {@link Role})
      * @param resetIfExists si true, resetea la contraseña si el usuario ya
      * existe
+     * @return el usuario creado
      * @throws UserCreationFailedException si no se pudo crear el usuario
      * @throws UserPasswordResetFailedException si no se pudo resetear la
      * contraseña
      */
     @Transactional
-    public void create(String username, String rawPassword, Role role, boolean resetIfExists) {
-        boolean userExists = existsByUsername(username);
+    public User create(String username, String rawPassword, int dni, String nombre, String apellido, Role role, boolean resetIfExists) {
+        boolean userExists = existsByUsername(username) || existsByDni(dni);
 
         if (userExists && resetIfExists) {
             User dbUser = findByUsername(username);
             if (dbUser != null) {
                 dbUser.setPassword(passwordEncoder.encode(rawPassword));
                 try {
-                    userRepository.save(dbUser);
-                    System.out.printf("Clave reestablecida correctamente para el usuario %s", dbUser.getUsername());
+                    User savedUser = userRepository.save(dbUser);
+                    System.out.printf("Usuario %s actualizado correctamente.%n", dbUser.getUsername());
+                    return savedUser;
                 } catch (DataIntegrityViolationException ex) {
-                    throw new UserPasswordResetFailedException("Error al reestablecer la clave " + username, ex);
+                    throw new UserPasswordResetFailedException("Error al actualizar el usuario " + username, ex);
                 }
             }
         } else if (userExists) {
-            throw new UserAlreadyExistsException(String.format("El usuario %s ya existe.", username));
-        } else {
-            User newUser = new User();
-            newUser.setUsername(username);
-            newUser.setPassword(passwordEncoder.encode(rawPassword));
-            newUser.setRole(role);
-            newUser.setEnabled(true);
-            try {
-                userRepository.save(newUser);
-                System.out.printf("Usuario %s guardado correctamente.", newUser.getUsername());
-            } catch (DataIntegrityViolationException ex) {
-                throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
-            }
+            throw new UserAlreadyExistsException(String.format("El usuario %s (DNI: %d) ya existe.", username, dni));
         }
 
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(passwordEncoder.encode(rawPassword));
+        newUser.setDni(dni);
+        newUser.setNombre(nombre);
+        newUser.setApellido(apellido);
+        newUser.setRole(role);
+        newUser.setEnabled(true);
+
+        try {
+            User savedUser = userRepository.save(newUser);
+            System.out.printf("Usuario %s guardado correctamente.%n", newUser.getUsername());
+            return savedUser;
+        } catch (DataIntegrityViolationException ex) {
+            throw new UserCreationFailedException("Error al crear el usuario " + username, ex);
+        }
     }
 
     /**
@@ -101,6 +110,10 @@ public class UserService {
             throw new UsernameNotFoundException("El nombre no puede ser nulo o vacio.");
         }
         return userRepository.findByUsername(username).isPresent();
+    }
+
+    public boolean existsByDni(int dni) {
+        return userRepository.findByDni(dni).isPresent();
     }
 
     public User findByUsername(String username) {

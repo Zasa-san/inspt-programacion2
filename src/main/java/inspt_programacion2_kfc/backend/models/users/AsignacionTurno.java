@@ -41,7 +41,7 @@ public class AsignacionTurno {
     @Column(nullable = false)
     private Timestamp inicio;
 
-    @Column(nullable = false)
+    @Column()
     private Timestamp fin;
 
 }

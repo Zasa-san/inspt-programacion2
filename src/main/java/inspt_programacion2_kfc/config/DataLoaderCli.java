@@ -1,20 +1,31 @@
 package inspt_programacion2_kfc.config;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.BeansException;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import com.zaxxer.hikari.HikariDataSource;
+
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.models.users.Role;
+import inspt_programacion2_kfc.backend.models.users.Turno;
+import inspt_programacion2_kfc.backend.models.users.User;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
+import inspt_programacion2_kfc.backend.services.users.AsignacionTurnoService;
+import inspt_programacion2_kfc.backend.services.users.TurnoService;
 import inspt_programacion2_kfc.backend.services.users.UserService;
-import org.springframework.beans.BeansException;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.sql.DataSource;
 
 public class DataLoaderCli {
 
@@ -28,11 +39,73 @@ public class DataLoaderCli {
             ProductoService productoService = ctx.getBean(ProductoService.class);
             CustomizacionesService customizacionesService = ctx.getBean(CustomizacionesService.class);
             MovimientoStockService stockService = ctx.getBean(MovimientoStockService.class);
+            TurnoService turnoService = ctx.getBean(TurnoService.class);
+            AsignacionTurnoService asignacionTurnoService = ctx.getBean(AsignacionTurnoService.class);
 
-            // Usuarios
-            userService.create("admin", "admin", Role.ROLE_ADMIN, true);
-            userService.create("ventas", "ventas", Role.ROLE_VENDEDOR, true);
-            userService.create("soporte", "soporte", Role.ROLE_SOPORTE, true);
+            // ═══════════════════════════════════════════════════════════════
+            // TURNOS: Crear turnos para los 7 días de la semana
+            // ═══════════════════════════════════════════════════════════════
+            List<Turno> turnosMañana = new ArrayList<>();
+            List<Turno> turnosTarde = new ArrayList<>();
+            List<Turno> turnosNoche = new ArrayList<>();
+
+            for (int dia = 1; dia <= 7; dia++) {
+                // Turno mañana: 6:00 - 12:00
+                Turno mañana = turnoService.create(Time.valueOf("06:00:00"), Time.valueOf("12:00:00"), dia);
+                turnosMañana.add(mañana);
+
+                // Turno tarde: 12:00 - 18:00
+                Turno tarde = turnoService.create(Time.valueOf("12:00:00"), Time.valueOf("18:00:00"), dia);
+                turnosTarde.add(tarde);
+
+                // Turno noche: 18:00 - 00:00
+                Turno noche = turnoService.create(Time.valueOf("18:00:00"), Time.valueOf("00:00:00"), dia);
+                turnosNoche.add(noche);
+            }
+            System.out.println("Turnos creados: 21 turnos (7 días x 3 franjas horarias)");
+
+            // ═══════════════════════════════════════════════════════════════
+            // USUARIOS
+            // ═══════════════════════════════════════════════════════════════
+            userService.create("admin", "admin", 11111111, "Admin", "Sistema", Role.ROLE_ADMIN, true);
+            userService.create("ventas", "ventas", 22222222, "Ventas", "General", Role.ROLE_VENDEDOR, true);
+            userService.create("soporte", "soporte", 33333333, "Soporte", "General", Role.ROLE_SOPORTE, true);
+
+            // Usuarios con datos completos
+            User vendedor1 = userService.create("jperez", "pass123", 12345678, "Juan", "Pérez", Role.ROLE_VENDEDOR, true);
+            User vendedor2 = userService.create("mgarcia", "pass123", 23456789, "María", "García", Role.ROLE_VENDEDOR, true);
+            User soporte1 = userService.create("lrodriguez", "pass123", 34567890, "Luis", "Rodríguez", Role.ROLE_SOPORTE, true);
+            User soporte2 = userService.create("agomez", "pass123", 45678901, "Ana", "Gómez", Role.ROLE_SOPORTE, true);
+
+            // ═══════════════════════════════════════════════════════════════
+            // ASIGNACIÓN DE TURNOS
+            // ═══════════════════════════════════════════════════════════════
+            Timestamp inicioVigencia = Timestamp.valueOf("2025-01-01 00:00:00");
+
+            // Vendedor1: Turnos de mañana de lunes a viernes (días 1-5)
+            for (int i = 0; i < 5; i++) {
+                asignacionTurnoService.asignarTurno(vendedor1, turnosMañana.get(i), inicioVigencia, true);
+            }
+
+            // Vendedor2: Turnos de tarde de lunes a viernes (días 1-5)
+            for (int i = 0; i < 5; i++) {
+                asignacionTurnoService.asignarTurno(vendedor2, turnosTarde.get(i), inicioVigencia, true);
+            }
+
+            // Soporte1: Turnos de noche de lunes a viernes (días 1-5)
+            for (int i = 0; i < 5; i++) {
+                asignacionTurnoService.asignarTurno(soporte1, turnosNoche.get(i), inicioVigencia, true);
+            }
+
+            // Soporte2: Turnos de fin de semana (sábado y domingo = días 6 y 7, todas las franjas)
+            asignacionTurnoService.asignarTurno(soporte2, turnosMañana.get(5), inicioVigencia, true);
+            asignacionTurnoService.asignarTurno(soporte2, turnosTarde.get(5), inicioVigencia, true);
+            asignacionTurnoService.asignarTurno(soporte2, turnosNoche.get(5), inicioVigencia, true);
+            asignacionTurnoService.asignarTurno(soporte2, turnosMañana.get(6), inicioVigencia, true);
+            asignacionTurnoService.asignarTurno(soporte2, turnosTarde.get(6), inicioVigencia, true);
+            asignacionTurnoService.asignarTurno(soporte2, turnosNoche.get(6), inicioVigencia, true);
+
+            System.out.println("Asignaciones de turno creadas para todos los usuarios");
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 1: Combo Clásico
@@ -47,8 +120,8 @@ public class DataLoaderCli {
 
             // Tamaños (UNICA)
             crearCustomizacion(customizacionesService, p1, "Combo Chico", 0, TipoCustomizacion.UNICA, "Tamaño");
-            crearCustomizacion(customizacionesService, p1, "Combo Mediano", 15000, TipoCustomizacion.UNICA,"Tamaño");
-            crearCustomizacion(customizacionesService, p1, "Combo Grande", 25000, TipoCustomizacion.UNICA,"Tamaño");
+            crearCustomizacion(customizacionesService, p1, "Combo Mediano", 15000, TipoCustomizacion.UNICA, "Tamaño");
+            crearCustomizacion(customizacionesService, p1, "Combo Grande", 25000, TipoCustomizacion.UNICA, "Tamaño");
 
             // Extras (MULTIPLE)
             crearCustomizacion(customizacionesService, p1, "Doble carne", 35000, TipoCustomizacion.MULTIPLE, "Extra");
@@ -171,8 +244,8 @@ public class DataLoaderCli {
             productoService.create(p6);
 
             // Tipo de pollo (UNICA)
-            crearCustomizacion(customizacionesService, p6, "Pollo crispy", 0, TipoCustomizacion.UNICA,"Cocción");
-            crearCustomizacion(customizacionesService, p6, "Pollo grillé", 5000, TipoCustomizacion.UNICA,"Cocción");
+            crearCustomizacion(customizacionesService, p6, "Pollo crispy", 0, TipoCustomizacion.UNICA, "Cocción");
+            crearCustomizacion(customizacionesService, p6, "Pollo grillé", 5000, TipoCustomizacion.UNICA, "Cocción");
 
             // Extras (MULTIPLE)
             crearCustomizacion(customizacionesService, p6, "Queso cheddar", 7000, TipoCustomizacion.MULTIPLE, "Extra");
@@ -183,7 +256,7 @@ public class DataLoaderCli {
             // Stock inicial: 35 unidades
             stockService.registrarMovimiento(p6, TipoMovimiento.ENTRADA, 35, "Stock inicial", null);
 
-            message = "Base de datos inicializada con usuarios, productos, customizaciones y stock.";
+            message = "Base de datos inicializada con usuarios, turnos, asignaciones, productos, customizaciones y stock.";
 
         } catch (BeansException e) {
             System.err.printf("Error inicializando la bdd %s", e.getMessage());
