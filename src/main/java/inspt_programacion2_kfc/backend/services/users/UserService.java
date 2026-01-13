@@ -47,9 +47,10 @@ public class UserService {
      */
     @Transactional
     public User create(String username, String rawPassword, int dni, String nombre, String apellido, Role role, boolean resetIfExists) {
-        boolean userExists = existsByUsername(username) || existsByDni(dni);
+        boolean usernameExists = existsByUsername(username);
+        boolean dniExists = existsByDni(dni);
 
-        if (userExists && resetIfExists) {
+        if ((usernameExists || dniExists) && resetIfExists) {
             User dbUser = findByUsername(username);
             if (dbUser != null) {
                 dbUser.setPassword(passwordEncoder.encode(rawPassword));
@@ -61,8 +62,10 @@ public class UserService {
                     throw new UserPasswordResetFailedException("Error al actualizar el usuario " + username, ex);
                 }
             }
-        } else if (userExists) {
-            throw new UserAlreadyExistsException(String.format("El usuario %s (DNI: %d) ya existe.", username, dni));
+        } else if (usernameExists) {
+            throw new UserAlreadyExistsException(String.format("El nombre de usuario %s ya existe.", username));
+        } else if (dniExists) {
+            throw new UserAlreadyExistsException(String.format("El DNI %d ya está asignado a otro usuario.", dni));
         }
 
         User newUser = new User();

@@ -230,6 +230,7 @@ public class UsersPageController {
         }
 
         try {
+
             userService.create(dto.getUsername(), dto.getPassword(), dto.getDni(),
                     dto.getNombre(), dto.getApellido(), Role.valueOf(dto.getRole()), false);
         } catch (Exception e) {
@@ -250,12 +251,12 @@ public class UsersPageController {
 
             if (existingUser != null && !existingUser.getUsername().equals(dto.getUsername())
                     && userService.existsByUsername(dto.getUsername())) {
-                throw new UserAlreadyExistsException("Ya existe un usuario con el nombre ingresado, intente con otro.");
+                throw new UserAlreadyExistsException(String.format("El nombre de usuario %s ya existe.", dto.getUsername()));
             }
 
             if (existingUser != null && existingUser.getDni() != dto.getDni()
                     && userService.existsByDni(dto.getDni())) {
-                throw new UserAlreadyExistsException("Ya existe un usuario con ese DNI.");
+                throw new UserAlreadyExistsException(String.format("El DNI %d ya está asignado a otro usuario.", dto.getDni()));
             }
 
             Role newRole = Role.valueOf(dto.getRole());
