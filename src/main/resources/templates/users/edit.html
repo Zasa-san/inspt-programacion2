@@ -27,37 +27,63 @@
               </div>
 
               <div class="field">
-                <label class="label">Nueva contraseña</label>
+                <label class="label">DNI</label>
                 <div class="control has-icons-left">
-                  <input class="input" type="password" name="password"
-                    placeholder="Dejar en blanco para no modificar" />
+                  <input class="input" type="number" name="dni" th:value="${user.dni}" required />
                   <span class="icon is-small is-left">
-                    <i class="fa-solid fa-lock"></i>
+                    <i class="fa-solid fa-id-card"></i>
                   </span>
                 </div>
-                <p class="help">Dejar en blanco si no desea cambiar la contraseña</p>
+              </div>
+
+              <div class="field">
+                <label class="label">Nombre</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="text" name="nombre" th:value="${user.nombre}" required />
+                  <span class="icon is-small is-left">
+                    <i class="fa-solid fa-signature"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label">Apellido</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="text" name="apellido" th:value="${user.apellido}" required />
+                  <span class="icon is-small is-left">
+                    <i class="fa-solid fa-signature"></i>
+                  </span>
+                </div>
               </div>
 
               <div class="field">
                 <label class="label">Rol</label>
                 <div class="control">
-                  <!-- Si el usuario edita su propio perfil, el rol se muestra pero no se puede cambiar -->
-                  <div class="select is-fullwidth" th:if="${editingSelf}">
-                    <select name="role" disabled>
-                      <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.name()}"
-                        th:selected="${r.name()==user.role}"></option>
-                    </select>
-                    <!-- Se envia el rol actual en un campo oculto -->
-                    <input type="hidden" name="role" th:value="${user.role}" />
-                  </div>
-                  <!-- Para admin editando otros usuarios, puede cambiar el rol -->
-                  <div class="select is-fullwidth" th:if="${!editingSelf and isAdmin}">
-                    <select name="role">
+                  <div class="select is-fullwidth">
+                    <select name="role" th:disabled="${editingSelf}">
                       <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.name()}"
                         th:selected="${r.name()==user.role}"></option>
                     </select>
                   </div>
+                  <!-- Si está deshabilitado, enviar el valor actual en un campo oculto -->
+                  <input type="hidden" th:if="${editingSelf}" name="role" th:value="${user.role}" />
                 </div>
+                <p class="help" th:if="${editingSelf}">No puedes cambiar tu propio rol</p>
+              </div>
+
+              <div class="field">
+                <label class="label">Estado</label>
+                <div class="control">
+                  <label class="checkbox">
+                    <input type="checkbox" name="enabled" th:checked="${user.enabled}" th:disabled="${editingSelf}" />
+                    Usuario habilitado
+                  </label>
+                </div>
+                <!-- Si está deshabilitado, enviar el valor actual en un campo oculto -->
+                <input type="hidden" th:if="${editingSelf}" name="enabled" th:value="${user.enabled}" />
+                <p class="help" th:if="${editingSelf}">No puedes cambiar tu propio estado</p>
+                <p class="help" th:unless="${editingSelf}">Desmarcar para deshabilitar el acceso del usuario al sistema
+                </p>
               </div>
 
               <div class="field is-grouped">

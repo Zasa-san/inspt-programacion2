@@ -124,29 +124,26 @@ public class UserService {
     }
 
     /**
-     * Actualiza los datos de un usuario existente. Si la contraseña es null o
-     * vacía, no se modifica.
+     * Actualiza los datos de un usuario existente
      *
      * @param id id del usuario a actualizar
      * @param username nuevo username
-     * @param rawPassword nueva contraseña en texto plano
      * @param dni nuevo DNI
      * @param nombre nuevo nombre
      * @param apellido nuevo apellido
      * @param role nuevo rol
+     * @param enabled estado habilitado/deshabilitado
      */
     @Transactional
-    public void update(Long id, String username, String rawPassword, int dni, String nombre, String apellido, Role role) {
+    public void update(Long id, String username, int dni, String nombre, String apellido, Role role, boolean enabled) {
         User user = findById(id);
 
         user.setUsername(username);
-        if (rawPassword != null && !rawPassword.isBlank()) {
-            user.setPassword(passwordEncoder.encode(rawPassword));
-        }
         user.setDni(dni);
         user.setNombre(nombre);
         user.setApellido(apellido);
         user.setRole(role);
+        user.setEnabled(enabled);
         userRepository.save(user);
     }
 
@@ -179,5 +176,65 @@ public class UserService {
             user.setEnabled(enabled);
             userRepository.save(user);
         }
+    }
+
+    /**
+     * Cambia la contraseña de un usuario después de verificar la contraseña
+     * actual.
+     *
+     * @param userId id del usuario
+     * @param currentPassword contraseña actual en texto plano
+     * @param newPassword nueva contraseña en texto plano
+     * @return true si se cambió exitosamente, false si la contraseña actual es
+     * incorrecta
+     */
+    @Transactional
+    public boolean changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("Usuario no encontrado.");
+        }
+
+        // Verificar que la contraseña actual sea correcta
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+
+        // Cambiar la contraseña
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
+
+    /**
+     * Verifica si la contraseña proporcionada es correcta para el usuario.
+     *
+     * @param userId id del usuario
+     * @param password contraseña en texto plano
+     * @return true si la contraseña es correcta
+     */
+    public boolean verifyPassword(Long userId, String password) {
+        User user = findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("Usuario no encontrado.");
+        }
+        return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    /**
+     * Cambia la contraseña de un usuario por un admin.
+     *
+     * @param userId id del usuario
+     * @param newPassword nueva contraseña en texto plano
+     */
+    @Transactional
+    public void changePasswordByAdmin(Long userId, String newPassword) {
+        User user = findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("Usuario no encontrado.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

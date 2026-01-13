@@ -29,6 +29,8 @@ public class UserRequestDTO {
     @NotBlank(message = "El rol es obligatorio")
     private String role;
 
+    private Boolean enabled;
+
     public UserRequestDTO() {
     }
 
@@ -39,6 +41,7 @@ public class UserRequestDTO {
         this.nombre = nombre;
         this.apellido = apellido;
         this.role = role;
+        this.enabled = true;
     }
 
 }
