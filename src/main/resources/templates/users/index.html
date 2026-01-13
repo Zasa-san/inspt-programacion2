@@ -45,6 +45,10 @@
               <th>ID</th>
               <th>Usuario</th>
               <th>Rol</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th class="has-text-centered">Turno</th>
+              <th class="has-text-centered">Presente</th>
               <th class="has-text-centered">Estado</th>
               <th class="has-text-centered">Acciones</th>
             </tr>
@@ -55,6 +59,13 @@
               <td th:text="${u.username}">usuario</td>
               <td>
                 <span class="tag is-primary" th:text="${u.role}">ROLE_ADMIN</span>
+              </td>
+              <td th:text="|${u.apellido}, ${u.nombre}|">nombre apellido</td>
+              <td th:text="${u.dni}">dni</td>
+              <td th:text="">turno</td>
+              <td class="has-text-centered">
+                <span class="tag is-success" th:if="${u.presente}">Presente</span>
+                <span class="tag is-danger" th:unless="${u.presente}">Fuera</span>
               </td>
               <td class="has-text-centered">
                 <span class="tag is-success" th:if="${u.enabled}">Activo</span>
