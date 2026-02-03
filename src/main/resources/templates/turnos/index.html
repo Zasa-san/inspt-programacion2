@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/head :: head"></head>
+
+<body>
+  <header th:replace="fragments/navbar :: navbar"></header>
+
+  <section class="section">
+    <div class="container">
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <div>
+              <h1 class="title">Turnos</h1>
+              <p class="subtitle">Gestión de turnos del sistema</p>
+            </div>
+          </div>
+        </div>
+<!--        <div class="level-right">-->
+<!--          <div class="level-item">-->
+<!--            <a class="button is-primary" th:href="@{/users/new}" th:if="${isAdmin}">-->
+<!--              <span class="icon">-->
+<!--                <i class="fa-solid fa-plus"></i>-->
+<!--              </span>-->
+<!--              <span>Nuevo Usuario</span>-->
+<!--            </a>-->
+<!--          </div>-->
+<!--        </div>-->
+      </div>
+
+      <div th:if="${successMessage != null}" class="notification is-success">
+        <button class="delete"></button>
+        <span th:text="${successMessage}"></span>
+      </div>
+      <div th:if="${errorMessage != null}" class="notification is-danger">
+        <button class="delete"></button>
+        <span th:text="${errorMessage}"></span>
+      </div>
+
+      <div class="box">
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <div th:each="entry : ${turnosPorDia}">
+                <h2 class="title is-4" th:text="${entry.key}">Lunes</h2>
+
+                <table class="table is-fullwidth is-striped">
+                    <thead>
+                    <tr>
+                        <th>Ingreso</th>
+                        <th>Salida</th>
+                        <th class="has-text-centered">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="t : ${entry.value}">
+                        <td th:text="${#dates.format(t.ingreso, 'HH:mm')}">08:00</td>
+                        <td th:text="${#dates.format(t.salida, 'HH:mm')}">17:00</td>
+                        <td class="has-text-centered">
+                            <div class="buttons is-centered">
+                                <!-- Botón de editar: solo para admin -->
+                                <a class="button is-small is-info" th:href="@{'/turnos/edit/' + ${t.id}}" th:if="${isAdmin}"
+                                   title="Editar turno">
+                            <span class="icon is-small">
+                                <i class="fa-solid fa-edit"></i>
+                            </span>
+                                </a>
+
+                                <!-- Botón de eliminar -->
+                                <form th:if="${isAdmin}" th:action="@{'/turnos/delete/' + ${t.id}}" method="post" style="display:inline"
+                                      onsubmit="return confirm('¿Está seguro de eliminar este turno?');">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <button type="submit" class="button is-small is-danger" title="Eliminar">
+                                <span class="icon is-small">
+                                    <i class="fa-solid fa-trash"></i>
+                                </span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </table>
+      </div>
+    </div>
+  </section>
+
+</body>
+
+</html>

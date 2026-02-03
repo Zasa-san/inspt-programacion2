@@ -1,6 +1,7 @@
 package inspt_programacion2_kfc.backend.services.users;
 
 import java.sql.Time;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,4 +28,11 @@ public class TurnoService {
         return turnoRepository.save(turno);
     }
 
+    public List<Turno> findAll() {
+        return turnoRepository.findAll();
+    }
+
+    public List<Turno> findAllSorted() {
+        return turnoRepository.findAllByOrderByDiaAscIngresoAsc();
+    }
 }
