@@ -20,7 +20,7 @@ public class TurnosPageController {
     public TurnosPageController(TurnoService turnoService) {
         this.turnoService = turnoService;
     }
-
+//accion de solo asignar para admin
 
     @GetMapping("/turnos")
     public String turnosPage(Model model, Authentication authentication) {
@@ -38,15 +38,10 @@ public class TurnosPageController {
                 ))
                 .toList();
 
-        //TODO DEJAR LINDO PORFA
-        List<String> diasOrden = List.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
-
         Map<String, List<TurnoDTO>> turnosPorDia = turnoDTOS.stream()
                 .collect(Collectors.groupingBy(
                         TurnoDTO::getDia,
-                        () -> new LinkedHashMap<String, List<TurnoDTO>>() {{
-                            diasOrden.forEach(d -> put(d, new ArrayList<>()));
-                        }},
+                        LinkedHashMap::new,
                         Collectors.toList()
                 ));
 
