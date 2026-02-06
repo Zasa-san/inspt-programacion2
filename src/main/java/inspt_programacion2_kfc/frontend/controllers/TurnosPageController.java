@@ -34,16 +34,21 @@ public class TurnosPageController {
                         turno.getId(),
                         turno.getIngreso(),
                         turno.getSalida(),
-                        Dias.numeroADia(turno.getDia())
+                        turno.getDia()
                 ))
                 .toList();
 
-        Map<String, List<TurnoDTO>> turnosPorDia = turnoDTOS.stream()
-                .collect(Collectors.groupingBy(
-                        TurnoDTO::getDia,
-                        LinkedHashMap::new,
-                        Collectors.toList()
+        Map<Integer, List<TurnoDTO>> turnosPorDia = Arrays.stream(Dias.values())
+                .collect(Collectors.toMap(
+                        Dias::getValor,
+                        d -> new ArrayList<>(),
+                        (a, b) -> a,
+                        LinkedHashMap::new
                 ));
+
+        for (TurnoDTO dto : turnoDTOS) {
+            turnosPorDia.computeIfAbsent(dto.getDia(), k -> new ArrayList<>()).add(dto);
+        }
 
         model.addAttribute("turnosPorDia", turnosPorDia);
 

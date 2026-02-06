@@ -12,6 +12,6 @@ public class TurnoDTO {
     private Long id;
     private Time ingreso;
     private Time salida;
-    private String dia;
+    private int dia;
 
 }

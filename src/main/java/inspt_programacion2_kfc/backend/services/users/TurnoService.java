@@ -32,7 +32,20 @@ public class TurnoService {
         return turnoRepository.findAll();
     }
 
+    public Turno findById(Long id) {
+        return turnoRepository.findById(id).orElse(null);
+    }
+
     public List<Turno> findAllSorted() {
         return turnoRepository.findAllByOrderByDiaAscIngresoAsc();
+    }
+
+    public List<Turno> findByDiaSorted(int dia) {
+        return turnoRepository.findByDiaOrderByIngresoAsc(dia);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        turnoRepository.deleteById(id);
     }
 }
