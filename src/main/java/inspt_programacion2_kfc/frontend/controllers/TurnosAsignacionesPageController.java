@@ -59,18 +59,34 @@ public class TurnosAsignacionesPageController {
                 .collect(Collectors.groupingBy(a -> a.getTurno().getId()));
         model.addAttribute("asignacionesPorTurno", asignacionesPorTurno);
 
-        Set<Long> usuariosAsignadosIds = asignacionesDelDia.stream()
-                .map(a -> a.getUsuario().getId())
-                .collect(Collectors.toSet());
-
-        List<User> usuariosDisponibles = userService.findAll().stream()
+        List<User> usuariosHabilitados = userService.findAll().stream()
                 .filter(User::isEnabled)
-                .filter(u -> !usuariosAsignadosIds.contains(u.getId()))
                 .sorted(Comparator.comparing(User::getApellido)
                         .thenComparing(User::getNombre)
                         .thenComparing(User::getUsername))
                 .toList();
-        model.addAttribute("usuariosDisponibles", usuariosDisponibles);
+
+        Map<Long, Set<Long>> userIdsAsignadosPorTurno = asignacionesDelDia.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getTurno().getId(),
+                        Collectors.mapping(a -> a.getUsuario().getId(), Collectors.toSet())
+                ));
+
+        Map<Long, List<User>> usuariosDisponiblesPorTurno = turnosDelDia.stream()
+                .collect(Collectors.toMap(
+                        Turno::getId,
+                        turno -> {
+                            Set<Long> assigned = userIdsAsignadosPorTurno.get(turno.getId());
+                            if (assigned == null || assigned.isEmpty()) {
+                                return usuariosHabilitados;
+                            }
+                            return usuariosHabilitados.stream()
+                                    .filter(u -> !assigned.contains(u.getId()))
+                                    .toList();
+                        }
+                ));
+
+        model.addAttribute("usuariosDisponiblesPorTurno", usuariosDisponiblesPorTurno);
 
         return "turnos/asignaciones";
     }
@@ -97,7 +113,7 @@ public class TurnosAsignacionesPageController {
         }
 
         try {
-            asignacionTurnoService.asignarTurnoVigenteUnicoPorDia(usuario, turno);
+            asignacionTurnoService.asignarTurnoVigente(usuario, turno);
             redirectAttrs.addFlashAttribute("successMessage", "Usuario asignado correctamente.");
         } catch (IllegalStateException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
@@ -136,4 +152,3 @@ public class TurnosAsignacionesPageController {
         return dia;
     }
 }
-

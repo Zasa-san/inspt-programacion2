@@ -53,14 +53,14 @@ public class AsignacionTurnoService {
     }
 
     @Transactional
-    public AsignacionTurno asignarTurnoVigenteUnicoPorDia(User usuario, Turno turno) {
+    public AsignacionTurno asignarTurnoVigente(User usuario, Turno turno) {
         Objects.requireNonNull(usuario, "usuario no puede ser null");
         Objects.requireNonNull(turno, "turno no puede ser null");
 
-        boolean alreadyAssignedInDay = asignacionTurnoRepository
-                .existsByUsuario_IdAndTurno_DiaAndVigenteTrue(usuario.getId(), turno.getDia());
-        if (alreadyAssignedInDay) {
-            throw new IllegalStateException("El usuario ya tiene un turno asignado para ese día.");
+        boolean alreadyAssignedInTurno = asignacionTurnoRepository
+                .existsByUsuario_IdAndTurno_IdAndVigenteTrue(usuario.getId(), turno.getId());
+        if (alreadyAssignedInTurno) {
+            throw new IllegalStateException("El usuario ya está asignado a ese turno.");
         }
 
         AsignacionTurno asignacion = new AsignacionTurno();

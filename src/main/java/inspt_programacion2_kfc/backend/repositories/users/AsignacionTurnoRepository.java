@@ -12,7 +12,7 @@ import inspt_programacion2_kfc.backend.models.users.AsignacionTurno;
 @Repository
 public interface AsignacionTurnoRepository extends JpaRepository<AsignacionTurno, Long> {
 
-    boolean existsByUsuario_IdAndTurno_DiaAndVigenteTrue(Long userId, int dia);
+    boolean existsByUsuario_IdAndTurno_IdAndVigenteTrue(Long userId, Long turnoId);
 
     @Query("""
             select a from AsignacionTurno a
