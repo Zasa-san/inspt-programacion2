@@ -1,12 +1,11 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import inspt_programacion2_kfc.backend.models.users.AsignacionTurno;
-import inspt_programacion2_kfc.backend.models.users.Turno;
-import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.services.users.AsignacionTurnoService;
-import inspt_programacion2_kfc.backend.services.users.TurnoService;
-import inspt_programacion2_kfc.backend.services.users.UserService;
-import inspt_programacion2_kfc.frontend.models.Dias;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import inspt_programacion2_kfc.backend.models.users.AsignacionTurno;
+import inspt_programacion2_kfc.backend.models.users.Turno;
+import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.services.users.AsignacionTurnoService;
+import inspt_programacion2_kfc.backend.services.users.TurnoService;
+import inspt_programacion2_kfc.backend.services.users.UserService;
+import inspt_programacion2_kfc.frontend.models.Dias;
 
 @Controller
 public class TurnosAsignacionesPageController {
@@ -38,7 +39,7 @@ public class TurnosAsignacionesPageController {
         this.asignacionTurnoService = asignacionTurnoService;
     }
 
-    @GetMapping("/turnos/asignaciones")
+    @GetMapping("/asignaciones")
     public String asignacionesPage(
             @RequestParam(required = false, defaultValue = "1") int dia,
             Model model
@@ -88,10 +89,10 @@ public class TurnosAsignacionesPageController {
 
         model.addAttribute("usuariosDisponiblesPorTurno", usuariosDisponiblesPorTurno);
 
-        return "turnos/asignaciones";
+        return "asignaciones/index";
     }
 
-    @PostMapping("/turnos/asignaciones/asignar")
+    @PostMapping("/asignaciones/asignar")
     public String asignar(
             @RequestParam int dia,
             @RequestParam Long turnoId,
@@ -103,13 +104,13 @@ public class TurnosAsignacionesPageController {
         Turno turno = turnoService.findById(turnoId);
         if (turno == null) {
             redirectAttrs.addFlashAttribute("errorMessage", "Turno no encontrado.");
-            return "redirect:/turnos/asignaciones?dia=" + selectedDia;
+            return "redirect:/asignaciones?dia=" + selectedDia;
         }
 
         User usuario = userService.findById(userId);
         if (usuario == null) {
             redirectAttrs.addFlashAttribute("errorMessage", "Usuario no encontrado.");
-            return "redirect:/turnos/asignaciones?dia=" + turno.getDia();
+            return "redirect:/asignaciones?dia=" + turno.getDia();
         }
 
         try {
@@ -121,10 +122,10 @@ public class TurnosAsignacionesPageController {
             redirectAttrs.addFlashAttribute("errorMessage", "No se pudo asignar el turno.");
         }
 
-        return "redirect:/turnos/asignaciones?dia=" + turno.getDia();
+        return "redirect:/asignaciones?dia=" + turno.getDia();
     }
 
-    @PostMapping("/turnos/asignaciones/quitar/{asignacionId}")
+    @PostMapping("/asignaciones/quitar/{asignacionId}")
     public String quitar(
             @PathVariable Long asignacionId,
             @RequestParam int dia,
@@ -139,7 +140,7 @@ public class TurnosAsignacionesPageController {
             redirectAttrs.addFlashAttribute("errorMessage", "No se pudo eliminar la asignación.");
         }
 
-        return "redirect:/turnos/asignaciones?dia=" + selectedDia;
+        return "redirect:/asignaciones?dia=" + selectedDia;
     }
 
     private static int clampDia(int dia) {

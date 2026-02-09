@@ -19,13 +19,13 @@
             </div>
           </div>
         </div>
-        <div class="level-right">
+        <div class="level-right" sec:authorize="hasRole('ADMIN')">
           <div class="level-item">
-            <a class="button is-light" th:href="@{/turnos}">
+            <a class="button is-primary" th:href="@{/turnos}">
               <span class="icon">
-                <i class="fa-solid fa-arrow-left"></i>
+                <i class="fa-solid fa-user-clock"></i>
               </span>
-              <span>Volver</span>
+              <span>Gestionar turnos</span>
             </a>
           </div>
         </div>
@@ -34,7 +34,7 @@
       <div class="tabs is-toggle is-small is-fullwidth">
         <ul>
           <li th:each="d : ${dias}" th:classappend="${selectedDia == d.valor} ? 'is-active'">
-            <a th:href="@{/turnos/asignaciones(dia=${d.valor})}" th:text="${d.nombre}">Lunes</a>
+            <a th:href="@{/asignaciones(dia=${d.valor})}" th:text="${d.nombre}">Lunes</a>
           </li>
         </ul>
       </div>
@@ -65,7 +65,7 @@
           </div>
           <div class="level-right">
             <div class="level-item">
-              <form th:action="@{/turnos/asignaciones/asignar}" method="post" class="is-flex is-align-items-center">
+              <form th:action="@{/asignaciones/asignar}" method="post" class="is-flex is-align-items-center">
                 <input type="hidden" name="dia" th:value="${selectedDia}" />
                 <input type="hidden" name="turnoId" th:value="${t.id}" />
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -122,7 +122,7 @@
                 </td>
                 <td th:text="${a.usuario.username}">usuario</td>
                 <td class="has-text-centered">
-                  <form th:action="@{'/turnos/asignaciones/quitar/' + ${a.id}}" method="post" style="display:inline">
+                  <form th:action="@{'/asignaciones/quitar/' + ${a.id}}" method="post" style="display:inline">
                     <input type="hidden" name="dia" th:value="${selectedDia}" />
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <button type="submit" class="button is-small is-danger is-light"

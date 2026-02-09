@@ -19,7 +19,7 @@
         </div>
         <div class="level-right" sec:authorize="hasRole('ADMIN')">
           <div class="level-item">
-            <a class="button is-primary" th:href="@{/turnos/asignaciones}">
+            <a class="button is-primary" th:href="@{/asignaciones}">
               <span class="icon">
                 <i class="fa-solid fa-user-clock"></i>
               </span>
@@ -42,7 +42,8 @@
         <div class="level mb-3">
           <div class="level-left">
             <div class="level-item">
-              <h2 class="title is-4 mb-0" th:text="${T(inspt_programacion2_kfc.frontend.models.Dias).numeroADia(entry.key)}">
+              <h2 class="title is-4 mb-0"
+                th:text="${T(inspt_programacion2_kfc.frontend.models.Dias).numeroADia(entry.key)}">
                 Lunes
               </h2>
             </div>
@@ -77,7 +78,7 @@
               <td th:text="${#dates.format(t.salida, 'HH:mm')}">17:00</td>
               <td class="has-text-right" sec:authorize="hasRole('ADMIN')">
                 <form th:action="@{'/turnos/delete/' + ${t.id}}" method="post" style="display:inline"
-                      onsubmit="return confirm('¿Eliminar este turno?');">
+                  onsubmit="return confirm('¿Eliminar este turno?');">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <button type="submit" class="button is-small is-danger is-light" title="Eliminar">
                     <span class="icon is-small">
