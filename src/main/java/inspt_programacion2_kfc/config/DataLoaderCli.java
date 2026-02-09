@@ -13,6 +13,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import inspt_programacion2_kfc.backend.models.ingredients.IngredienteEntity;
+import inspt_programacion2_kfc.backend.models.ingredients.ProductoIngredienteEntity;
+import inspt_programacion2_kfc.backend.models.bundles.ProductoComponenteEntity;
 import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
@@ -20,6 +23,9 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.Turno;
 import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.repositories.bundles.ProductoComponenteRepository;
+import inspt_programacion2_kfc.backend.repositories.ingredients.ProductoIngredienteRepository;
+import inspt_programacion2_kfc.backend.services.ingredients.IngredienteService;
 import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
@@ -38,7 +44,10 @@ public class DataLoaderCli {
             UserService userService = ctx.getBean(UserService.class);
             ProductoService productoService = ctx.getBean(ProductoService.class);
             CustomizacionesService customizacionesService = ctx.getBean(CustomizacionesService.class);
+            IngredienteService ingredienteService = ctx.getBean(IngredienteService.class);
             MovimientoStockService stockService = ctx.getBean(MovimientoStockService.class);
+            ProductoIngredienteRepository productoIngredienteRepository = ctx.getBean(ProductoIngredienteRepository.class);
+            ProductoComponenteRepository productoComponenteRepository = ctx.getBean(ProductoComponenteRepository.class);
             TurnoService turnoService = ctx.getBean(TurnoService.class);
             AsignacionTurnoService asignacionTurnoService = ctx.getBean(AsignacionTurnoService.class);
 
@@ -128,8 +137,7 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p1, "Bacon crispy", 12000, TipoCustomizacion.MULTIPLE, "Extra");
             crearCustomizacion(customizacionesService, p1, "Queso cheddar extra", 8000, TipoCustomizacion.MULTIPLE, "Extra");
 
-            // Stock inicial: 25 unidades
-            stockService.registrarMovimiento(p1, TipoMovimiento.ENTRADA, 25, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 2: Bucket Familiar
@@ -153,8 +161,7 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p2, "Coleslaw", 12000, TipoCustomizacion.MULTIPLE, "Extra");
             crearCustomizacion(customizacionesService, p2, "Puré de papas", 15000, TipoCustomizacion.MULTIPLE, "Extra");
 
-            // Stock inicial: 15 unidades
-            stockService.registrarMovimiento(p2, TipoMovimiento.ENTRADA, 15, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 3: Tenders Box
@@ -177,8 +184,7 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p3, "Salsa buffalo", 4000, TipoCustomizacion.MULTIPLE, "Extra");
             crearCustomizacion(customizacionesService, p3, "Aros de cebolla", 15000, TipoCustomizacion.MULTIPLE, "Extra");
 
-            // Stock inicial: 30 unidades
-            stockService.registrarMovimiento(p3, TipoMovimiento.ENTRADA, 30, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 4: Helado Sundae
@@ -201,8 +207,7 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p4, "Maní picado", 4000, TipoCustomizacion.MULTIPLE, "Toppings");
             crearCustomizacion(customizacionesService, p4, "Crema batida", 6000, TipoCustomizacion.MULTIPLE, "Toppings");
 
-            // Stock inicial: 50 unidades
-            stockService.registrarMovimiento(p4, TipoMovimiento.ENTRADA, 50, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 5: Alitas Picantes
@@ -229,8 +234,7 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p5, "Dip de queso azul", 8000, TipoCustomizacion.MULTIPLE, "Extra");
             crearCustomizacion(customizacionesService, p5, "Apio y zanahoria", 6000, TipoCustomizacion.MULTIPLE, "Extra");
 
-            // Stock inicial: 20 unidades
-            stockService.registrarMovimiento(p5, TipoMovimiento.ENTRADA, 20, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
             // ═══════════════════════════════════════════════════════════════
             // PRODUCTO 6: Wrap de Pollo
@@ -253,10 +257,91 @@ public class DataLoaderCli {
             crearCustomizacion(customizacionesService, p6, "Jalapeños", 4000, TipoCustomizacion.MULTIPLE, "Extra");
             crearCustomizacion(customizacionesService, p6, "Palta", 12000, TipoCustomizacion.MULTIPLE, "Extra");
 
-            // Stock inicial: 35 unidades
-            stockService.registrarMovimiento(p6, TipoMovimiento.ENTRADA, 35, "Stock inicial", null);
+            // Stock: ahora se deriva de ingredientes (ver bloque al final)
 
-            message = "Base de datos inicializada con usuarios, turnos, asignaciones, productos, customizaciones y stock.";
+            // ════════════════════════════════════════════════════════════════════════════════════════
+            // COMPONENTES PARA BUNDLE (ej: Combo Clásico = sanguche + papas + bebida)
+            // ════════════════════════════════════════════════════════════════════════════════════════
+            ProductoEntity sanguchePollo = new ProductoEntity();
+            sanguchePollo.setName("Sánguche de pollo");
+            sanguchePollo.setDescription("Sánguche individual de pollo.");
+            sanguchePollo.setAvailable(true);
+            sanguchePollo.setPrice(32000);
+            sanguchePollo.setImgUrl("/uploads/products/sanguche-pollo.jpg");
+            productoService.create(sanguchePollo);
+
+            ProductoEntity papasMedianas = new ProductoEntity();
+            papasMedianas.setName("Papas medianas");
+            papasMedianas.setDescription("Papas fritas tamaño mediano.");
+            papasMedianas.setAvailable(true);
+            papasMedianas.setPrice(16000);
+            papasMedianas.setImgUrl("/uploads/products/papas-medianas.jpg");
+            productoService.create(papasMedianas);
+
+            ProductoEntity bebidaComun = new ProductoEntity();
+            bebidaComun.setName("Bebida");
+            bebidaComun.setDescription("Bebida individual.");
+            bebidaComun.setAvailable(true);
+            bebidaComun.setPrice(12000);
+            bebidaComun.setImgUrl("/uploads/products/bebida.jpg");
+            productoService.create(bebidaComun);
+
+            // ════════════════════════════════════════════════════════════════════════════════════════
+            // INGREDIENTES + RECETAS + STOCK INICIAL (por ingrediente)
+            // ════════════════════════════════════════════════════════════════════════════════════════
+            IngredienteEntity pollo = crearIngrediente(ingredienteService, "Pollo", "porción");
+            IngredienteEntity papas = crearIngrediente(ingredienteService, "Papas", "porción");
+            IngredienteEntity pan = crearIngrediente(ingredienteService, "Pan", "u");
+            IngredienteEntity bebida = crearIngrediente(ingredienteService, "Bebida", "u");
+            IngredienteEntity helado = crearIngrediente(ingredienteService, "Helado", "u");
+            IngredienteEntity salsa = crearIngrediente(ingredienteService, "Salsa", "porción");
+            IngredienteEntity tortilla = crearIngrediente(ingredienteService, "Tortilla", "u");
+            IngredienteEntity lechuga = crearIngrediente(ingredienteService, "Lechuga", "porción");
+
+            // Recetas (cantidad de ingrediente por 1 unidad de producto)
+            agregarIngredienteReceta(productoIngredienteRepository, sanguchePollo, pollo, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, sanguchePollo, pan, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, sanguchePollo, salsa, 1);
+
+            agregarIngredienteReceta(productoIngredienteRepository, papasMedianas, papas, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, bebidaComun, bebida, 1);
+
+            agregarIngredienteReceta(productoIngredienteRepository, p2, pollo, 8);
+            agregarIngredienteReceta(productoIngredienteRepository, p2, papas, 2);
+            agregarIngredienteReceta(productoIngredienteRepository, p2, bebida, 4);
+
+            agregarIngredienteReceta(productoIngredienteRepository, p3, pollo, 2);
+            agregarIngredienteReceta(productoIngredienteRepository, p3, papas, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p3, bebida, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p3, salsa, 1);
+
+            agregarIngredienteReceta(productoIngredienteRepository, p4, helado, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p4, salsa, 1);
+
+            agregarIngredienteReceta(productoIngredienteRepository, p5, pollo, 3);
+            agregarIngredienteReceta(productoIngredienteRepository, p5, salsa, 1);
+
+            agregarIngredienteReceta(productoIngredienteRepository, p6, tortilla, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p6, pollo, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p6, lechuga, 1);
+            agregarIngredienteReceta(productoIngredienteRepository, p6, salsa, 1);
+
+            // Bundle: Combo Clásico = sanguche + papas + bebida (sin receta propia)
+            agregarComponenteBundle(productoComponenteRepository, p1, sanguchePollo, 1);
+            agregarComponenteBundle(productoComponenteRepository, p1, papasMedianas, 1);
+            agregarComponenteBundle(productoComponenteRepository, p1, bebidaComun, 1);
+
+            // Stock inicial (alto a propósito para que el menú no quede vacío)
+            stockService.registrarMovimiento(pollo, TipoMovimiento.ENTRADA, 500, "Stock inicial", null);
+            stockService.registrarMovimiento(papas, TipoMovimiento.ENTRADA, 250, "Stock inicial", null);
+            stockService.registrarMovimiento(pan, TipoMovimiento.ENTRADA, 200, "Stock inicial", null);
+            stockService.registrarMovimiento(bebida, TipoMovimiento.ENTRADA, 250, "Stock inicial", null);
+            stockService.registrarMovimiento(helado, TipoMovimiento.ENTRADA, 200, "Stock inicial", null);
+            stockService.registrarMovimiento(salsa, TipoMovimiento.ENTRADA, 400, "Stock inicial", null);
+            stockService.registrarMovimiento(tortilla, TipoMovimiento.ENTRADA, 200, "Stock inicial", null);
+            stockService.registrarMovimiento(lechuga, TipoMovimiento.ENTRADA, 250, "Stock inicial", null);
+
+            message = "Base de datos inicializada con usuarios, turnos, asignaciones, productos, customizaciones, ingredientes, recetas y stock.";
 
         } catch (BeansException e) {
             System.err.printf("Error inicializando la bdd %s", e.getMessage());
@@ -299,5 +384,46 @@ public class DataLoaderCli {
         c.setTipo(tipo);
         c.setGrupo(grupo);
         service.create(c);
+    }
+
+    private static IngredienteEntity crearIngrediente(IngredienteService service, String nombre, String unidad) {
+        IngredienteEntity i = new IngredienteEntity();
+        i.setName(nombre);
+        i.setUnit(unidad != null ? unidad : "u");
+        i.setActive(true);
+        return service.create(i);
+    }
+
+    private static void agregarIngredienteReceta(
+            ProductoIngredienteRepository repo,
+            ProductoEntity producto,
+            IngredienteEntity ingrediente,
+            int cantidad) {
+        if (producto == null || producto.getId() == null || ingrediente == null || ingrediente.getId() == null) {
+            return;
+        }
+        if (repo.existsByProductoIdAndIngredienteId(producto.getId(), ingrediente.getId())) {
+            return;
+        }
+        ProductoIngredienteEntity linea = new ProductoIngredienteEntity();
+        linea.setProducto(producto);
+        linea.setIngrediente(ingrediente);
+        linea.setCantidad(cantidad);
+        repo.save(linea);
+    }
+
+    private static void agregarComponenteBundle(
+            ProductoComponenteRepository repo,
+            ProductoEntity producto,
+            ProductoEntity componente,
+            int cantidad) {
+        if (producto == null || producto.getId() == null || componente == null || componente.getId() == null) {
+            return;
+        }
+        ProductoComponenteEntity linea = new ProductoComponenteEntity();
+        linea.setProducto(producto);
+        linea.setComponente(componente);
+        linea.setCantidad(cantidad);
+        repo.save(linea);
     }
 }

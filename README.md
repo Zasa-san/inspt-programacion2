@@ -103,3 +103,7 @@ $env:MYSQL_HOST="db.example.com"; $env:MYSQL_PORT="3307"; java -jar inspt-progra
 ```bash
 MYSQL_HOST=db.example.com MYSQL_PORT=3307 java -jar inspt-programacion2-kfc.jar
 ```
+
+## Nota sobre stock
+- El stock se gestiona por ingredientes (menú `/stock`) y el stock de cada producto se calcula en base a su receta (ingredientes requeridos por unidad).
+- El `dataloader` carga ingredientes, recetas y un stock inicial por ingrediente.

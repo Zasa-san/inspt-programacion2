@@ -6,7 +6,6 @@ import inspt_programacion2_kfc.backend.exceptions.order.OrderCancelledException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderNotFoundException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
-import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.helpers.PedidoHelper;
 import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
@@ -78,28 +77,15 @@ public class PedidoService {
         // Agrupar cantidades por producto para validar stock correctamente
         // (un producto puede aparecer múltiples veces con diferentes customizaciones)
         Map<Long, Integer> cantidadesPorProducto = new HashMap<>();
-        Map<Long, String> nombresPorProducto = new HashMap<>();
         
         for (CartItemDto cartItem : items) {
             Long productoId = cartItem.getProductoId();
             // Fusiona los productos por clave en el map y suma las cantidades
             cantidadesPorProducto.merge(productoId, cartItem.getQuantity(), Integer::sum);
-            if (cartItem.getProductoName() != null) {
-                nombresPorProducto.putIfAbsent(productoId, cartItem.getProductoName());
-            }
         }
         
-        // Validar stock para cada producto (cantidad total)
-        for (Map.Entry<Long, Integer> entry : cantidadesPorProducto.entrySet()) {
-            Long productoId = entry.getKey();
-            int cantidadTotal = entry.getValue();
-            int stockActual = pedidoHelper.obtenerStockPorIdProducto(productoId);
-            
-            if (stockActual < cantidadTotal) {
-                String nombre = nombresPorProducto.getOrDefault(productoId, "");
-                throw new StockException(String.format("No hay stock suficiente para el producto: %s", nombre));
-            }
-        }
+        // Validación real por ingredientes (evita overselling cuando productos comparten insumos)
+        pedidoHelper.validarDisponibilidadPorIngredientes(cantidadesPorProducto);
 
         Pedido pedido = new Pedido();
         pedido.setEstado(estadoInicial);

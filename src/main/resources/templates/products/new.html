@@ -61,6 +61,13 @@
         </div>
 
         <!-- Sección de Customizaciones -->
+        <!-- Sección de Receta / Ingredientes -->
+        <div th:replace="~{products/fragments/ingredients :: ingredientsSection(${ingredientes}, ${recetaMap})}"></div>
+
+        <!-- Sección de Bundle (Combo) -->
+        <div th:replace="~{products/fragments/bundle :: bundleSection(${productosBundle}, ${bundleMap})}"></div>
+
+        <!-- Sección de Customizaciones -->
         <div th:replace="~{products/fragments/customizations :: customizationsSection(null)}"></div>
 
         <div class="field is-grouped">
@@ -79,6 +86,8 @@
 
   <script th:src="@{/js/products/imageHandler.js}" defer></script>
   <script th:src="@{/js/products/precioHandler.js}" defer></script>
+  <script th:src="@{/js/products/ingredientsHandler.js}" defer></script>
+  <script th:src="@{/js/products/bundleHandler.js}" defer></script>
   <script th:src="@{/js/products/customizationsHandler.js}" defer></script>
 </body>
 

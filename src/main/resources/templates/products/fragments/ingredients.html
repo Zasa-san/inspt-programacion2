@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+  <div th:fragment="ingredientsSection(ingredientes, recetaMap)">
+    <div class="box mt-5">
+      <h2 class="subtitle mb-3">Receta (Ingredientes)</h2>
+      <p class="help mb-4">Seleccioná los ingredientes y la cantidad necesaria para producir 1 unidad del producto.</p>
+
+      <div th:if="${ingredientes == null or ingredientes.isEmpty()}">
+        <div class="notification is-warning is-light">
+          No hay ingredientes cargados. Cargalos con el dataloader o desde la base de datos.
+        </div>
+      </div>
+
+      <div th:if="${ingredientes != null and !ingredientes.isEmpty()}">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th class="has-text-centered">Usar</th>
+              <th>Ingrediente</th>
+              <th class="has-text-centered">Unidad</th>
+              <th class="has-text-centered">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="i : ${ingredientes}">
+              <td class="has-text-centered">
+                <label class="checkbox">
+                  <input type="checkbox" class="ingredient-enabled"
+                    th:checked="${recetaMap != null and recetaMap[i.id] != null and recetaMap[i.id] > 0}" />
+                </label>
+              </td>
+              <td th:text="${i.name}">Ingrediente</td>
+              <td class="has-text-centered" th:text="${i.unit}">u</td>
+              <td class="has-text-centered" style="max-width: 180px;">
+                <input type="hidden" name="ingredienteId" th:value="${i.id}" />
+                <input class="input is-small ingredient-qty" type="number" name="ingredienteCantidad" min="0"
+                  th:value="${recetaMap != null and recetaMap[i.id] != null ? recetaMap[i.id] : 0}" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="help">Tip: si un ingrediente no se usa, destildalo o dejá cantidad en 0.</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+

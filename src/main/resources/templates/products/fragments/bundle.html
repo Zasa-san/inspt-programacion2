@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+  <div th:fragment="bundleSection(productos, bundleMap)">
+    <div class="box mt-5">
+      <h2 class="subtitle mb-3">Bundle (Combo)</h2>
+      <p class="help mb-4">Opcional: si configurás componentes, el stock del combo se deriva de sus productos internos (sin receta propia).</p>
+
+      <div th:if="${productos == null or productos.isEmpty()}">
+        <div class="notification is-info is-light">
+          No hay otros productos para usar como componentes.
+        </div>
+      </div>
+
+      <div th:if="${productos != null and !productos.isEmpty()}">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th class="has-text-centered">Incluir</th>
+              <th>Producto</th>
+              <th class="has-text-centered">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="p : ${productos}">
+              <td class="has-text-centered">
+                <label class="checkbox">
+                  <input type="checkbox" class="bundle-enabled"
+                    th:checked="${bundleMap != null and bundleMap[p.id] != null and bundleMap[p.id] > 0}" />
+                </label>
+              </td>
+              <td th:text="${p.name}">Producto</td>
+              <td class="has-text-centered" style="max-width: 180px;">
+                <input type="hidden" name="componenteId" th:value="${p.id}" />
+                <input class="input is-small bundle-qty" type="number" name="componenteCantidad" min="0"
+                  th:value="${bundleMap != null and bundleMap[p.id] != null ? bundleMap[p.id] : 0}" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="help">Tip: destildar pone cantidad 0.</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+

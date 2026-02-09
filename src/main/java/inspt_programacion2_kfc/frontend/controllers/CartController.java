@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
+import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.helpers.CartHelper;
 import inspt_programacion2_kfc.frontend.models.CartItem;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -57,20 +59,20 @@ public class CartController {
             return "redirect:/";
         }
 
-        int stockDisponible = movimientoStockService.calcularStockProducto(productId);
-
-        if (stockDisponible <= 0) {
-            redirectAttrs.addFlashAttribute("cartError", "Producto sin stock disponible.");
-            return "redirect:/";
-        }
-
         Map<String, CartItem> cart = getCart(session);
-        // Calcular cantidad TOTAL de este producto en el carrito (todas las variantes)
-        int totalProductoEnCarrito = cartHelper.calcularCantidadProductoEnCarrito(cart, productId);
-        int totalRequested = totalProductoEnCarrito + quantity;
+        Map<Long, Integer> cantidadesPorProducto = new HashMap<>();
+        for (CartItem item : cart.values()) {
+            if (item == null || item.getProducto() == null || item.getProducto().getId() == null) {
+                continue;
+            }
+            cantidadesPorProducto.merge(item.getProducto().getId(), item.getQuantity(), Integer::sum);
+        }
+        cantidadesPorProducto.merge(productId, quantity, Integer::sum);
 
-        if (totalRequested > stockDisponible) {
-            redirectAttrs.addFlashAttribute("cartError", "Stock insuficiente.");
+        try {
+            movimientoStockService.validarDisponibilidadPorIngredientes(cantidadesPorProducto);
+        } catch (StockException ex) {
+            redirectAttrs.addFlashAttribute("cartError", ex.getMessage());
             return "redirect:/";
         }
 

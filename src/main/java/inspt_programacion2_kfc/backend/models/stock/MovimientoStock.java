@@ -7,7 +7,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.models.ingredients.IngredienteEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,8 +33,8 @@ public class MovimientoStock {
     @NotFound(action = NotFoundAction.IGNORE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id")
-    private ProductoEntity producto;
+    @JoinColumn(name = "ingrediente_id")
+    private IngredienteEntity ingrediente;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,8 +53,8 @@ public class MovimientoStock {
     @Column(name = "pedido_id")
     private Long pedidoId;
 
-    public MovimientoStock(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
-        this.producto = producto;
+    public MovimientoStock(IngredienteEntity ingrediente, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
+        this.ingrediente = ingrediente;
         this.tipo = tipo;
         this.cantidad = cantidad;
         this.fecha = LocalDateTime.now();

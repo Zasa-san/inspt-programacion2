@@ -42,6 +42,10 @@ public class ProductoService {
     }
 
     public void create(ProductoEntity producto, MultipartFile imageFile) {
+        createAndReturn(producto, imageFile);
+    }
+
+    public ProductoEntity createAndReturn(ProductoEntity producto, MultipartFile imageFile) {
         Objects.requireNonNull(producto, "Producto no puede ser nulo");
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -55,7 +59,7 @@ public class ProductoService {
             producto.setImgUrl(AppConstants.DEFAULT_IMG_URL);
         }
 
-        productoRepository.save(producto);
+        return productoRepository.save(producto);
     }
 
     public void create(ProductoEntity producto) {

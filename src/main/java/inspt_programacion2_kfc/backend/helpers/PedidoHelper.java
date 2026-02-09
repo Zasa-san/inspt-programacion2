@@ -6,6 +6,8 @@ import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class PedidoHelper {
 
@@ -18,7 +20,7 @@ public class PedidoHelper {
 
     public void registrarMovimientoStock(Pedido guardado, TipoMovimiento movimiento, String motivo) {
         for (ItemPedido item : guardado.getItems()) {
-            stockService.registrarMovimiento(
+            stockService.registrarMovimientoPorProducto(
                     item.getProducto(),
                     movimiento,
                     item.getQuantity(),
@@ -29,5 +31,9 @@ public class PedidoHelper {
 
     public int obtenerStockPorIdProducto(Long idProducto) {
         return stockService.calcularStockProducto(idProducto);
+    }
+
+    public void validarDisponibilidadPorIngredientes(Map<Long, Integer> cantidadesPorProducto) {
+        stockService.validarDisponibilidadPorIngredientes(cantidadesPorProducto);
     }
 }

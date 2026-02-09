@@ -8,40 +8,36 @@
 
   <section class="section">
     <div class="container">
-      <h1 class="title" th:text="${page.title}">Stock de productos</h1>
-      <p class="subtitle" th:text="${page.description}">Gestión de stock por producto</p>
+      <h1 class="title" th:text="${page.title}">Stock de ingredientes</h1>
+      <p class="subtitle" th:text="${page.description}">Gestión de stock por ingrediente</p>
 
       <div th:if="${successMessage != null}" class="notification is-success" th:text="${successMessage}"></div>
       <div th:if="${errorMessage != null}" class="notification is-danger" th:text="${errorMessage}"></div>
 
-      <div th:if="${#lists.isEmpty(productos)}">
-        <p>No hay productos cargados.</p>
+      <div th:if="${#lists.isEmpty(ingredientes)}">
+        <p>No hay ingredientes cargados.</p>
       </div>
 
-      <div th:if="${!#lists.isEmpty(productos)}">
+      <div th:if="${!#lists.isEmpty(ingredientes)}">
         <form th:action="@{/stock/movimiento}" method="post">
           <table class="table is-fullwidth is-striped is-hoverable">
             <thead>
               <tr>
-                <th>Producto</th>
-                <th>Descripción</th>
-                <th class="has-text-right">Precio</th>
+                <th>Ingrediente</th>
+                <th class="has-text-centered">Unidad</th>
                 <th class="has-text-centered">Stock actual</th>
                 <th class="has-text-centered">Registrar movimiento</th>
               </tr>
             </thead>
             <tbody>
-              <tr th:each="p : ${productos}">
-                <td th:text="${p.name}">Nombre</td>
-                <td th:text="${p.description}">Descripción</td>
-                <td class="has-text-right">
-                  $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
-                </td>
+              <tr th:each="i : ${ingredientes}">
+                <td th:text="${i.name}">Nombre</td>
+                <td class="has-text-centered" th:text="${i.unit}">u</td>
                 <td class="has-text-centered">
-                  <span th:text="${stocks[p.id]}">0</span>
+                  <span th:text="${stocks[i.id]}">0</span>
                 </td>
                 <td>
-                  <input type="hidden" name="productoId" th:value="${p.id}" />
+                  <input type="hidden" name="ingredienteId" th:value="${i.id}" />
                   <div class="columns is-mobile is-vcentered">
                     <div class="column is-4">
                       <div class="select is-small">
@@ -79,8 +75,7 @@
       </div>
     </div>
   </section>
-
-  <script th:src="@{/js/products/precioHandler.js}" defer></script>
 </body>
 
 </html>
+
