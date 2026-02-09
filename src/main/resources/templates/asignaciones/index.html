@@ -63,7 +63,7 @@
               </h2>
             </div>
           </div>
-          <div class="level-right">
+          <div class="level-right" sec:authorize="hasRole('ADMIN')">
             <div class="level-item">
               <form th:action="@{/asignaciones/asignar}" method="post" class="is-flex is-align-items-center">
                 <input type="hidden" name="dia" th:value="${selectedDia}" />
@@ -111,7 +111,7 @@
                 <th>Usuario</th>
                 <th>Rol</th>
                 <th>Username</th>
-                <th class="has-text-centered">Quitar</th>
+                <th class="has-text-centered" sec:authorize="hasRole('ADMIN')">Quitar</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +121,7 @@
                   <span class="tag is-light" th:text="${a.usuario.role}">ROLE</span>
                 </td>
                 <td th:text="${a.usuario.username}">usuario</td>
-                <td class="has-text-centered">
+                <td class="has-text-centered" sec:authorize="hasRole('ADMIN')">
                   <form th:action="@{'/asignaciones/quitar/' + ${a.id}}" method="post" style="display:inline">
                     <input type="hidden" name="dia" th:value="${selectedDia}" />
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
