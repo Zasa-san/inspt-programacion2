@@ -44,3 +44,11 @@ public class ProductoEntity {
     @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomizacionEntity> customizaciones = new ArrayList<>();
 }
+
+// los productos dejan de tener precio. porque el precio pasa a ser la sumatoria de ingredientes
+// el precio pasa a ser una propiedad del pedido.
+// el producto puede mostrar el precio base, pero serán los adicionales que finalmente determinan
+// el precio del pedido
+//
+// al borrar un producto -> transacional con borrar todos los ingredientes
+// al editar un procutos -> transacional con borrar los ingredientes quitados
