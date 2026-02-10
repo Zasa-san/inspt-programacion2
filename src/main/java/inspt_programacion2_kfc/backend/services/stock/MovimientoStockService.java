@@ -2,6 +2,7 @@ package inspt_programacion2_kfc.backend.services.stock;
 
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.models.stock.Item;
 import inspt_programacion2_kfc.backend.models.stock.MovimientoStock;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.stock.MovimientoStockRepository;
@@ -22,18 +23,18 @@ public class MovimientoStockService {
     }
 
     @Transactional
-    public void registrarMovimiento(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
+    public void registrarMovimiento(Item item, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
         if (cantidad <= 0) {
             throw new StockException("La cantidad debe ser mayor a cero.");
         }
 
-        if (producto != null) {
-            movimientoStockRepository.save(new MovimientoStock(producto, tipo, cantidad, motivo, pedidoId));
+        if (item != null) {
+            movimientoStockRepository.save(new MovimientoStock(item, tipo, cantidad, motivo, pedidoId));
         }
     }
 
-    public int calcularStockProducto(Long productoId) {
-        List<MovimientoStock> movimientos = movimientoStockRepository.findByProductoId(productoId);
+    public int calcularStockItem(Long itemId) {
+        List<MovimientoStock> movimientos = movimientoStockRepository.findByItemId(itemId);
         int stock = 0;
         for (MovimientoStock m : movimientos) {
             if (m.getTipo() == TipoMovimiento.ENTRADA) {
@@ -48,7 +49,7 @@ public class MovimientoStockService {
     public Map<Long, Integer> calcularStockParaProductos(List<ProductoEntity> productos) {
         Map<Long, Integer> result = new HashMap<>();
         for (ProductoEntity p : productos) {
-            result.put(p.getId(), calcularStockProducto(p.getId()));
+            result.put(p.getId(), calcularStockItem(p.getId()));
         }
         return result;
     }

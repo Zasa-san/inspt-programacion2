@@ -57,7 +57,7 @@ public class CartController {
             return "redirect:/";
         }
 
-        int stockDisponible = movimientoStockService.calcularStockProducto(productId);
+        int stockDisponible = movimientoStockService.calcularStockItem(productId);
 
         if (stockDisponible <= 0) {
             redirectAttrs.addFlashAttribute("cartError", "Producto sin stock disponible.");

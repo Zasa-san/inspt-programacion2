@@ -28,6 +28,6 @@ public class PedidoHelper {
     }
 
     public int obtenerStockPorIdProducto(Long idProducto) {
-        return stockService.calcularStockProducto(idProducto);
+        return stockService.calcularStockItem(idProducto);
     }
 }

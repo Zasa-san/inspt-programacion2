@@ -33,8 +33,8 @@ public class MovimientoStock {
     @NotFound(action = NotFoundAction.IGNORE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "producto_id")
-    private ProductoEntity producto;
+    @JoinColumn(name = "item_id")
+    private Item item;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,12 +49,13 @@ public class MovimientoStock {
     @Column(length = 255)
     private String motivo;
 
+    //todo ver
     @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "pedido_id")
     private Long pedidoId;
 
-    public MovimientoStock(ProductoEntity producto, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
-        this.producto = producto;
+    public MovimientoStock(Item item, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
+        this.item = item;
         this.tipo = tipo;
         this.cantidad = cantidad;
         this.fecha = LocalDateTime.now();
