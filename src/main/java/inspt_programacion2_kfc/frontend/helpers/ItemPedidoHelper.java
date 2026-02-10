@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
 
 @Component("itemPedidoHelper")
 public class ItemPedidoHelper {

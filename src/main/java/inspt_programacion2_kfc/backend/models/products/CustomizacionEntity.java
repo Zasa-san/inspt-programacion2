@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@Deprecated
 @Data
 @Entity
 @Table(name = "customizaciones")

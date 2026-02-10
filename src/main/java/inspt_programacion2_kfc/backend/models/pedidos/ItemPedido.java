@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.backend.models.orders;
+package inspt_programacion2_kfc.backend.models.pedidos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -53,6 +53,4 @@ public class ItemPedido {
     @Column(nullable = false)
     private int subtotal;
 
-    @Column(columnDefinition = "TEXT")
-    private String customizacionesJson;
 }

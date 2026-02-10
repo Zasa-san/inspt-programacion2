@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
-import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
-import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
+import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import jakarta.servlet.http.HttpSession;

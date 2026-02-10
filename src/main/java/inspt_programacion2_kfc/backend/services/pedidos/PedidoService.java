@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.backend.services.orders;
+package inspt_programacion2_kfc.backend.services.pedidos;
 
 import inspt_programacion2_kfc.backend.exceptions.cart.CartEmptyException;
 import inspt_programacion2_kfc.backend.exceptions.order.OrderAlreadyDeliveredException;
@@ -10,18 +10,22 @@ import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.helpers.PedidoHelper;
 import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
-import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
-import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
-import inspt_programacion2_kfc.backend.models.orders.Pedido;
+import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
+import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
+import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.repositories.orders.ItemsPedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.orders.PedidoRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
+import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.backend.utils.PedidoUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +37,15 @@ public class PedidoService {
     private final ItemsPedidoRepository itemsPedidoRepository;
     private final ProductoRepository productoRepository;
     private final PedidoHelper pedidoHelper;
+    private final MovimientoStockService stockService;
 
     public PedidoService(PedidoRepository pedidoRepository, ProductoRepository productoRepository,
-                         ItemsPedidoRepository itemsPedidoRepository, PedidoHelper pedidoHelper) {
+                         ItemsPedidoRepository itemsPedidoRepository, PedidoHelper pedidoHelper, MovimientoStockService stockService) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
         this.itemsPedidoRepository = itemsPedidoRepository;
         this.pedidoHelper = pedidoHelper;
+        this.stockService = stockService;
     }
 
     public List<ItemPedido> findAll() {
@@ -65,63 +71,98 @@ public class PedidoService {
         crearPedidoDesdeCarrito(items, EstadoPedido.CREADO);
     }
 
-    /**
-     * Crea un pedido a partir del carrito, validando stock y permitiendo
-     * especificar el estado inicial (por ejemplo CREADO o PAGADO).
-     */
     @Transactional
     public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial) {
         if (items == null || items.isEmpty()) {
             throw new CartEmptyException("El carrito está vacío.");
         }
 
-        // Agrupar cantidades por producto para validar stock correctamente
-        // (un producto puede aparecer múltiples veces con diferentes customizaciones)
-        Map<Long, Integer> cantidadesPorProducto = new HashMap<>();
-        Map<Long, String> nombresPorProducto = new HashMap<>();
-        
+        int precioFinal = 0;
+        List<Ingrediente> movimientos = new ArrayList<>();
+
         for (CartItemDto cartItem : items) {
-            Long productoId = cartItem.getProductoId();
-            // Fusiona los productos por clave en el map y suma las cantidades
-            cantidadesPorProducto.merge(productoId, cartItem.getQuantity(), Integer::sum);
-            if (cartItem.getProductoName() != null) {
-                nombresPorProducto.putIfAbsent(productoId, cartItem.getProductoName());
-            }
-        }
-        
-        // Validar stock para cada producto (cantidad total)
-        for (Map.Entry<Long, Integer> entry : cantidadesPorProducto.entrySet()) {
-            Long productoId = entry.getKey();
-            int cantidadTotal = entry.getValue();
-            int stockActual = pedidoHelper.obtenerStockPorIdProducto(productoId);
-            
-            if (stockActual < cantidadTotal) {
-                String nombre = nombresPorProducto.getOrDefault(productoId, "");
-                throw new StockException(String.format("No hay stock suficiente para el producto: %s", nombre));
+            ProductoEntity producto = findByIdProducto(cartItem.getProductoId());
+            for (GrupoIngrediente grupoIngrediente : producto.getGruposIngredientes()) {
+                for (Ingrediente ingrediente : grupoIngrediente.getIngredientes()) {
+                    if (stockService.calcularStockItem(ingrediente.getItem().getId()) < ingrediente.getCantidad()) {
+                        throw new StockException(String.format("Ingrediente %s sin stock suficiente", ingrediente.getItem().getName()));
+                    }
+                    precioFinal += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+                    movimientos.add(ingrediente);
+                }
             }
         }
 
         Pedido pedido = new Pedido();
         pedido.setEstado(estadoInicial);
-
-        int total = 0;
-        for (CartItemDto cartItem : items) {
-            Long productoId = cartItem.getProductoId();
-            if (productoId != null) {
-                ProductoEntity producto = findByIdProducto(productoId);
-                if (producto != null) {
-                    ItemPedido item = PedidoUtils.mapItemPedido(cartItem, producto);
-                    total += item.getSubtotal();
-                    pedido.addItem(item);
-                }
-            }
-        }
-        pedido.setTotal(total);
+        pedido.setTotal(precioFinal);
 
         Pedido guardado = pedidoRepository.save(pedido);
-        pedidoHelper.registrarMovimientoStock(guardado, TipoMovimiento.SALIDA, AppConstants.MOVIMIENTO_VENTA);
+        for (Ingrediente ingrediente : movimientos) {
+            stockService.registrarMovimiento(ingrediente.getItem(), TipoMovimiento.SALIDA, ingrediente.getCantidad(), AppConstants.MOVIMIENTO_VENTA, guardado.getId());
+        }
     }
 
+    /**
+     * Crea un pedido a partir del carrito, validando stock y permitiendo
+     * especificar el estado inicial (por ejemplo CREADO o PAGADO).
+     */
+//    @Transactional
+//    public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial) {
+//        if (items == null || items.isEmpty()) {
+//            throw new CartEmptyException("El carrito está vacío.");
+//        }
+//
+//        // Agrupar cantidades por producto para validar stock correctamente
+//        // (un producto puede aparecer múltiples veces con diferentes customizaciones)
+//        Map<Long, Integer> cantidadesPorProducto = new HashMap<>();
+//        Map<Long, String> nombresPorProducto = new HashMap<>();
+//
+//        for (CartItemDto cartItem : items) {
+//            Long productoId = cartItem.getProductoId();
+//            // Fusiona los productos por clave en el map y suma las cantidades
+//            cantidadesPorProducto.merge(productoId, cartItem.getQuantity(), Integer::sum);
+//            if (cartItem.getProductoName() != null) {
+//                nombresPorProducto.putIfAbsent(productoId, cartItem.getProductoName());
+//            }
+//        }
+//
+//        // Validar stock para cada producto (cantidad total)
+//        for (Map.Entry<Long, Integer> entry : cantidadesPorProducto.entrySet()) {
+//            Long productoId = entry.getKey();
+//            int cantidadTotal = entry.getValue();
+//            int stockActual = pedidoHelper.obtenerStockPorIdProducto(productoId);
+//
+//            if (stockActual < cantidadTotal) {
+//                String nombre = nombresPorProducto.getOrDefault(productoId, "");
+//                throw new StockException(String.format("No hay stock suficiente para el producto: %s", nombre));
+//            }
+//        }
+//
+//        Pedido pedido = new Pedido();
+//        pedido.setEstado(estadoInicial);
+//
+//        int total = 0;
+//        for (CartItemDto cartItem : items) {
+//            Long productoId = cartItem.getProductoId();
+//            if (productoId != null) {
+//                ProductoEntity producto = findByIdProducto(productoId);
+//                if (producto != null) {
+//                    ItemPedido item = PedidoUtils.mapItemPedido(cartItem, producto);
+//                    total += item.getSubtotal();
+//                    pedido.addItem(item);
+//                }
+//            }
+//        }
+//        pedido.setTotal(total);
+//
+//        Pedido guardado = pedidoRepository.save(pedido);
+//        pedidoHelper.registrarMovimientoStock(guardado, TipoMovimiento.SALIDA, AppConstants.MOVIMIENTO_VENTA);
+//    }
+
+    /*
+    TODO tabla intermedia ProductoPedido, para saber sus customizaciones y poder cancelar
+     */
     @Transactional
     public void cancelarPedido(Long id) {
         if (id == null || id < 0) {
@@ -130,9 +171,6 @@ public class PedidoService {
 
         Pedido pedido = findByIdPedido(id);
 
-        if (pedido == null) {
-            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
-        }
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new OrderCancelledException("El pedido ya está cancelado.");
         }
@@ -152,10 +190,6 @@ public class PedidoService {
         }
 
         Pedido pedido = findByIdPedido(id);
-
-        if (pedido == null) {
-            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
-        }
 
         if (pedido.getEstado() != EstadoPedido.PAGADO) {
             throw new OrderException("Sólo se pueden marcar como ENTREGADO los pedidos en estado PAGADO.");

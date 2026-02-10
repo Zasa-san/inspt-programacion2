@@ -1,7 +1,7 @@
 package inspt_programacion2_kfc.backend.utils;
 
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
-import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 
 
@@ -19,8 +19,6 @@ public class PedidoUtils {
         item.setUnitPrice(precioUnitario);
         item.setSubtotal(precioUnitario * cartItem.getQuantity());
 
-        // Guardar customizaciones seleccionadas como JSON
-        item.setCustomizacionesJson(cartItem.getCustomizacionesJson());
         return item;
     }
 }

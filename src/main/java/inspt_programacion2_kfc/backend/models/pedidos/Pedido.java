@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.backend.models.orders;
+package inspt_programacion2_kfc.backend.models.pedidos;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

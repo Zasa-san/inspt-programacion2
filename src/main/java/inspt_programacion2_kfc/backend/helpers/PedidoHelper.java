@@ -1,7 +1,7 @@
 package inspt_programacion2_kfc.backend.helpers;
 
-import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
-import inspt_programacion2_kfc.backend.models.orders.Pedido;
+import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import org.springframework.stereotype.Component;

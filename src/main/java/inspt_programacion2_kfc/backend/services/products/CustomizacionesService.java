@@ -11,6 +11,7 @@ import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.CustomizacionesRepository;
 
+@Deprecated
 @Service
 public class CustomizacionesService {
 

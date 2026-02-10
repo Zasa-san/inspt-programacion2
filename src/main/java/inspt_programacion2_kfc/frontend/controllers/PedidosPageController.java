@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import inspt_programacion2_kfc.backend.models.orders.EstadoPedido;
-import inspt_programacion2_kfc.backend.models.orders.ItemPedido;
-import inspt_programacion2_kfc.backend.models.orders.Pedido;
-import inspt_programacion2_kfc.backend.services.orders.PedidoService;
+import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
+import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
+import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.frontend.helpers.ItemPedidoHelper;
 
 @Controller
