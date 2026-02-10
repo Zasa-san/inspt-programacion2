@@ -1,19 +1,21 @@
 package inspt_programacion2_kfc.backend.services.products;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.constants.AppConstants;
+import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
+import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.files.FileUploadService;
+import org.eclipse.jetty.util.StringUtil;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @Service
 public class ProductoService {
@@ -41,27 +43,41 @@ public class ProductoService {
         return productoRepository.findById(id).orElse(null);
     }
 
-    public void create(ProductoEntity producto, MultipartFile imageFile) {
-        Objects.requireNonNull(producto, "Producto no puede ser nulo");
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                String imageUrl = fileUploadService.saveFile(imageFile, "products");
-                producto.setImgUrl(imageUrl);
-            } catch (IOException e) {
-                throw new ProductImageException("Error al guardar la imagen del producto", e);
-            }
-        } else if (producto.getImgUrl() == null || producto.getImgUrl().isBlank()) {
-            producto.setImgUrl(AppConstants.DEFAULT_IMG_URL);
+    public void create(String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile) {
+        ProductoEntity productoEntity = new ProductoEntity();
+        if (StringUtil.isBlank(name)) {
+            throw new ProductException("Nombre producto invalido.");
+        }
+        if (CollectionUtils.isEmpty(grupoIngredientes)) {
+            throw new ProductException("Grupo ingrediente invalido.");
         }
 
-        productoRepository.save(producto);
+        productoEntity.setName(name);
+        productoEntity.setDescription(description);
+        productoEntity.setGruposIngredientes(grupoIngredientes);
+
+        int precio = getPrecio(grupoIngredientes);
+
+        productoEntity.setPrecioBase(precio);
     }
 
-    public void create(ProductoEntity producto) {
-        Objects.requireNonNull(producto, "Producto no puede ser nulo");
-        productoRepository.save(producto);
+    private static int getPrecio(List<GrupoIngrediente> grupoIngredientes) {
+        int precio = 0;
+
+        for (GrupoIngrediente grupoIngrediente : grupoIngredientes) {
+            for (Ingrediente ingrediente : grupoIngrediente.getIngredientes()) {
+                if (ingrediente.isSeleccionadoPorDefecto()) {
+                    precio += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+                }
+            }
+        }
+        return precio;
     }
+
+//    public void create(ProductoEntity producto) {
+//        Objects.requireNonNull(producto, "Producto no puede ser nulo");
+//        productoRepository.save(producto);
+//    }
 
     public void delete(Long id) {
         if (id == null) {
@@ -80,9 +96,15 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
-    public void update(Long id, ProductoEntity updatedData, MultipartFile imageFile, boolean removeImage) {
+    public void update(Long id, String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile, boolean removeImage) {
         if (id == null) {
             throw new ProductNotFoundException("ID no puede ser NULL.");
+        }
+        if (StringUtil.isBlank(name)) {
+            throw new ProductException("Nombre producto invalido.");
+        }
+        if (CollectionUtils.isEmpty(grupoIngredientes)) {
+            throw new ProductException("Grupo ingrediente invalido.");
         }
 
         ProductoEntity existing = findById(id);
@@ -90,9 +112,9 @@ public class ProductoService {
             throw new ProductNotFoundException("Producto no encontrado con ID: " + id);
         }
 
-        existing.setName(updatedData.getName());
-        existing.setDescription(updatedData.getDescription());
-        existing.setPrice(updatedData.getPrice());
+        existing.setName(name);
+        existing.setDescription(description);
+        existing.setPrecioBase(getPrecio(grupoIngredientes));
 
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
