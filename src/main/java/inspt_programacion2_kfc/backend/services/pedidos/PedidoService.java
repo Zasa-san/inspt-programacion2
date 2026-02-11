@@ -85,7 +85,8 @@ public class PedidoService {
             for (GrupoIngrediente grupoIngrediente : producto.getGruposIngredientes()) {
                 for (Ingrediente ingrediente : grupoIngrediente.getIngredientes()) {
                     if (stockService.calcularStockItem(ingrediente.getItem().getId()) < ingrediente.getCantidad()) {
-                        throw new StockException(String.format("Ingrediente %s sin stock suficiente", ingrediente.getItem().getName()));
+                        System.out.printf("Ingrediente %s sin stock suficiente", ingrediente.getItem().getName());
+                        throw new StockException("Producto o ingredientes sin stock.");
                     }
                     precioFinal += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
                     movimientos.add(ingrediente);
@@ -206,10 +207,6 @@ public class PedidoService {
         }
 
         Pedido pedido = findByIdPedido(id);
-
-        if (pedido == null) {
-            throw new OrderNotFoundException(String.format("Pedido con id %s no encontrado.", id));
-        }
 
         if (pedido.getEstado() == EstadoPedido.CANCELADO) {
             throw new OrderCancelledException("No se puede marcar como pagado un pedido cancelado.");
