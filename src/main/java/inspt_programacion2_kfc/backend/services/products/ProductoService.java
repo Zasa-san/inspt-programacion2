@@ -1,5 +1,13 @@
 package inspt_programacion2_kfc.backend.services.products;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.eclipse.jetty.util.StringUtil;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
@@ -9,13 +17,6 @@ import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.files.FileUploadService;
-import org.eclipse.jetty.util.StringUtil;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @Service
 public class ProductoService {
@@ -59,6 +60,10 @@ public class ProductoService {
         int precio = getPrecio(grupoIngredientes);
 
         productoEntity.setPrecioBase(precio);
+
+        setImagen(imageFile, false, productoEntity);
+
+        productoRepository.save(productoEntity);
     }
 
     private static int getPrecio(List<GrupoIngrediente> grupoIngredientes) {
@@ -73,11 +78,6 @@ public class ProductoService {
         }
         return precio;
     }
-
-//    public void create(ProductoEntity producto) {
-//        Objects.requireNonNull(producto, "Producto no puede ser nulo");
-//        productoRepository.save(producto);
-//    }
 
     public void delete(Long id) {
         if (id == null) {
@@ -116,6 +116,12 @@ public class ProductoService {
         existing.setDescription(description);
         existing.setPrecioBase(getPrecio(grupoIngredientes));
 
+        setImagen(imageFile, removeImage, existing);
+
+        productoRepository.save(existing);
+    }
+
+    private void setImagen(MultipartFile imageFile, boolean removeImage, ProductoEntity existing) {
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
                 if (existing.getImgUrl() != null && !existing.getImgUrl().equals(AppConstants.DEFAULT_IMG_URL)) {
@@ -132,8 +138,6 @@ public class ProductoService {
             }
             existing.setImgUrl(AppConstants.DEFAULT_IMG_URL);
         }
-
-        productoRepository.save(existing);
     }
 
     public void toggleAvailability(Long id) {
