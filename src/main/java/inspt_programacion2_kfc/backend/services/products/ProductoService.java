@@ -58,10 +58,10 @@ public class ProductoService {
 
         productoEntity.setName(name);
         productoEntity.setDescription(description);
-        productoEntity.setGruposIngredientes(grupoIngredientes);
+
+        configurarGrupos(productoEntity, grupoIngredientes);
 
         int precio = getPrecio(grupoIngredientes);
-
         productoEntity.setPrecioBase(precio);
 
         setImagen(imageFile, false, productoEntity);
@@ -117,6 +117,10 @@ public class ProductoService {
 
         existing.setName(name);
         existing.setDescription(description);
+
+        existing.getGruposIngredientes().clear();
+        configurarGrupos(existing, grupoIngredientes);
+
         existing.setPrecioBase(getPrecio(grupoIngredientes));
 
         setImagen(imageFile, removeImage, existing);
@@ -163,6 +167,18 @@ public class ProductoService {
             int nuevoPrecio = getPrecio(producto.getGruposIngredientes());
             producto.setPrecioBase(nuevoPrecio);
             productoRepository.save(producto);
+        }
+    }
+
+    private void configurarGrupos(ProductoEntity producto, List<GrupoIngrediente> grupos) {
+        for (GrupoIngrediente grupo : grupos) {
+            grupo.setProducto(producto);
+            producto.getGruposIngredientes().add(grupo);
+            if (grupo.getIngredientes() != null) {
+                for (Ingrediente ingrediente : grupo.getIngredientes()) {
+                    ingrediente.setGrupo(grupo);
+                }
+            }
         }
     }
 }
