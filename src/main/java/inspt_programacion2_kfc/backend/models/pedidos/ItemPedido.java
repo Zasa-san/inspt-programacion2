@@ -1,11 +1,15 @@
 package inspt_programacion2_kfc.backend.models.pedidos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -16,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -52,5 +57,13 @@ public class ItemPedido {
      */
     @Column(nullable = false)
     private int subtotal;
+
+    @OneToMany(mappedBy = "itemPedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoProducto> customizaciones = new ArrayList<>();
+
+    public void addCustomizacion(PedidoProducto customizacion) {
+        customizaciones.add(customizacion);
+        customizacion.setItemPedido(this);
+    }
 
 }

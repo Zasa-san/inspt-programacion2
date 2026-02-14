@@ -1,10 +1,12 @@
 package inspt_programacion2_kfc.backend.helpers;
 
+import org.springframework.stereotype.Component;
+
 import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
 import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
+import inspt_programacion2_kfc.backend.models.pedidos.PedidoProducto;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
-import org.springframework.stereotype.Component;
 
 @Component
 public class PedidoHelper {
@@ -15,15 +17,20 @@ public class PedidoHelper {
         this.stockService = stockService;
     }
 
-
     public void registrarMovimientoStock(Pedido guardado, TipoMovimiento movimiento, String motivo) {
         for (ItemPedido item : guardado.getItems()) {
-            stockService.registrarMovimiento(
-                    item.getProducto(),
-                    movimiento,
-                    item.getQuantity(),
-                    motivo + guardado.getId(),
-                    guardado.getId());
+            for (PedidoProducto customizacion : item.getCustomizaciones()) {
+                if (customizacion.getIngrediente() == null) {
+                    continue;
+                }
+                int cantidad = customizacion.getCantidad() * item.getQuantity();
+                stockService.registrarMovimiento(
+                        customizacion.getIngrediente().getItem(),
+                        movimiento,
+                        cantidad,
+                        motivo + guardado.getId(),
+                        guardado.getId());
+            }
         }
     }
 

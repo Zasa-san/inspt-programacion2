@@ -1,34 +1,25 @@
 package inspt_programacion2_kfc.frontend.helpers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import inspt_programacion2_kfc.backend.exceptions.cart.CartException;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import org.springframework.stereotype.Component;
+import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
 
 @Component
 public class CheckoutHelper {
-
-    private final ObjectMapper objectMapper;
-
-    public CheckoutHelper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
 
     /**
      * Convierte CartItem a CartItemDto incluyendo customizaciones.
      */
     public CartItemDto toCartItemDto(CartItem ci) {
-        String customizacionesJson = null;
-
+        List<Long> ingredientesIds = null;
         if (ci.getCustomizaciones() != null && !ci.getCustomizaciones().isEmpty()) {
-            try {
-                customizacionesJson = objectMapper.writeValueAsString(ci.getCustomizaciones());
-            } catch (JsonProcessingException e) {
-                throw new CartException("Error serializando customizaciones.", e);
-            }
+            ingredientesIds = ci.getCustomizaciones().stream()
+                    .map(CustomizacionSeleccionada::getId)
+                    .toList();
         }
 
         return new CartItemDto(
@@ -36,7 +27,7 @@ public class CheckoutHelper {
                 ci.getQuantity(),
                 ci.getProducto().getName(),
                 ci.getPrecioUnitario(),
-                customizacionesJson
+                ingredientesIds
         );
     }
 }
