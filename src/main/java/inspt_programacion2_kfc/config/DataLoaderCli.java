@@ -13,15 +13,15 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
-import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
+import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
+import inspt_programacion2_kfc.backend.models.products.Ingrediente;
+import inspt_programacion2_kfc.backend.models.stock.Item;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.Turno;
 import inspt_programacion2_kfc.backend.models.users.User;
-import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
+import inspt_programacion2_kfc.backend.services.stock.ItemService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.backend.services.users.AsignacionTurnoService;
 import inspt_programacion2_kfc.backend.services.users.TurnoService;
@@ -37,7 +37,7 @@ public class DataLoaderCli {
         try {
             UserService userService = ctx.getBean(UserService.class);
             ProductoService productoService = ctx.getBean(ProductoService.class);
-            CustomizacionesService customizacionesService = ctx.getBean(CustomizacionesService.class);
+            ItemService itemService = ctx.getBean(ItemService.class);
             MovimientoStockService stockService = ctx.getBean(MovimientoStockService.class);
             TurnoService turnoService = ctx.getBean(TurnoService.class);
             AsignacionTurnoService asignacionTurnoService = ctx.getBean(AsignacionTurnoService.class);
@@ -108,155 +108,392 @@ public class DataLoaderCli {
             System.out.println("Asignaciones de turno creadas para todos los usuarios");
 
             // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 1: Combo Clásico
+            // ITEMS Y PRODUCTOS
             // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p1 = new ProductoEntity();
-            p1.setName("Combo Clásico");
-            p1.setDescription("Sandwich de pollo frito + papas medianas + bebida.");
-            p1.setPrice(55000);
-            p1.setAvailable(true);
-            p1.setImgUrl("/uploads/products/combo-clasico.jpg");
-            productoService.create(p1);
+            Item piezaPollo = itemService.create("Pieza de pollo", "Pieza de pollo crudo", 12000);
+            Item bastonPapa = itemService.create("Bastones de papa", "Porción de bastones de papa crudos", 3000);
+            Item vaso = itemService.create("Vaso", "Vaso para bebidas", 2000);
+            Item bacon = itemService.create("Bacon", "Tiras de bacon", 8000);
+            Item quesoCheddar = itemService.create("Queso cheddar", "Porción de queso cheddar", 5000);
+            Item tender = itemService.create("Tender", "Tender de pollo crudo", 6000);
+            Item alita = itemService.create("Alita de pollo", "Alita de pollo cruda", 5000);
+            Item tortilla = itemService.create("Tortilla wrap", "Tortilla de harina", 4000);
+            Item helado = itemService.create("Helado", "Porción de helado", 8000);
+            Item salsaBBQ = itemService.create("Salsa BBQ", "Porción de salsa BBQ", 1000);
+            Item salsaRanch = itemService.create("Salsa ranch", "Porción de salsa ranch", 1000);
+            Item salsaBuffalo = itemService.create("Salsa buffalo", "Porción de salsa buffalo", 1000);
+            Item salsaChocolate = itemService.create("Salsa chocolate", "Porción de salsa chocolate", 1500);
+            Item salsaFrutilla = itemService.create("Salsa frutilla", "Porción de salsa frutilla", 1500);
+            Item salsaDulceLeche = itemService.create("Salsa dulce de leche", "Porción de dulce de leche", 2000);
+            Item salsaQuesoAzul = itemService.create("Dip de queso azul", "Porción de dip de queso azul", 3000);
+            Item coleslaw = itemService.create("Coleslaw", "Porción de ensalada coleslaw", 4000);
+            Item purePapas = itemService.create("Puré de papas", "Porción de puré de papas", 5000);
+            Item arosCebolla = itemService.create("Aros de cebolla", "Porción de aros de cebolla", 4000);
+            Item jalapenos = itemService.create("Jalapeños", "Porción de jalapeños", 2000);
+            Item palta = itemService.create("Palta", "Porción de palta", 8000);
+            Item chipsChocolate = itemService.create("Chips de chocolate", "Topping de chips de chocolate", 3000);
+            Item mani = itemService.create("Maní picado", "Topping de maní picado", 2500);
+            Item cremaBatida = itemService.create("Crema batida", "Porción de crema batida", 3500);
+            Item bastonesVegetales = itemService.create("Apio y zanahoria", "Bastones de apio y zanahoria", 3000);
 
-            // Tamaños (UNICA)
-            crearCustomizacion(customizacionesService, p1, "Combo Chico", 0, TipoCustomizacion.UNICA, "Tamaño");
-            crearCustomizacion(customizacionesService, p1, "Combo Mediano", 15000, TipoCustomizacion.UNICA, "Tamaño");
-            crearCustomizacion(customizacionesService, p1, "Combo Grande", 25000, TipoCustomizacion.UNICA, "Tamaño");
+            System.out.println("Items creados: 26 ingredientes base");
 
-            // Extras (MULTIPLE)
-            crearCustomizacion(customizacionesService, p1, "Doble carne", 35000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p1, "Bacon crispy", 12000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p1, "Queso cheddar extra", 8000, TipoCustomizacion.MULTIPLE, "Extra");
+            stockService.registrarMovimiento(piezaPollo, TipoMovimiento.ENTRADA, 500, "Stock inicial", null);
+            stockService.registrarMovimiento(bastonPapa, TipoMovimiento.ENTRADA, 300, "Stock inicial", null);
+            stockService.registrarMovimiento(vaso, TipoMovimiento.ENTRADA, 400, "Stock inicial", null);
+            stockService.registrarMovimiento(bacon, TipoMovimiento.ENTRADA, 200, "Stock inicial", null);
+            stockService.registrarMovimiento(quesoCheddar, TipoMovimiento.ENTRADA, 250, "Stock inicial", null);
+            stockService.registrarMovimiento(tender, TipoMovimiento.ENTRADA, 400, "Stock inicial", null);
+            stockService.registrarMovimiento(alita, TipoMovimiento.ENTRADA, 300, "Stock inicial", null);
+            stockService.registrarMovimiento(tortilla, TipoMovimiento.ENTRADA, 200, "Stock inicial", null);
+            stockService.registrarMovimiento(helado, TipoMovimiento.ENTRADA, 150, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaBBQ, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaRanch, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaBuffalo, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaChocolate, TipoMovimiento.ENTRADA, 80, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaFrutilla, TipoMovimiento.ENTRADA, 80, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaDulceLeche, TipoMovimiento.ENTRADA, 80, "Stock inicial", null);
+            stockService.registrarMovimiento(salsaQuesoAzul, TipoMovimiento.ENTRADA, 60, "Stock inicial", null);
+            stockService.registrarMovimiento(coleslaw, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(purePapas, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(arosCebolla, TipoMovimiento.ENTRADA, 120, "Stock inicial", null);
+            stockService.registrarMovimiento(jalapenos, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
+            stockService.registrarMovimiento(palta, TipoMovimiento.ENTRADA, 80, "Stock inicial", null);
+            stockService.registrarMovimiento(chipsChocolate, TipoMovimiento.ENTRADA, 150, "Stock inicial", null);
+            stockService.registrarMovimiento(mani, TipoMovimiento.ENTRADA, 150, "Stock inicial", null);
+            stockService.registrarMovimiento(cremaBatida, TipoMovimiento.ENTRADA, 120, "Stock inicial", null);
+            stockService.registrarMovimiento(bastonesVegetales, TipoMovimiento.ENTRADA, 100, "Stock inicial", null);
 
-            // Stock inicial: 25 unidades
-            stockService.registrarMovimiento(p1, TipoMovimiento.ENTRADA, 25, "Stock inicial", null);
+            System.out.println("Stock inicial registrado para todos los items");
 
-            // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 2: Bucket Familiar
-            // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p2 = new ProductoEntity();
-            p2.setName("Bucket Familiar");
-            p2.setDescription("8 piezas de pollo + 2 papas grandes + 4 bebidas.");
-            p2.setPrice(129000);
-            p2.setAvailable(true);
-            p2.setImgUrl("/uploads/products/bucket-familiar.jpg");
-            productoService.create(p2);
+            GrupoIngrediente grupoBase1 = new GrupoIngrediente();
+            grupoBase1.setNombre("Base");
+            grupoBase1.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase1.setMinSeleccion(3);
+            grupoBase1.setMaxSeleccion(3);
 
-            // Tamaños (UNICA)
-            crearCustomizacion(customizacionesService, p2, "8 piezas", 0, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p2, "12 piezas", 45000, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p2, "16 piezas", 75000, TipoCustomizacion.UNICA, "Piezas");
+            Ingrediente ing1_1 = new Ingrediente();
+            ing1_1.setItem(piezaPollo);
+            ing1_1.setCantidad(2);
+            ing1_1.setSeleccionadoPorDefecto(true);
+            grupoBase1.getIngredientes().add(ing1_1);
 
-            // Extras (MULTIPLE)
-            crearCustomizacion(customizacionesService, p2, "Papas XL", 18000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p2, "Salsa BBQ extra", 5000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p2, "Coleslaw", 12000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p2, "Puré de papas", 15000, TipoCustomizacion.MULTIPLE, "Extra");
+            Ingrediente ing1_2 = new Ingrediente();
+            ing1_2.setItem(bastonPapa);
+            ing1_2.setCantidad(1);
+            ing1_2.setSeleccionadoPorDefecto(true);
+            grupoBase1.getIngredientes().add(ing1_2);
 
-            // Stock inicial: 15 unidades
-            stockService.registrarMovimiento(p2, TipoMovimiento.ENTRADA, 15, "Stock inicial", null);
+            Ingrediente ing1_3 = new Ingrediente();
+            ing1_3.setItem(vaso);
+            ing1_3.setCantidad(1);
+            ing1_3.setSeleccionadoPorDefecto(true);
+            grupoBase1.getIngredientes().add(ing1_3);
 
-            // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 3: Tenders Box
-            // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p3 = new ProductoEntity();
-            p3.setName("Tenders Box");
-            p3.setDescription("6 tenders crujientes + papas + bebida + salsa a elección.");
-            p3.setPrice(62000);
-            p3.setAvailable(true);
-            p3.setImgUrl("/uploads/products/tenders-box.jpg");
-            productoService.create(p3);
+            GrupoIngrediente grupoExtras1 = new GrupoIngrediente();
+            grupoExtras1.setNombre("Extras");
+            grupoExtras1.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoExtras1.setMinSeleccion(0);
+            grupoExtras1.setMaxSeleccion(10);
 
-            // Tamaños (UNICA)
-            crearCustomizacion(customizacionesService, p3, "6 tenders", 0, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p3, "9 tenders", 22000, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p3, "12 tenders", 38000, TipoCustomizacion.UNICA, "Piezas");
+            Ingrediente ing1_ex1 = new Ingrediente();
+            ing1_ex1.setItem(piezaPollo);
+            ing1_ex1.setCantidad(2);
+            ing1_ex1.setSeleccionadoPorDefecto(false);
+            grupoExtras1.getIngredientes().add(ing1_ex1);
 
-            // Extras (MULTIPLE)
-            crearCustomizacion(customizacionesService, p3, "Salsa ranch extra", 4000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p3, "Salsa buffalo", 4000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p3, "Aros de cebolla", 15000, TipoCustomizacion.MULTIPLE, "Extra");
+            Ingrediente ing1_ex2 = new Ingrediente();
+            ing1_ex2.setItem(bacon);
+            ing1_ex2.setCantidad(1);
+            ing1_ex2.setSeleccionadoPorDefecto(false);
+            grupoExtras1.getIngredientes().add(ing1_ex2);
 
-            // Stock inicial: 30 unidades
-            stockService.registrarMovimiento(p3, TipoMovimiento.ENTRADA, 30, "Stock inicial", null);
+            Ingrediente ing1_ex3 = new Ingrediente();
+            ing1_ex3.setItem(quesoCheddar);
+            ing1_ex3.setCantidad(1);
+            ing1_ex3.setSeleccionadoPorDefecto(false);
+            grupoExtras1.getIngredientes().add(ing1_ex3);
 
-            // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 4: Helado Sundae
-            // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p4 = new ProductoEntity();
-            p4.setName("Helado Sundae");
-            p4.setDescription("Helado cremoso con salsa y toppings.");
-            p4.setAvailable(true);
-            p4.setPrice(25000);
-            p4.setImgUrl("/uploads/products/helado-sundae.jpg");
-            productoService.create(p4);
+            List<GrupoIngrediente> gruposComboClasico = new ArrayList<>();
+            gruposComboClasico.add(grupoBase1);
+            gruposComboClasico.add(grupoExtras1);
 
-            // Sabor salsa (UNICA)
-            crearCustomizacion(customizacionesService, p4, "Salsa chocolate", 0, TipoCustomizacion.UNICA, "Salsa");
-            crearCustomizacion(customizacionesService, p4, "Salsa frutilla", 0, TipoCustomizacion.UNICA, "Salsa");
-            crearCustomizacion(customizacionesService, p4, "Salsa dulce de leche", 3000, TipoCustomizacion.UNICA, "Salsa");
+            productoService.create("Combo Clásico", "Sandwich de pollo frito + papas medianas + bebida", gruposComboClasico, null, "/uploads/products/combo-clasico.jpg");
 
-            // Toppings (MULTIPLE)
-            crearCustomizacion(customizacionesService, p4, "Chips de chocolate", 5000, TipoCustomizacion.MULTIPLE, "Toppings");
-            crearCustomizacion(customizacionesService, p4, "Maní picado", 4000, TipoCustomizacion.MULTIPLE, "Toppings");
-            crearCustomizacion(customizacionesService, p4, "Crema batida", 6000, TipoCustomizacion.MULTIPLE, "Toppings");
+            GrupoIngrediente grupoBase2 = new GrupoIngrediente();
+            grupoBase2.setNombre("Base");
+            grupoBase2.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase2.setMinSeleccion(3);
+            grupoBase2.setMaxSeleccion(3);
 
-            // Stock inicial: 50 unidades
-            stockService.registrarMovimiento(p4, TipoMovimiento.ENTRADA, 50, "Stock inicial", null);
+            Ingrediente ing2_1 = new Ingrediente();
+            ing2_1.setItem(piezaPollo);
+            ing2_1.setCantidad(8);
+            ing2_1.setSeleccionadoPorDefecto(true);
+            grupoBase2.getIngredientes().add(ing2_1);
 
-            // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 5: Alitas Picantes
-            // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p5 = new ProductoEntity();
-            p5.setName("Alitas Picantes");
-            p5.setDescription("Alitas de pollo bañadas en salsa picante.");
-            p5.setAvailable(true);
-            p5.setPrice(48000);
-            p5.setImgUrl("/uploads/products/alitas-picantes.jpg");
-            productoService.create(p5);
+            Ingrediente ing2_2 = new Ingrediente();
+            ing2_2.setItem(bastonPapa);
+            ing2_2.setCantidad(2);
+            ing2_2.setSeleccionadoPorDefecto(true);
+            grupoBase2.getIngredientes().add(ing2_2);
 
-            // Cantidad (UNICA)
-            crearCustomizacion(customizacionesService, p5, "6 alitas", 0, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p5, "12 alitas", 42000, TipoCustomizacion.UNICA, "Piezas");
-            crearCustomizacion(customizacionesService, p5, "18 alitas", 78000, TipoCustomizacion.UNICA, "Piezas");
+            Ingrediente ing2_3 = new Ingrediente();
+            ing2_3.setItem(vaso);
+            ing2_3.setCantidad(4);
+            ing2_3.setSeleccionadoPorDefecto(true);
+            grupoBase2.getIngredientes().add(ing2_3);
 
-            // Nivel picante (UNICA)
-            crearCustomizacion(customizacionesService, p5, "Suave", 0, TipoCustomizacion.UNICA, "Picante");
-            crearCustomizacion(customizacionesService, p5, "Medio ️", 0, TipoCustomizacion.UNICA, "Picante");
-            crearCustomizacion(customizacionesService, p5, "Infernall️", 0, TipoCustomizacion.UNICA, "Picante");
+            GrupoIngrediente grupoExtras2 = new GrupoIngrediente();
+            grupoExtras2.setNombre("Extras");
+            grupoExtras2.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoExtras2.setMinSeleccion(0);
+            grupoExtras2.setMaxSeleccion(10);
 
-            // Extras (MULTIPLE)
-            crearCustomizacion(customizacionesService, p5, "Dip de queso azul", 8000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p5, "Apio y zanahoria", 6000, TipoCustomizacion.MULTIPLE, "Extra");
+            Ingrediente ing2_ex1 = new Ingrediente();
+            ing2_ex1.setItem(bastonPapa);
+            ing2_ex1.setCantidad(2);
+            ing2_ex1.setSeleccionadoPorDefecto(false);
+            grupoExtras2.getIngredientes().add(ing2_ex1);
 
-            // Stock inicial: 20 unidades
-            stockService.registrarMovimiento(p5, TipoMovimiento.ENTRADA, 20, "Stock inicial", null);
+            Ingrediente ing2_ex2 = new Ingrediente();
+            ing2_ex2.setItem(salsaBBQ);
+            ing2_ex2.setCantidad(1);
+            ing2_ex2.setSeleccionadoPorDefecto(false);
+            grupoExtras2.getIngredientes().add(ing2_ex2);
 
-            // ═══════════════════════════════════════════════════════════════
-            // PRODUCTO 6: Wrap de Pollo
-            // ═══════════════════════════════════════════════════════════════
-            ProductoEntity p6 = new ProductoEntity();
-            p6.setName("Wrap de Pollo");
-            p6.setDescription("Tortilla de harina con pollo crispy, lechuga y salsa.");
-            p6.setAvailable(true);
-            p6.setPrice(42000);
-            p6.setImgUrl("/uploads/products/wrap-pollo.jpg");
-            productoService.create(p6);
+            Ingrediente ing2_ex3 = new Ingrediente();
+            ing2_ex3.setItem(coleslaw);
+            ing2_ex3.setCantidad(1);
+            ing2_ex3.setSeleccionadoPorDefecto(false);
+            grupoExtras2.getIngredientes().add(ing2_ex3);
 
-            // Tipo de pollo (UNICA)
-            crearCustomizacion(customizacionesService, p6, "Pollo crispy", 0, TipoCustomizacion.UNICA, "Cocción");
-            crearCustomizacion(customizacionesService, p6, "Pollo grillé", 5000, TipoCustomizacion.UNICA, "Cocción");
+            Ingrediente ing2_ex4 = new Ingrediente();
+            ing2_ex4.setItem(purePapas);
+            ing2_ex4.setCantidad(1);
+            ing2_ex4.setSeleccionadoPorDefecto(false);
+            grupoExtras2.getIngredientes().add(ing2_ex4);
 
-            // Extras (MULTIPLE)
-            crearCustomizacion(customizacionesService, p6, "Queso cheddar", 7000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p6, "Bacon", 10000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p6, "Jalapeños", 4000, TipoCustomizacion.MULTIPLE, "Extra");
-            crearCustomizacion(customizacionesService, p6, "Palta", 12000, TipoCustomizacion.MULTIPLE, "Extra");
+            List<GrupoIngrediente> gruposBucket = new ArrayList<>();
+            gruposBucket.add(grupoBase2);
+            gruposBucket.add(grupoExtras2);
 
-            // Stock inicial: 35 unidades
-            stockService.registrarMovimiento(p6, TipoMovimiento.ENTRADA, 35, "Stock inicial", null);
+            productoService.create("Bucket Familiar", "8 piezas de pollo + 2 papas grandes + 4 bebidas", gruposBucket, null, "/uploads/products/bucket-familiar.jpg");
 
-            message = "Base de datos inicializada con usuarios, turnos, asignaciones, productos, customizaciones y stock.";
+            GrupoIngrediente grupoBase3 = new GrupoIngrediente();
+            grupoBase3.setNombre("Base");
+            grupoBase3.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase3.setMinSeleccion(3);
+            grupoBase3.setMaxSeleccion(3);
+
+            Ingrediente ing3_1 = new Ingrediente();
+            ing3_1.setItem(tender);
+            ing3_1.setCantidad(6);
+            ing3_1.setSeleccionadoPorDefecto(true);
+            grupoBase3.getIngredientes().add(ing3_1);
+
+            Ingrediente ing3_2 = new Ingrediente();
+            ing3_2.setItem(bastonPapa);
+            ing3_2.setCantidad(1);
+            ing3_2.setSeleccionadoPorDefecto(true);
+            grupoBase3.getIngredientes().add(ing3_2);
+
+            Ingrediente ing3_3 = new Ingrediente();
+            ing3_3.setItem(vaso);
+            ing3_3.setCantidad(1);
+            ing3_3.setSeleccionadoPorDefecto(true);
+            grupoBase3.getIngredientes().add(ing3_3);
+
+            GrupoIngrediente grupoExtras3 = new GrupoIngrediente();
+            grupoExtras3.setNombre("Extras");
+            grupoExtras3.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoExtras3.setMinSeleccion(0);
+            grupoExtras3.setMaxSeleccion(10);
+
+            Ingrediente ing3_ex1 = new Ingrediente();
+            ing3_ex1.setItem(salsaRanch);
+            ing3_ex1.setCantidad(1);
+            ing3_ex1.setSeleccionadoPorDefecto(false);
+            grupoExtras3.getIngredientes().add(ing3_ex1);
+
+            Ingrediente ing3_ex2 = new Ingrediente();
+            ing3_ex2.setItem(salsaBuffalo);
+            ing3_ex2.setCantidad(1);
+            ing3_ex2.setSeleccionadoPorDefecto(false);
+            grupoExtras3.getIngredientes().add(ing3_ex2);
+
+            Ingrediente ing3_ex3 = new Ingrediente();
+            ing3_ex3.setItem(arosCebolla);
+            ing3_ex3.setCantidad(1);
+            ing3_ex3.setSeleccionadoPorDefecto(false);
+            grupoExtras3.getIngredientes().add(ing3_ex3);
+
+            List<GrupoIngrediente> gruposTenders = new ArrayList<>();
+            gruposTenders.add(grupoBase3);
+            gruposTenders.add(grupoExtras3);
+
+            productoService.create("Tenders Box", "6 tenders crujientes + papas + bebida + salsa a elección", gruposTenders, null, "/uploads/products/tenders-box.jpg");
+
+            GrupoIngrediente grupoBase4 = new GrupoIngrediente();
+            grupoBase4.setNombre("Base");
+            grupoBase4.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase4.setMinSeleccion(1);
+            grupoBase4.setMaxSeleccion(1);
+
+            Ingrediente ing4_1 = new Ingrediente();
+            ing4_1.setItem(helado);
+            ing4_1.setCantidad(1);
+            ing4_1.setSeleccionadoPorDefecto(true);
+            grupoBase4.getIngredientes().add(ing4_1);
+
+            GrupoIngrediente grupoSalsa4 = new GrupoIngrediente();
+            grupoSalsa4.setNombre("Salsa");
+            grupoSalsa4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO);
+            grupoSalsa4.setMinSeleccion(0);
+            grupoSalsa4.setMaxSeleccion(1);
+
+            Ingrediente ing4_s1 = new Ingrediente();
+            ing4_s1.setItem(salsaChocolate);
+            ing4_s1.setCantidad(1);
+            ing4_s1.setSeleccionadoPorDefecto(false);
+            grupoSalsa4.getIngredientes().add(ing4_s1);
+
+            Ingrediente ing4_s2 = new Ingrediente();
+            ing4_s2.setItem(salsaFrutilla);
+            ing4_s2.setCantidad(1);
+            ing4_s2.setSeleccionadoPorDefecto(false);
+            grupoSalsa4.getIngredientes().add(ing4_s2);
+
+            Ingrediente ing4_s3 = new Ingrediente();
+            ing4_s3.setItem(salsaDulceLeche);
+            ing4_s3.setCantidad(1);
+            ing4_s3.setSeleccionadoPorDefecto(false);
+            grupoSalsa4.getIngredientes().add(ing4_s3);
+
+            GrupoIngrediente grupoToppings4 = new GrupoIngrediente();
+            grupoToppings4.setNombre("Toppings");
+            grupoToppings4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoToppings4.setMinSeleccion(0);
+            grupoToppings4.setMaxSeleccion(5);
+
+            Ingrediente ing4_t1 = new Ingrediente();
+            ing4_t1.setItem(chipsChocolate);
+            ing4_t1.setCantidad(1);
+            ing4_t1.setSeleccionadoPorDefecto(false);
+            grupoToppings4.getIngredientes().add(ing4_t1);
+
+            Ingrediente ing4_t2 = new Ingrediente();
+            ing4_t2.setItem(mani);
+            ing4_t2.setCantidad(1);
+            ing4_t2.setSeleccionadoPorDefecto(false);
+            grupoToppings4.getIngredientes().add(ing4_t2);
+
+            Ingrediente ing4_t3 = new Ingrediente();
+            ing4_t3.setItem(cremaBatida);
+            ing4_t3.setCantidad(1);
+            ing4_t3.setSeleccionadoPorDefecto(false);
+            grupoToppings4.getIngredientes().add(ing4_t3);
+
+            List<GrupoIngrediente> gruposHelado = new ArrayList<>();
+            gruposHelado.add(grupoBase4);
+            gruposHelado.add(grupoSalsa4);
+            gruposHelado.add(grupoToppings4);
+
+            productoService.create("Helado Sundae", "Helado cremoso con salsa y toppings", gruposHelado, null, "/uploads/products/helado-sundae.jpg");
+
+            GrupoIngrediente grupoBase5 = new GrupoIngrediente();
+            grupoBase5.setNombre("Base");
+            grupoBase5.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase5.setMinSeleccion(1);
+            grupoBase5.setMaxSeleccion(1);
+
+            Ingrediente ing5_1 = new Ingrediente();
+            ing5_1.setItem(alita);
+            ing5_1.setCantidad(6);
+            ing5_1.setSeleccionadoPorDefecto(true);
+            grupoBase5.getIngredientes().add(ing5_1);
+
+            GrupoIngrediente grupoExtras5 = new GrupoIngrediente();
+            grupoExtras5.setNombre("Extras");
+            grupoExtras5.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoExtras5.setMinSeleccion(0);
+            grupoExtras5.setMaxSeleccion(5);
+
+            Ingrediente ing5_ex1 = new Ingrediente();
+            ing5_ex1.setItem(salsaQuesoAzul);
+            ing5_ex1.setCantidad(1);
+            ing5_ex1.setSeleccionadoPorDefecto(false);
+            grupoExtras5.getIngredientes().add(ing5_ex1);
+
+            Ingrediente ing5_ex2 = new Ingrediente();
+            ing5_ex2.setItem(bastonesVegetales);
+            ing5_ex2.setCantidad(1);
+            ing5_ex2.setSeleccionadoPorDefecto(false);
+            grupoExtras5.getIngredientes().add(ing5_ex2);
+
+            List<GrupoIngrediente> gruposAlitas = new ArrayList<>();
+            gruposAlitas.add(grupoBase5);
+            gruposAlitas.add(grupoExtras5);
+
+            productoService.create("Alitas Picantes", "Alitas de pollo bañadas en salsa picante", gruposAlitas, null, "/uploads/products/alitas-picantes.jpg");
+
+            GrupoIngrediente grupoBase6 = new GrupoIngrediente();
+            grupoBase6.setNombre("Base");
+            grupoBase6.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            grupoBase6.setMinSeleccion(2);
+            grupoBase6.setMaxSeleccion(2);
+
+            Ingrediente ing6_1 = new Ingrediente();
+            ing6_1.setItem(tortilla);
+            ing6_1.setCantidad(1);
+            ing6_1.setSeleccionadoPorDefecto(true);
+            grupoBase6.getIngredientes().add(ing6_1);
+
+            Ingrediente ing6_2 = new Ingrediente();
+            ing6_2.setItem(piezaPollo);
+            ing6_2.setCantidad(1);
+            ing6_2.setSeleccionadoPorDefecto(true);
+            grupoBase6.getIngredientes().add(ing6_2);
+
+            GrupoIngrediente grupoExtras6 = new GrupoIngrediente();
+            grupoExtras6.setNombre("Extras");
+            grupoExtras6.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            grupoExtras6.setMinSeleccion(0);
+            grupoExtras6.setMaxSeleccion(10);
+
+            Ingrediente ing6_ex1 = new Ingrediente();
+            ing6_ex1.setItem(quesoCheddar);
+            ing6_ex1.setCantidad(1);
+            ing6_ex1.setSeleccionadoPorDefecto(false);
+            grupoExtras6.getIngredientes().add(ing6_ex1);
+
+            Ingrediente ing6_ex2 = new Ingrediente();
+            ing6_ex2.setItem(bacon);
+            ing6_ex2.setCantidad(1);
+            ing6_ex2.setSeleccionadoPorDefecto(false);
+            grupoExtras6.getIngredientes().add(ing6_ex2);
+
+            Ingrediente ing6_ex3 = new Ingrediente();
+            ing6_ex3.setItem(jalapenos);
+            ing6_ex3.setCantidad(1);
+            ing6_ex3.setSeleccionadoPorDefecto(false);
+            grupoExtras6.getIngredientes().add(ing6_ex3);
+
+            Ingrediente ing6_ex4 = new Ingrediente();
+            ing6_ex4.setItem(palta);
+            ing6_ex4.setCantidad(1);
+            ing6_ex4.setSeleccionadoPorDefecto(false);
+            grupoExtras6.getIngredientes().add(ing6_ex4);
+
+            List<GrupoIngrediente> gruposWrap = new ArrayList<>();
+            gruposWrap.add(grupoBase6);
+            gruposWrap.add(grupoExtras6);
+
+            productoService.create("Wrap de Pollo", "Tortilla de harina con pollo crispy, lechuga y salsa", gruposWrap, null, "/uploads/products/wrap-pollo.jpg");
+
+            System.out.println("Productos creados: 6 productos con grupos e ingredientes");
+
+            message = "Base de datos inicializada con usuarios, turnos, asignaciones, items, stock y productos.";
 
         } catch (BeansException e) {
             System.err.printf("Error inicializando la bdd %s", e.getMessage());
@@ -285,19 +522,4 @@ public class DataLoaderCli {
         }
     }
 
-    private static void crearCustomizacion(
-            CustomizacionesService service,
-            ProductoEntity producto,
-            String nombre,
-            int precio,
-            TipoCustomizacion tipo,
-            String grupo) {
-        CustomizacionEntity c = new CustomizacionEntity();
-        c.setProducto(producto);
-        c.setNombre(nombre);
-        c.setPriceModifier(precio);
-        c.setTipo(tipo);
-        c.setGrupo(grupo);
-        service.create(c);
-    }
 }
