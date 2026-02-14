@@ -47,7 +47,7 @@ public class ProductoService {
         return productoRepository.findById(id).orElse(null);
     }
 
-    public void create(String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile) {
+    public void create(String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile, String imgURL) {
         ProductoEntity productoEntity = new ProductoEntity();
         if (StringUtil.isBlank(name)) {
             throw new ProductException("Nombre producto invalido.");
@@ -64,7 +64,11 @@ public class ProductoService {
         int precio = getPrecio(grupoIngredientes);
         productoEntity.setPrecioBase(precio);
 
-        setImagen(imageFile, false, productoEntity);
+        if (imageFile != null) {
+            setImagen(imageFile, false, productoEntity);
+        } else if (imgURL != null) {
+            productoEntity.setImgUrl(imgURL);
+        }
 
         productoRepository.save(productoEntity);
     }
