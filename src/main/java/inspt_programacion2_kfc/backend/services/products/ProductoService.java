@@ -15,6 +15,7 @@ import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
 import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.repositories.products.IngredienteRepository;
 import inspt_programacion2_kfc.backend.repositories.products.ProductoRepository;
 import inspt_programacion2_kfc.backend.services.files.FileUploadService;
 
@@ -23,10 +24,12 @@ public class ProductoService {
 
     private final ProductoRepository productoRepository;
     private final FileUploadService fileUploadService;
+    private final IngredienteRepository ingredienteRepository;
 
-    public ProductoService(ProductoRepository productoRepository, FileUploadService fileUploadService) {
+    public ProductoService(ProductoRepository productoRepository, FileUploadService fileUploadService, IngredienteRepository ingredienteRepository) {
         this.productoRepository = productoRepository;
         this.fileUploadService = fileUploadService;
+        this.ingredienteRepository = ingredienteRepository;
     }
 
     public List<ProductoEntity> findAll() {
@@ -144,6 +147,21 @@ public class ProductoService {
         ProductoEntity producto = findById(id);
         if (producto != null) {
             producto.setAvailable(!producto.isAvailable());
+            productoRepository.save(producto);
+        }
+    }
+
+    public void recalcularPreciosProductosPorItem(Long itemId) {
+        List<Ingrediente> ingredientes = ingredienteRepository.findByItemId(itemId);
+
+        List<ProductoEntity> productosAfectados = ingredientes.stream()
+                .map(ing -> ing.getGrupo().getProducto())
+                .distinct()
+                .toList();
+
+        for (ProductoEntity producto : productosAfectados) {
+            int nuevoPrecio = getPrecio(producto.getGruposIngredientes());
+            producto.setPrecioBase(nuevoPrecio);
             productoRepository.save(producto);
         }
     }
