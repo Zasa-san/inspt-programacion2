@@ -7,18 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
-import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
-import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.frontend.helpers.ProductHelper;
-import inspt_programacion2_kfc.frontend.models.Customizacion;
+// import inspt_programacion2_kfc.frontend.models.Customizacion;
 
 @Controller
 public class ProductsPageController {
@@ -50,6 +46,7 @@ public class ProductsPageController {
         return "products/new";
     }
 
+    /*
     @PostMapping("/products/new")
     public String createProductFromForm(
             @RequestParam String name,
@@ -67,8 +64,8 @@ public class ProductsPageController {
 
             productoService.create(producto, imageFile);
 
-            List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
-            productHelper.handleCustomizations(producto, customizations);
+            // List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
+            // productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (ProductImageException e) {
@@ -84,7 +81,7 @@ public class ProductsPageController {
 
         return "redirect:/products";
     }
-
+     */
     @GetMapping("/products/edit/{id}")
     public String editProductPage(@PathVariable Long id, Model model, RedirectAttributes redirectAttrs) {
         PageMetadata page = new PageMetadata("Editar producto");
@@ -96,14 +93,16 @@ public class ProductsPageController {
             return "redirect:/products";
         }
 
+        /*
         List<CustomizacionEntity> customizaciones = productHelper.getCustomizacionesPorProducto(producto);
-
-        model.addAttribute("product", producto);
         model.addAttribute("customizaciones", customizaciones);
+         */
+        model.addAttribute("product", producto);
 
         return "products/edit";
     }
 
+    /*
     @PostMapping("/products/edit/{id}")
     public String updateProduct(
             @PathVariable Long id,
@@ -124,8 +123,8 @@ public class ProductsPageController {
             productoService.update(id, updatedData, imageFile, removeImage);
 
             ProductoEntity producto = productoService.findById(id);
-            List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
-            productHelper.handleCustomizations(producto, customizations);
+            // List<Customizacion> customizations = productHelper.parseCustomizations(customizationsJson);
+            // productHelper.handleCustomizations(producto, customizations);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (ProductNotFoundException e) {
@@ -141,7 +140,7 @@ public class ProductsPageController {
 
         return "redirect:/products";
     }
-
+     */
     @PostMapping("/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
-import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
+// import inspt_programacion2_kfc.backend.models.products.CustomizacionEntity;
+// import inspt_programacion2_kfc.backend.models.products.TipoCustomizacion;
+// import inspt_programacion2_kfc.backend.services.products.CustomizacionesService;
 import inspt_programacion2_kfc.frontend.models.Customizacion;
 
 import org.springframework.stereotype.Component;
@@ -20,14 +20,16 @@ import java.util.Objects;
 public class ProductHelper {
 
     private final ObjectMapper objectMapper;
-    private final CustomizacionesService customizacionesService;
+    // private final CustomizacionesService customizacionesService;
 
-    public ProductHelper(ObjectMapper objectMapper, CustomizacionesService customizacionesService) {
+    public ProductHelper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.customizacionesService = customizacionesService;
+        // this.customizacionesService = customizacionesService;
     }
 
     public void handleCustomizations(ProductoEntity producto, List<Customizacion> customizations) {
+        // TODO: Refactorizar customizaciones a items cuando se implemente el sistema de items en frontend.
+        /* 
         if (customizations == null || customizations.isEmpty()) {
             return;
         }
@@ -38,7 +40,7 @@ public class ProductHelper {
             // Asegurar que el precio nunca sea negativo
             int priceModifier = Math.max(0, Objects.requireNonNullElse(dto.getPriceModifier(), 0));
             boolean enabled = Objects.requireNonNullElse(dto.getEnabled(), false);
-            TipoCustomizacion tipo = parseTipo(dto.getTipo());
+            // TipoCustomizacion tipo = parseTipo(dto.getTipo());
             String grupo = Objects.requireNonNullElse(dto.getGrupo(), "").trim();
 
             if (enabled && grupo.isEmpty()) {
@@ -60,30 +62,32 @@ public class ProductHelper {
 
             if (isExisting && customizationId != null && customizationId > 0) {
                 if (!enabled) {
-                    customizacionesService.delete(customizationId);
+                    // customizacionesService.delete(customizationId);
                 } else {
-                    CustomizacionEntity existing = customizacionesService.findById(customizationId);
-                    if (existing != null) {
-                        existing.setNombre(nombre);
-                        existing.setPriceModifier(priceModifier);
-                        existing.setTipo(tipo);
-                        existing.setGrupo(grupo);
-                        customizacionesService.update(customizationId, existing);
-                    }
+                    // CustomizacionEntity existing = customizacionesService.findById(customizationId);
+                    // if (existing != null) {
+                    //     existing.setNombre(nombre);
+                    //     existing.setPriceModifier(priceModifier);
+                    //     existing.setTipo(tipo);
+                    //     existing.setGrupo(grupo);
+                    //     customizacionesService.update(customizationId, existing);
+                    // }
                 }
             } else if (enabled && nombre != null && !nombre.trim().isEmpty()) {
                 // Nueva customización (id es null, vacío o "NEW_X")
-                CustomizacionEntity newCustomization = new CustomizacionEntity();
-                newCustomization.setProducto(producto);
-                newCustomization.setNombre(nombre);
-                newCustomization.setPriceModifier(priceModifier);
-                newCustomization.setTipo(tipo);
-                newCustomization.setGrupo(grupo);
-                customizacionesService.create(newCustomization);
+                // CustomizacionEntity newCustomization = new CustomizacionEntity();
+                // newCustomization.setProducto(producto);
+                // newCustomization.setNombre(nombre);
+                // newCustomization.setPriceModifier(priceModifier);
+                // newCustomization.setTipo(tipo);
+                // newCustomization.setGrupo(grupo);
+                // customizacionesService.create(newCustomization);
             }
         }
+        */
     }
 
+    /*
     public TipoCustomizacion parseTipo(String tipo) {
         if (tipo == null || tipo.isBlank()) {
             return TipoCustomizacion.MULTIPLE;
@@ -94,6 +98,7 @@ public class ProductHelper {
             return TipoCustomizacion.MULTIPLE;
         }
     }
+    */
 
     public List<Customizacion> parseCustomizations(String json) {
         if (json == null || json.trim().isEmpty()) {
@@ -107,7 +112,9 @@ public class ProductHelper {
         }
     }
 
+    /*
     public List<CustomizacionEntity> getCustomizacionesPorProducto(ProductoEntity producto) {
         return customizacionesService.findByProducto(producto);
     }
+    */
 }
