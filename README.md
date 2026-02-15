@@ -48,12 +48,12 @@ Inicializar base de datos por defecto:
 
 **Windows:**
 ```cmd
-.\mvnw.cmd exec:java@dataloader -DskipTests
+.\mvnw.cmd -P dataloader exec:java@dataloader
 ```
 
 **Linux/Mac:**
 ```bash
-./mvnw exec:java@dataloader -DskipTests
+./mvnw -P dataloader exec:java@dataloader
 ```
 
 #### 5 - Ejecutar la aplicación (arranca Jetty en el puerto 8080 por defecto):
