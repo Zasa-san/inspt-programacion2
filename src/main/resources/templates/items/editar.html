@@ -34,12 +34,13 @@
           </div>
 
           <div class="field">
-            <label class="label">Precio (en centavos) *</label>
+            <label class="label">Precio *</label>
             <div class="control">
-              <input class="input" type="number" name="precio" min="0" th:value="${item.price}"
-                placeholder="Ej: 5500 ($55,00)" required>
+              <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50"
+                pattern="[0-9]+(,[0-9]{1,2})?" required>
+              <input type="hidden" name="precio" id="priceHidden" th:value="${item.price}" />
             </div>
-            <p class="help">El precio se especifica en centavos (5500 = $55,00)</p>
+            <p class="help">Usar coma para decimales. Ej: 55 o 55,00 o 55,5</p>
           </div>
 
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
