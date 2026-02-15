@@ -29,7 +29,7 @@ public class StockPageController {
 
     @GetMapping("/stock")
     public String stockPage(Model model) {
-        PageMetadata page = new PageMetadata("Stock de items", "Gestión de stock por item");
+        PageMetadata page = new PageMetadata("Stock de items", "Gestión de movimientos de stock");
         model.addAttribute("page", page);
 
         List<Item> items = itemService.findAll();
@@ -60,6 +60,7 @@ public class StockPageController {
         }
 
         boolean algunMovimiento = false;
+        String errorMsg = null;
 
         for (int i = 0; i < itemIds.size(); i++) {
             Integer cantidadObj = cantidades.get(i);
@@ -77,11 +78,13 @@ public class StockPageController {
                 movimientoStockService.registrarMovimiento(item, tipo, cantidad, motivo, null);
                 algunMovimiento = true;
             } catch (RuntimeException ex) {
-                redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
+                errorMsg = ex.getMessage();
             }
         }
 
-        if (algunMovimiento) {
+        if (errorMsg != null) {
+            redirectAttrs.addFlashAttribute("errorMessage", errorMsg);
+        } else if (algunMovimiento) {
             redirectAttrs.addFlashAttribute("successMessage", "Movimientos registrados correctamente.");
         } else {
             redirectAttrs.addFlashAttribute("errorMessage",

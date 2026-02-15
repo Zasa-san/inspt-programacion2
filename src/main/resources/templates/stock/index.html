@@ -8,8 +8,26 @@
 
   <section class="section">
     <div class="container">
-      <h1 class="title" th:text="${page.title}">Stock de items</h1>
-      <p class="subtitle" th:text="${page.description}">Gestión de stock por item</p>
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <div>
+              <h1 class="title" th:text="${page.title}">Stock de items</h1>
+              <p class="subtitle" th:text="${page.description}">Gestión de movimientos de stock</p>
+            </div>
+          </div>
+        </div>
+        <div class="level-right" sec:authorize="hasRole('ADMIN')">
+          <div class="level-item">
+            <a href="/items" class="button is-info">
+              <span class="icon is-small">
+                <i class="fas fa-box"></i>
+              </span>
+              <span>Gestionar items</span>
+            </a>
+          </div>
+        </div>
+      </div>
 
       <div th:if="${successMessage != null}" class="notification is-success" th:text="${successMessage}"></div>
       <div th:if="${errorMessage != null}" class="notification is-danger" th:text="${errorMessage}"></div>
@@ -19,49 +37,42 @@
       </div>
 
       <div th:if="${!#lists.isEmpty(items)}">
-        <form th:action="@{/stock/movimiento}" method="post">
-          <table class="table is-fullwidth is-striped is-hoverable">
+        <form th:action="@{/stock/movimiento}" method="post" class="mt-5">
+          <h3 class="title is-5">Registrar movimientos de stock</h3>
+          <table class="table is-fullwidth is-hoverable">
             <thead>
               <tr>
                 <th>Item</th>
-                <th>Descripción</th>
-                <th class="has-text-right">Precio</th>
                 <th class="has-text-centered">Stock actual</th>
-                <th class="has-text-centered">Registrar movimiento</th>
+                <th class="has-text-centered">Tipo</th>
+                <th class="has-text-centered">Cantidad</th>
+                <th>Motivo</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="item : ${items}">
                 <td th:text="${item.name}">Nombre</td>
-                <td th:text="${item.descripcion}">Descripción</td>
-                <td class="has-text-right">
-                  $ <span class="price-format" th:attr="data-price=${item.price}">0</span>
-                </td>
                 <td class="has-text-centered">
                   <span th:text="${stocks[item.id]}">0</span>
                 </td>
-                <td>
+                <td class="has-text-centered">
                   <input type="hidden" name="itemId" th:value="${item.id}" />
-                  <div class="columns is-mobile is-vcentered">
-                    <div class="column is-4">
-                      <div class="select is-small">
-                        <select name="tipo">
-                          <option th:value="${T(inspt_programacion2_kfc.backend.models.stock.TipoMovimiento).ENTRADA}">
-                            Entrada
-                          </option>
-                          <option th:value="${T(inspt_programacion2_kfc.backend.models.stock.TipoMovimiento).SALIDA}">
-                            Salida
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="column is-3">
-                      <input class="input is-small" type="number" name="cantidad" min="0" value="0" />
-                    </div>
-                    <div class="column is-5">
-                      <input class="input is-small" type="text" name="motivo" placeholder="Motivo (opcional)" />
-                    </div>
+                  <div class="select is-small">
+                    <select name="tipo">
+                      <option th:value="${T(inspt_programacion2_kfc.backend.models.stock.TipoMovimiento).ENTRADA}">
+                        Entrada
+                      </option>
+                      <option th:value="${T(inspt_programacion2_kfc.backend.models.stock.TipoMovimiento).SALIDA}">
+                        Salida
+                      </option>
+                    </select>
                   </div>
+                </td>
+                <td class="has-text-centered">
+                  <input class="input is-small" type="number" name="cantidad" min="0" value="0" />
+                </td>
+                <td>
+                  <input class="input is-small" type="text" name="motivo" placeholder="Motivo (opcional)" />
                 </td>
               </tr>
             </tbody>
