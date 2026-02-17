@@ -218,7 +218,7 @@ public class DataLoaderCli {
             gruposComboClasico.add(grupoBase1);
             gruposComboClasico.add(grupoExtras1);
 
-            productoService.create("Combo Clásico", "Sandwich de pollo frito + papas medianas + bebida", gruposComboClasico, null, "/uploads/products/combo-clasico.jpg");
+            productoService.create("Combo Clásico", "Sandwich de pollo frito + papas medianas + bebida", gruposComboClasico, null, null, "/uploads/products/combo-clasico.jpg");
 
             GrupoIngrediente grupoBase2 = new GrupoIngrediente();
             grupoBase2.setNombre("Base");
@@ -278,7 +278,7 @@ public class DataLoaderCli {
             gruposBucket.add(grupoBase2);
             gruposBucket.add(grupoExtras2);
 
-            productoService.create("Bucket Familiar", "8 piezas de pollo + 2 papas grandes + 4 bebidas", gruposBucket, null, "/uploads/products/bucket-familiar.jpg");
+            productoService.create("Bucket Familiar", "8 piezas de pollo + 2 papas grandes + 4 bebidas", gruposBucket, null, null, "/uploads/products/bucket-familiar.jpg");
 
             GrupoIngrediente grupoBase3 = new GrupoIngrediente();
             grupoBase3.setNombre("Base");
@@ -332,7 +332,7 @@ public class DataLoaderCli {
             gruposTenders.add(grupoBase3);
             gruposTenders.add(grupoExtras3);
 
-            productoService.create("Tenders Box", "6 tenders crujientes + papas + bebida + salsa a elección", gruposTenders, null, "/uploads/products/tenders-box.jpg");
+            productoService.create("Tenders Box", "6 tenders crujientes + papas + bebida + salsa a elección", gruposTenders, null, null, "/uploads/products/tenders-box.jpg");
 
             GrupoIngrediente grupoBase4 = new GrupoIngrediente();
             grupoBase4.setNombre("Base");
@@ -399,7 +399,7 @@ public class DataLoaderCli {
             gruposHelado.add(grupoSalsa4);
             gruposHelado.add(grupoToppings4);
 
-            productoService.create("Helado Sundae", "Helado cremoso con salsa y toppings", gruposHelado, null, "/uploads/products/helado-sundae.jpg");
+            productoService.create("Helado Sundae", "Helado cremoso con salsa y toppings", gruposHelado, null, null, "/uploads/products/helado-sundae.jpg");
 
             GrupoIngrediente grupoBase5 = new GrupoIngrediente();
             grupoBase5.setNombre("Base");
@@ -435,7 +435,7 @@ public class DataLoaderCli {
             gruposAlitas.add(grupoBase5);
             gruposAlitas.add(grupoExtras5);
 
-            productoService.create("Alitas Picantes", "Alitas de pollo bañadas en salsa picante", gruposAlitas, null, "/uploads/products/alitas-picantes.jpg");
+            productoService.create("Alitas Picantes", "Alitas de pollo bañadas en salsa picante", gruposAlitas, null, null, "/uploads/products/alitas-picantes.jpg");
 
             GrupoIngrediente grupoBase6 = new GrupoIngrediente();
             grupoBase6.setNombre("Base");
@@ -489,7 +489,7 @@ public class DataLoaderCli {
             gruposWrap.add(grupoBase6);
             gruposWrap.add(grupoExtras6);
 
-            productoService.create("Wrap de Pollo", "Tortilla de harina con pollo crispy, lechuga y salsa", gruposWrap, null, "/uploads/products/wrap-pollo.jpg");
+            productoService.create("Wrap de Pollo", "Tortilla de harina con pollo crispy, lechuga y salsa", gruposWrap, null, null, "/uploads/products/wrap-pollo.jpg");
 
             System.out.println("Productos creados: 6 productos con grupos e ingredientes");
 

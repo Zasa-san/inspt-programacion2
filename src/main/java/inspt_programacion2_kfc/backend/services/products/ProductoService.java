@@ -47,7 +47,7 @@ public class ProductoService {
         return productoRepository.findById(id).orElse(null);
     }
 
-    public void create(String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile, String imgURL) {
+    public void create(String name, String description, List<GrupoIngrediente> grupoIngredientes, Integer precioBase, MultipartFile imageFile, String imgURL) {
         ProductoEntity productoEntity = new ProductoEntity();
         if (StringUtil.isBlank(name)) {
             throw new ProductException("Nombre producto invalido.");
@@ -61,7 +61,14 @@ public class ProductoService {
 
         configurarGrupos(productoEntity, grupoIngredientes);
 
-        int precio = getPrecio(grupoIngredientes);
+        Integer precio = 0;
+
+        if (precioBase != null && precioBase > 0) {
+            precio = precioBase;
+        } else {
+            precio = getPrecio(grupoIngredientes);
+        }
+
         productoEntity.setPrecioBase(precio);
 
         if (imageFile != null) {
@@ -103,7 +110,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
-    public void update(Long id, String name, String description, List<GrupoIngrediente> grupoIngredientes, MultipartFile imageFile, boolean removeImage) {
+    public void update(Long id, String name, String description, List<GrupoIngrediente> grupoIngredientes, Integer precioBase, MultipartFile imageFile, boolean removeImage) {
         if (id == null) {
             throw new ProductNotFoundException("ID no puede ser NULL.");
         }
@@ -125,7 +132,11 @@ public class ProductoService {
         existing.getGruposIngredientes().clear();
         configurarGrupos(existing, grupoIngredientes);
 
-        existing.setPrecioBase(getPrecio(grupoIngredientes));
+        if (precioBase != null && precioBase > 0) {
+            existing.setPrecioBase(precioBase);
+        } else {
+            existing.setPrecioBase(getPrecio(grupoIngredientes));
+        }
 
         setImagen(imageFile, removeImage, existing);
 
