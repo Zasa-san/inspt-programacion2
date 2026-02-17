@@ -6,24 +6,24 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class Producto {
+public class ProductoDTO {
 
     private final Long id;
     private final String name;
     private final String description;
-    private final int price;
+    private final int precioBase;
     private final String imgUrl;
     private final List<Customizacion> customizaciones;
 
-    public Producto(Long id, String name, String description, int price, String imgUrl) {
-        this(id, name, description, price, imgUrl, new ArrayList<>());
+    public ProductoDTO(Long id, String name, String description, int precioBase, String imgUrl) {
+        this(id, name, description, precioBase, imgUrl, new ArrayList<>());
     }
 
-    public Producto(Long id, String name, String description, int price, String imgUrl, List<Customizacion> customizaciones) {
+    public ProductoDTO(Long id, String name, String description, int precioBase, String imgUrl, List<Customizacion> customizaciones) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.price = price;
+        this.precioBase = precioBase;
         this.imgUrl = imgUrl;
         this.customizaciones = customizaciones != null ? customizaciones : new ArrayList<>();
     }

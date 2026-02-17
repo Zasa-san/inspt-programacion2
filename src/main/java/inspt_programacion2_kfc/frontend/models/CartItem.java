@@ -8,16 +8,16 @@ import lombok.Data;
 @Data
 public class CartItem {
 
-    private final Producto producto;
+    private final ProductoDTO productoDTO;
     private int quantity;
     private final List<CustomizacionSeleccionada> customizaciones;
 
-    public CartItem(Producto producto, int quantity) {
-        this(producto, quantity, new ArrayList<>());
+    public CartItem(ProductoDTO productoDTO, int quantity) {
+        this(productoDTO, quantity, new ArrayList<>());
     }
 
-    public CartItem(Producto producto, int quantity, List<CustomizacionSeleccionada> customizaciones) {
-        this.producto = producto;
+    public CartItem(ProductoDTO productoDTO, int quantity, List<CustomizacionSeleccionada> customizaciones) {
+        this.productoDTO = productoDTO;
         this.quantity = quantity;
         this.customizaciones = customizaciones != null ? customizaciones : new ArrayList<>();
     }
@@ -36,7 +36,7 @@ public class CartItem {
         int extras = customizaciones.stream()
                 .mapToInt(CustomizacionSeleccionada::getPrecio)
                 .sum();
-        return producto.getPrice() + extras;
+        return productoDTO.getPrecioBase() + extras;
     }
 
     /**
@@ -52,13 +52,13 @@ public class CartItem {
      */
     public String getCartKey() {
         if (customizaciones == null || customizaciones.isEmpty()) {
-            return String.valueOf(producto.getId());
+            return String.valueOf(productoDTO.getId());
         }
         List<Long> ids = customizaciones.stream()
                 .map(CustomizacionSeleccionada::getId)
                 .sorted()
                 .toList();
-        return producto.getId() + "_" + ids;
+        return productoDTO.getId() + "_" + ids;
     }
 
 }

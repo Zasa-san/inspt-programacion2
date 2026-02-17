@@ -17,7 +17,7 @@ import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.Producto;
+import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 import inspt_programacion2_kfc.frontend.services.ProductService;
 import jakarta.servlet.http.HttpSession;
 
@@ -30,8 +30,8 @@ public class BaseRoutesController {
     @Autowired
     private MovimientoStockService movimientoStockService;
 
-    @Autowired
-    private ProductoService productoService;
+//    @Autowired
+//    private ProductoService productoService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -46,40 +46,41 @@ public class BaseRoutesController {
         return List.of();
     }
 
-    @GetMapping({"/", "/index"})
-    public String index(Model model, HttpSession session) {
-        PageMetadata page = new PageMetadata("Inicio", "Página pública para que el cliente vea el menú y su carrito");
-        model.addAttribute("page", page);
-
-        List<Producto> products = productService.findAll();
-        model.addAttribute("products", products);
-
-        // Generar JSON de customizaciones por producto
-        Map<Long, String> customizacionesJsonMap = new HashMap<>();
-        for (Producto p : products) {
-            if (p.tieneCustomizaciones()) {
-                try {
-                    String json = objectMapper.writeValueAsString(p.getCustomizaciones());
-                    customizacionesJsonMap.put(p.getId(), json);
-                } catch (JsonProcessingException e) {
-                    customizacionesJsonMap.put(p.getId(), "[]");
-                }
-            }
-        }
-        model.addAttribute("customizacionesJsonMap", customizacionesJsonMap);
-
-        List<ProductoEntity> productosEntities = productoService.findAllAvailable();
-        Map<Long, Integer> stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
-        model.addAttribute("stockMap", stockMap);
-
-        List<CartItem> cartItems = getCartItems(session);
-        int cartTotal = cartItems.stream().mapToInt(CartItem::getSubtotal).sum();
-
-        model.addAttribute("cartItems", cartItems);
-        model.addAttribute("cartTotal", cartTotal);
-
-        return "index";
-    }
+    //TODO ajustar ProductoDTO o dejar de utilizarlo
+//    @GetMapping({"/", "/index"})
+//    public String index(Model model, HttpSession session) {
+//        PageMetadata page = new PageMetadata("Inicio", "Página pública para que el cliente vea el menú y su carrito");
+//        model.addAttribute("page", page);
+//
+//        List<ProductoDTO> products = productService.findAll();
+//        model.addAttribute("products", products);
+//
+//        // Generar JSON de customizaciones por producto
+//        Map<Long, String> customizacionesJsonMap = new HashMap<>();
+//        for (ProductoDTO p : products) {
+//            if (p.tieneCustomizaciones()) {
+//                try {
+//                    String json = objectMapper.writeValueAsString(p.getCustomizaciones());
+//                    customizacionesJsonMap.put(p.getId(), json);
+//                } catch (JsonProcessingException e) {
+//                    customizacionesJsonMap.put(p.getId(), "[]");
+//                }
+//            }
+//        }
+//        model.addAttribute("customizacionesJsonMap", customizacionesJsonMap);
+//
+//        List<ProductoEntity> productosEntities = productoService.findAllAvailable();
+//        Map<Long, Integer> stockMap = movimientoStockService.calcularStockParaProductos(productosEntities);
+//        model.addAttribute("stockMap", stockMap);
+//
+//        List<CartItem> cartItems = getCartItems(session);
+//        int cartTotal = cartItems.stream().mapToInt(CartItem::getSubtotal).sum();
+//
+//        model.addAttribute("cartItems", cartItems);
+//        model.addAttribute("cartTotal", cartTotal);
+//
+//        return "index";
+//    }
 
     @GetMapping("/login")
     public String login(Model model) {

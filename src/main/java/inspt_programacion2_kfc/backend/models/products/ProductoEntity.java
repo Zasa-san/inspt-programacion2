@@ -44,11 +44,4 @@ public class ProductoEntity {
     @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GrupoIngrediente> gruposIngredientes = new ArrayList<>();
 
-    public int getPrecioBase() {
-        return precioBase;
-    }
-
-    public void setPrecioBase(int precioBase) {
-        this.precioBase = precioBase;
-    }
 }

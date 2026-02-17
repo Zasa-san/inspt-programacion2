@@ -14,7 +14,7 @@ import inspt_programacion2_kfc.backend.exceptions.cart.CartException;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.models.Customizacion;
 import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
-import inspt_programacion2_kfc.frontend.models.Producto;
+import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 
 @Component
 public class CartHelper {
@@ -29,7 +29,7 @@ public class CartHelper {
      * Parsea el JSON de IDs de customizaciones y las convierte a
      * CustomizacionSeleccionada usando los datos actuales del producto.
      */
-    public List<CustomizacionSeleccionada> parseCustomizaciones(String json, Producto producto) {
+    public List<CustomizacionSeleccionada> parseCustomizaciones(String json, ProductoDTO productoDTO) {
         List<CustomizacionSeleccionada> result = new ArrayList<>();
 
         if (json == null || json.trim().isEmpty()) {
@@ -42,7 +42,7 @@ public class CartHelper {
 
             for (String customId : ids) {
                 // Buscar la customización en el producto
-                for (Customizacion c : producto.getCustomizaciones()) {
+                for (Customizacion c : productoDTO.getCustomizaciones()) {
                     if (c.getId().equals(customId)) {
                         result.add(new CustomizacionSeleccionada(Long.valueOf(c.getId()), c.getNombre(), c.getPriceModifier()));
                         break;
@@ -62,7 +62,7 @@ public class CartHelper {
      */
     public int calcularCantidadProductoEnCarrito(Map<String, CartItem> cart, Long productId) {
         return cart.values().stream()
-                .filter(item -> item.getProducto().getId().equals(productId))
+                .filter(item -> item.getProductoDTO().getId().equals(productId))
                 .mapToInt(CartItem::getQuantity)
                 .sum();
     }
