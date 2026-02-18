@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IngredienteDTO {
 
+    private Long id;
     private Long itemId;
+    private String itemName;
+    private Integer itemPrice;
     private Integer cantidad;
     private Boolean seleccionadoPorDefecto;
 

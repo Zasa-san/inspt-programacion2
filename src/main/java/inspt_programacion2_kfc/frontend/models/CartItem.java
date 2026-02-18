@@ -12,6 +12,11 @@ public class CartItem {
     private int quantity;
     private final List<CustomizacionSeleccionada> customizaciones;
 
+    // Compatibilidad con templates/helpers viejos que referencian "producto".
+    public ProductoDTO getProducto() {
+        return productoDTO;
+    }
+
     public CartItem(ProductoDTO productoDTO, int quantity) {
         this(productoDTO, quantity, new ArrayList<>());
     }

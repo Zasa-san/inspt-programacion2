@@ -3,10 +3,7 @@ package inspt_programacion2_kfc.frontend.controllers;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.helpers.CartHelper;
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
-import inspt_programacion2_kfc.frontend.services.ProductService;
+import inspt_programacion2_kfc.frontend.services.FrontProductoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,19 +12,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/cart")
 public class CartController {
 
-    private final ProductService productService;
+    private final FrontProductoService frontProductoService;
     private final MovimientoStockService movimientoStockService;
     private final CartHelper cartHelper;
     
-    public CartController(ProductService productService, MovimientoStockService movimientoStockService, CartHelper cartHelper) {
-        this.productService = productService;
+    public CartController(FrontProductoService frontProductoService, MovimientoStockService movimientoStockService, CartHelper cartHelper) {
+        this.frontProductoService = frontProductoService;
         this.movimientoStockService = movimientoStockService;
         this.cartHelper = cartHelper;
     }

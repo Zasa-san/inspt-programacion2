@@ -57,7 +57,7 @@
                   <p class="title is-5" th:text="${p.name}">Nombre producto</p>
                   <p class="subtitle is-6" th:text="${p.description}">Descripción</p>
                   <p class="has-text-weight-semibold">
-                    $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
+                    $ <span class="price-format" th:attr="data-price=${p.precioBase}">0</span>
                   </p>
 
                   <!-- Sin stock -->
@@ -67,8 +67,8 @@
 
                   <!-- Con stock -->
                   <div th:if="${stockMap[p.id] != null && stockMap[p.id] > 0}" class="mt-3" sec:authorize="isAnonymous()">
-                    <!-- Producto SIN customizaciones: form directo -->
-                    <form th:if="${!p.tieneCustomizaciones()}" th:action="@{/cart/add}" method="post">
+                    <!-- Producto SIN opciones: form directo -->
+                    <form th:if="${!p.tieneOpciones()}" th:action="@{/cart/add}" method="post">
                       <input type="hidden" name="productId" th:value="${p.id}" />
                       <div class="field has-addons">
                         <div class="control is-expanded">
@@ -83,13 +83,13 @@
                       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     </form>
 
-                    <!-- Producto CON customizaciones: botón que abre modal -->
-                    <div th:if="${p.tieneCustomizaciones()}">
+                    <!-- Producto CON opciones: botón que abre modal -->
+                    <div th:if="${p.tieneOpciones()}">
                       <button type="button" class="button is-primary is-fullwidth open-customization-modal"
                               th:data-product-id="${p.id}"
                               th:data-product-name="${p.name}"
-                              th:data-product-price="${p.price}"
-                              th:data-customizaciones="${customizacionesJsonMap[p.id]}">
+                              th:data-product-price="${p.precioBase}"
+                              th:data-grupos="${gruposJsonMap[p.id]}">
                         <span class="icon">
                           <i class="fas fa-plus"></i>
                         </span>
@@ -128,7 +128,7 @@
                 <tbody>
                   <tr th:each="item : ${cartItems}">
                     <td>
-                      <span th:text="${item.producto.name}">Producto</span>
+                      <span th:text="${item.productoDTO.name}">Producto</span>
                       <!-- Mostrar extras si hay -->
                       <div th:if="${!item.customizaciones.isEmpty()}" class="is-size-7 has-text-grey">
                         <span th:each="custom, iterStat : ${item.customizaciones}">

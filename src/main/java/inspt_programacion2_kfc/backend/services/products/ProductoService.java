@@ -61,7 +61,7 @@ public class ProductoService {
 
         configurarGrupos(productoEntity, grupoIngredientes);
 
-        Integer precio = 0;
+        int precio;
 
         if (precioBase != null && precioBase > 0) {
             precio = precioBase;

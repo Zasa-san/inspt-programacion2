@@ -11,62 +11,32 @@ import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.ItemService;
 import inspt_programacion2_kfc.frontend.models.ProductoDTO;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
 import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
-import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class ProductService {
+public class FrontProductoService {
 
     private final ProductoService productoService;
     private final ItemService itemService;
     private final ObjectMapper objectMapper;
 
-    public ProductService(ProductoService productoService, ItemService itemService,  ObjectMapper objectMapper) {
+    public FrontProductoService(ProductoService productoService, ItemService itemService, ObjectMapper objectMapper) {
         this.productoService = productoService;
         this.itemService = itemService;
         this.objectMapper = objectMapper;
     }
 
-//    public List<ProductoDTO> findAll() {
-//        return productoService.findAllAvailable()
-//                .stream()
-//                .map(this::mapToProducto)
-//                .collect(Collectors.toList());
-//    }
-//
-//    public ProductoDTO findById(Long id) {
-//        ProductoEntity productoBack = productoService.findById(id);
-//        return mapToProducto(productoBack);
-//    }
-//
-//    private ProductoDTO mapToProducto(ProductoEntity p) {
-//        if (p == null) {
-//            return null;
-//        }
-//        String img = getImageUrl(p.getImgUrl());
-//        return new ProductoDTO(p.getId(), p.getName(), p.getDescription(), p.getPrecioBase(), img);
-//    }
-//
-//    private String getImageUrl(String url) {
-//        if (url == null || url.isBlank()) {
-//            return AppConstants.DEFAULT_IMG_URL;
-//        }
-//        return url;
-//    }
-
-    public List<ProductoEntity> findAllDB() {
+    public List<ProductoEntity> findAll() {
         return productoService.findAllAvailable();
     }
 
-    public ProductoEntity findProductoDBById(Long id) {
+    public ProductoEntity findProductoById(Long id) {
         return productoService.findById(id);
     }
 
@@ -151,7 +121,7 @@ public class ProductService {
         return grupos;
     }
 
-    private static @NonNull GrupoIngrediente getGrupoIngrediente(GrupoIngredienteDTO ingredienteDTO, GrupoIngrediente.TipoGrupo tipo, String nombre) {
+    private static GrupoIngrediente getGrupoIngrediente(GrupoIngredienteDTO ingredienteDTO, GrupoIngrediente.TipoGrupo tipo, String nombre) {
         if (tipo == null) {
             throw new ProductException("Tipo de grupo invalido para: " + nombre);
         }
@@ -185,5 +155,49 @@ public class ProductService {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+
+    public ProductoDTO mapToProductoDTO(ProductoEntity prodEntity) {
+        if (prodEntity == null) {
+            return null;
+        }
+
+        String img = prodEntity.getImgUrl();
+        if (img == null || img.isBlank()) {
+            img = AppConstants.DEFAULT_IMG_URL;
+        }
+
+        List<GrupoIngredienteDTO> grupos = new ArrayList<>();
+        if (prodEntity.getGruposIngredientes() != null) {
+            for (GrupoIngrediente grupoEntity : prodEntity.getGruposIngredientes()) {
+                if (grupoEntity == null) {
+                    continue;
+                }
+
+                GrupoIngredienteDTO grupoDTO = new GrupoIngredienteDTO(grupoEntity.getNombre(), grupoEntity.getTipo().name(), grupoEntity.getMinSeleccion(),
+                        grupoEntity.getMaxSeleccion(), getIngredienteDTOS(grupoEntity));
+
+                grupos.add(grupoDTO);
+            }
+        }
+
+        return new ProductoDTO(prodEntity.getId(), prodEntity.getName(), prodEntity.getDescription(), prodEntity.getPrecioBase(), img, grupos);
+    }
+
+    private static List<IngredienteDTO> getIngredienteDTOS(GrupoIngrediente grupoEntity) {
+        List<IngredienteDTO> ingredientes = new ArrayList<>();
+        if (grupoEntity.getIngredientes() != null) {
+            for (Ingrediente ingredienteEntity : grupoEntity.getIngredientes()) {
+                if (ingredienteEntity == null) {
+                    continue;
+                }
+
+                IngredienteDTO ingredienteDTO = new IngredienteDTO(ingredienteEntity.getId(), ingredienteEntity.getItem().getId(), ingredienteEntity.getItem().getName(),
+                        ingredienteEntity.getItem().getPrice(), ingredienteEntity.getCantidad(), ingredienteEntity.isSeleccionadoPorDefecto());
+                ingredientes.add(ingredienteDTO);
+            }
+        }
+        return ingredientes;
     }
 }

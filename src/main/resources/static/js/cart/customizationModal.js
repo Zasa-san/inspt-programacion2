@@ -14,7 +14,8 @@ $(() => {
   const $modalTotalPrice = $('#modalTotalPrice');
 
   let currentProductPrice = 0;
-  let currentCustomizaciones = [];
+  let currentGrupos = [];
+  let currentDefaultTotal = 0;
 
   // Función para formatear precio (centavos a pesos)
   function formatPrice(centavos) {
@@ -26,26 +27,24 @@ $(() => {
 
   // Actualizar precios mostrados en el modal
   function updatePrices() {
-    let extrasTotal = 0;
+    let selectedTotal = 0;
 
-    // Sumar checkboxes seleccionados
-    $customizacionesContainer.find('input[type="checkbox"]:checked').each(function () {
+    $customizacionesContainer.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function () {
+      if (!$(this).val()) return; // "Sin selección"
       const precio = parseInt($(this).data('price')) || 0;
-      extrasTotal += precio;
+      selectedTotal += precio;
     });
 
-    // Sumar radio buttons seleccionados (ignorar los de valor vacío = "Sin selección")
-    $customizacionesContainer.find('input[type="radio"]:checked').each(function () {
-      if ($(this).val()) {
-        const precio = parseInt($(this).data('price')) || 0;
-        extrasTotal += precio;
-      }
-    });
+    let ajuste = selectedTotal - (currentDefaultTotal || 0);
+    if (ajuste < 0) {
+      // Evitar mostrar "extras" negativos; el modelo del producto se ajusta en otra etapa.
+      ajuste = 0;
+    }
 
-    const totalUnitario = currentProductPrice + extrasTotal;
+    const totalUnitario = currentProductPrice + ajuste;
 
     $modalBasePrice.attr('data-price', currentProductPrice).text(formatPrice(currentProductPrice));
-    $modalExtrasPrice.attr('data-price', extrasTotal).text(formatPrice(extrasTotal));
+    $modalExtrasPrice.attr('data-price', ajuste).text(formatPrice(ajuste));
     $modalTotalPrice.attr('data-price', totalUnitario).text(formatPrice(totalUnitario));
   }
 
@@ -53,20 +52,61 @@ $(() => {
   function updateSelectedIds() {
     const selectedIds = [];
     
-    // Recoger checkboxes seleccionados
-    $customizacionesContainer.find('input[type="checkbox"]:checked').each(function () {
-      selectedIds.push(parseInt($(this).val()));
-    });
-    
-    // Recoger radio buttons seleccionados (ignorar los vacíos)
-    $customizacionesContainer.find('input[type="radio"]:checked').each(function () {
+    $customizacionesContainer.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function () {
       const val = $(this).val();
-      if (val) {
-        selectedIds.push(parseInt(val));
-      }
+      if (!val) return;
+      selectedIds.push(parseInt(val));
     });
     
     $customizacionesIdsInput.val(JSON.stringify(selectedIds));
+  }
+
+  function computeDefaultTotal(grupos) {
+    let total = 0;
+
+    (grupos || []).forEach(grupo => {
+      if (!grupo || !Array.isArray(grupo.ingredientes)) return;
+      const tipo = (grupo.tipo || '').toUpperCase();
+      const ingredientes = grupo.ingredientes;
+
+      const defaults = ingredientes.filter(i => i && i.seleccionadoPorDefecto);
+      const sumIngrediente = (i) => {
+        const unit = parseInt(i.itemPrice) || 0;
+        const cant = parseInt(i.cantidad) || 1;
+        return unit * cant;
+      };
+
+      if (tipo === 'OPCIONAL_UNICO' || (tipo === 'OBLIGATORIO' && parseInt(grupo.maxSeleccion) === 1)) {
+        const d = defaults.length ? defaults[0] : null;
+        if (d) total += sumIngrediente(d);
+      } else {
+        defaults.forEach(d => { total += sumIngrediente(d); });
+      }
+    });
+
+    return total;
+  }
+
+  function enforceMinMax($groupRoot) {
+    const min = parseInt($groupRoot.attr('data-min')) || 0;
+    const max = parseInt($groupRoot.attr('data-max')) || 0;
+
+    const $checks = $groupRoot.find('input[type="checkbox"]');
+    if (!$checks.length) return;
+
+    const checked = $checks.filter(':checked').length;
+
+    if (max > 0 && checked > max) {
+      // Revertir el último cambio: desmarcar el que disparó el evento.
+      // (El handler de change pasa el input en `this`, pero acá no lo tenemos; desmarco el último checked.)
+      $checks.filter(':checked').last().prop('checked', false);
+    }
+
+    const checkedAfter = $checks.filter(':checked').length;
+    if (min > 0 && checkedAfter < min) {
+      // Volver a cumplir el mínimo: marcar los primeros no seleccionados.
+      $checks.not(':checked').slice(0, min - checkedAfter).prop('checked', true);
+    }
   }
 
   // Abrir modal
@@ -76,95 +116,123 @@ $(() => {
     const productName = $btn.data('product-name');
     const productPrice = parseInt($btn.data('product-price')) || 0;
 
-    // Leer customizaciones del data-attribute (JSON válido del backend)
+    // Leer grupos/ingredientes del data-attribute (JSON válido del backend)
     try {
-      const customizacionesJson = $btn.attr('data-customizaciones');
-      currentCustomizaciones = customizacionesJson ? JSON.parse(customizacionesJson) : [];
+      const gruposJson = $btn.attr('data-grupos');
+      currentGrupos = gruposJson ? JSON.parse(gruposJson) : [];
     } catch (e) {
-      console.error('Error parseando customizaciones JSON:', e);
-      currentCustomizaciones = [];
+      console.error('Error parseando grupos JSON:', e);
+      currentGrupos = [];
     }
 
     currentProductPrice = productPrice;
+    currentDefaultTotal = computeDefaultTotal(currentGrupos);
 
     // Setear valores en el modal
     $modalProductName.text(productName);
     $modalProductId.val(productId);
     $modalQuantity.val(1);
 
-    // Generar inputs de customizaciones agrupados por "grupo"
+    // Generar inputs agrupados por grupo (OBLIGATORIO / OPCIONAL_*)
     $customizacionesContainer.empty();
 
-    if (currentCustomizaciones.length === 0) {
-      $customizacionesContainer.html('<p class="has-text-grey">Este producto no tiene extras disponibles.</p>');
+    if (!currentGrupos || currentGrupos.length === 0) {
+      $customizacionesContainer.html('<p class="has-text-grey">Este producto no tiene opciones disponibles.</p>');
     } else {
-      // Agrupar por "grupo"
-      const grupos = {};
-      currentCustomizaciones.forEach(custom => {
-        const grupo = custom.grupo || 'Extra';
-        if (!grupos[grupo]) {
-          grupos[grupo] = {
-            tipo: custom.tipo, // Asumimos que todas las del mismo grupo tienen el mismo tipo
-            items: []
-          };
-        }
-        grupos[grupo].items.push(custom);
-      });
+      currentGrupos.forEach((grupo, grupoIndex) => {
+        if (!grupo || !Array.isArray(grupo.ingredientes)) return;
 
-      // Renderizar cada grupo
-      Object.keys(grupos).forEach(grupoNombre => {
-        const grupoData = grupos[grupoNombre];
-        const esUnica = grupoData.tipo === 'UNICA';
-        
-        const $grupoSection = $('<div class="mb-4"></div>');
-        
-        // Título del grupo con icono según tipo
-        const icono = esUnica ? 'fa-dot-circle' : 'fa-check-square';
+        const grupoNombre = grupo.nombre || 'Grupo';
+        const tipo = (grupo.tipo || '').toUpperCase();
+        const minSeleccion = parseInt(grupo.minSeleccion) || 0;
+        const maxSeleccion = parseInt(grupo.maxSeleccion) || 0;
+        const ingredientes = grupo.ingredientes.filter(i => i != null);
+
+        // Determinar tipo de input para el grupo
+        const esUnico = tipo === 'OPCIONAL_UNICO' || (tipo === 'OBLIGATORIO' && maxSeleccion === 1);
+        const icono = esUnico ? 'fa-dot-circle' : 'fa-check-square';
+
+        const $grupoSection = $(`<div class="mb-4" data-grupo-index="${grupoIndex}" data-min="${minSeleccion}" data-max="${maxSeleccion}"></div>`);
         $grupoSection.append(`
           <p class="has-text-weight-semibold mb-2">
-            <span class="icon"><i class="fas ${icono}"></i></span> 
+            <span class="icon"><i class="fas ${icono}"></i></span>
             ${grupoNombre}
           </p>
         `);
 
-        if (esUnica) {
-          // UNICA: Radio buttons - solo uno seleccionable por grupo
-          // La primera opción se selecciona por defecto
-          const radioName = `grupo_${productId}_${grupoNombre.replace(/\s+/g, '_')}`;
+        const radioName = `grupo_${productId}_${grupoIndex}`;
 
-          grupoData.items.forEach((custom, index) => {
-            const precioDisplay = custom.priceModifier > 0 
-              ? `+$${formatPrice(custom.priceModifier)}` 
-              : '$0,00';
-            const tagClass = custom.priceModifier > 0 ? 'is-warning' : 'is-light';
-            const isChecked = index === 0 ? 'checked' : '';
-            
+        if (esUnico) {
+          const allowEmpty = minSeleccion === 0 && tipo !== 'OBLIGATORIO';
+
+          if (allowEmpty) {
+            const $none = $(`
+              <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
+                <input type="radio" name="${radioName}" value="" data-price="0" checked />
+                <span class="ml-2">Sin selección</span>
+                <span class="tag is-light ml-2">$0,00</span>
+              </label>
+            `);
+            $grupoSection.append($none);
+          }
+
+          let checkedSet = false;
+          ingredientes.forEach((ing) => {
+            const unit = parseInt(ing.itemPrice) || 0;
+            const cant = parseInt(ing.cantidad) || 1;
+            const total = unit * cant;
+
+            const precioDisplay = total > 0 ? `+$${formatPrice(total)}` : '$0,00';
+            const tagClass = total > 0 ? 'is-warning' : 'is-light';
+
+            let checked = '';
+            if (!checkedSet && ing.seleccionadoPorDefecto) {
+              checked = 'checked';
+              checkedSet = true;
+            }
+
+            const label = ing.itemName || `Item ${ing.itemId || ''}`;
             const $item = $(`
               <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-                <input type="radio" name="${radioName}" value="${custom.id}" data-price="${custom.priceModifier}" ${isChecked} />
-                <span class="ml-2">${custom.nombre}</span>
+                <input type="radio" name="${radioName}" value="${ing.id}" data-price="${total}" ${checked} />
+                <span class="ml-2">${label}</span>
                 <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
               </label>
             `);
             $grupoSection.append($item);
           });
+
+          // Si el grupo es obligatorio (min>0) y nada quedó chequeado (no había defaults),
+          // seleccionar el primer ingrediente.
+          if (minSeleccion > 0) {
+            const $checked = $grupoSection.find('input[type="radio"]:checked');
+            if (!$checked.length) {
+              $grupoSection.find('input[type="radio"]').first().prop('checked', true);
+            }
+          }
         } else {
-          // MULTIPLE: Checkboxes - múltiples seleccionables
-          grupoData.items.forEach(custom => {
-            const precioDisplay = custom.priceModifier > 0 
-              ? `+$${formatPrice(custom.priceModifier)}` 
-              : '$0,00';
-            const tagClass = custom.priceModifier > 0 ? 'is-info' : 'is-light';
-            
+          ingredientes.forEach((ing) => {
+            const unit = parseInt(ing.itemPrice) || 0;
+            const cant = parseInt(ing.cantidad) || 1;
+            const total = unit * cant;
+
+            const precioDisplay = total > 0 ? `+$${formatPrice(total)}` : '$0,00';
+            const tagClass = total > 0 ? 'is-info' : 'is-light';
+            const checked = ing.seleccionadoPorDefecto ? 'checked' : '';
+            const label = ing.itemName || `Item ${ing.itemId || ''}`;
+
             const $item = $(`
               <label class="checkbox is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-                <input type="checkbox" value="${custom.id}" data-price="${custom.priceModifier}" />
-                <span class="ml-2">${custom.nombre}</span>
+                <input type="checkbox" value="${ing.id}" data-price="${total}" ${checked} />
+                <span class="ml-2">${label}</span>
                 <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
               </label>
             `);
             $grupoSection.append($item);
           });
+
+          // Asegurar mínimos al abrir
+          enforceMinMax($grupoSection);
         }
 
         $customizacionesContainer.append($grupoSection);
@@ -195,6 +263,10 @@ $(() => {
 
   // Actualizar precios cuando cambian checkboxes o radio buttons
   $customizacionesContainer.on('change', 'input[type="checkbox"], input[type="radio"]', function () {
+    const $groupRoot = $(this).closest('[data-grupo-index]');
+    if ($groupRoot.length) {
+      enforceMinMax($groupRoot);
+    }
     updatePrices();
     updateSelectedIds();
   });

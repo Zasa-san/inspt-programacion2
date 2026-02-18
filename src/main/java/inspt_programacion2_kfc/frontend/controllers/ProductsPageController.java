@@ -4,7 +4,7 @@ import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.frontend.services.ProductService;
+import inspt_programacion2_kfc.frontend.services.FrontProductoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +19,10 @@ import java.util.List;
 @Controller
 public class ProductsPageController {
 
-    private final ProductService productService;
+    private final FrontProductoService frontProductoService;
 
-    public ProductsPageController(ProductService productService) {
-        this.productService = productService;
+    public ProductsPageController(FrontProductoService frontProductoService) {
+        this.frontProductoService = frontProductoService;
     }
 
     @GetMapping("/products")
@@ -30,7 +30,7 @@ public class ProductsPageController {
         PageMetadata page = new PageMetadata("Productos", "Administración de productos");
         model.addAttribute("page", page);
 
-        List<ProductoEntity> productos = productService.findAllDB();
+        List<ProductoEntity> productos = frontProductoService.findAll();
         model.addAttribute("products", productos);
         return "products/index";
     }
@@ -55,7 +55,7 @@ public class ProductsPageController {
             RedirectAttributes redirectAttrs) {
 
         try {
-            productService.create(name, description, gruposJson, precio, imageFile);
+            frontProductoService.create(name, description, gruposJson, precio, imageFile);
             redirectAttrs.addFlashAttribute("successMessage", "Producto creado correctamente.");
         } catch (ProductImageException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al guardar la imagen: " + e.getMessage());
@@ -76,7 +76,7 @@ public class ProductsPageController {
         PageMetadata page = new PageMetadata("Editar producto");
         model.addAttribute("page", page);
 
-        ProductoEntity producto = productService.findProductoDBById(id);
+        ProductoEntity producto = frontProductoService.findProductoById(id);
 
         if (producto == null) {
             redirectAttrs.addFlashAttribute("errorMessage", "Producto no encontrado.");
@@ -101,7 +101,7 @@ public class ProductsPageController {
 
         try {
             boolean removeImageValue = removeImage != null && removeImage;
-            productService.update(id, name, description, gruposJson, precio, imageFile, removeImageValue);
+            frontProductoService.update(id, name, description, gruposJson, precio, imageFile, removeImageValue);
 
             redirectAttrs.addFlashAttribute("successMessage", "Producto actualizado correctamente.");
         } catch (ProductNotFoundException e) {
@@ -121,7 +121,7 @@ public class ProductsPageController {
     @PostMapping("/products/delete/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            productService.delete(id);
+            frontProductoService.delete(id);
             redirectAttrs.addFlashAttribute("successMessage", "Producto eliminado correctamente.");
         } catch (ProductNotFoundException e) {
             redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
@@ -134,7 +134,7 @@ public class ProductsPageController {
     @PostMapping("/products/toggle-availability/{id}")
     public String toggleAvailability(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            productService.toggleAvailability(id);
+            frontProductoService.toggleAvailability(id);
             redirectAttrs.addFlashAttribute("successMessage", "Disponibilidad actualizada correctamente.");
         } catch (ProductException e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Error al actualizar disponibilidad: " + e.getMessage());
