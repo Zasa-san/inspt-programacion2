@@ -32,8 +32,12 @@ public class FrontProductoService {
         this.objectMapper = objectMapper;
     }
 
-    public List<ProductoEntity> findAll() {
+    public List<ProductoEntity> findAllAvailable() {
         return productoService.findAllAvailable();
+    }
+
+    public List<ProductoEntity> findAll() {
+        return productoService.findAll();
     }
 
     public ProductoEntity findProductoById(Long id) {

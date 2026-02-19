@@ -45,7 +45,7 @@ public class BaseRoutesController {
         PageMetadata page = new PageMetadata("Inicio", "Página pública para que el cliente vea el menú y su carrito");
         model.addAttribute("page", page);
 
-        List<ProductoEntity> productosEntities = frontProductoService.findAll();
+        List<ProductoEntity> productosEntities = frontProductoService.findAllAvailable();
 
         List<ProductoDTO> products = productosEntities.stream()
                 .map(frontProductoService::mapToProductoDTO)

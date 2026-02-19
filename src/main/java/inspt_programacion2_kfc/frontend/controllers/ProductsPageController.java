@@ -4,6 +4,7 @@ import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductImageException;
 import inspt_programacion2_kfc.backend.exceptions.product.ProductNotFoundException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.services.stock.ItemService;
 import inspt_programacion2_kfc.frontend.services.FrontProductoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +21,11 @@ import java.util.List;
 public class ProductsPageController {
 
     private final FrontProductoService frontProductoService;
+    private final ItemService itemService;
 
-    public ProductsPageController(FrontProductoService frontProductoService) {
+    public ProductsPageController(FrontProductoService frontProductoService, ItemService itemService) {
         this.frontProductoService = frontProductoService;
+        this.itemService = itemService;
     }
 
     @GetMapping("/products")
@@ -41,10 +44,10 @@ public class ProductsPageController {
         model.addAttribute("page", page);
 
         model.addAttribute("product", new ProductoEntity());
+        model.addAttribute("items", itemService.findAll());
         return "products/new";
     }
 
-    //todo traer items disponibles en NEW y EDIT para inyectar en la busqueda de items disponibles
     @PostMapping("/products/new")
     public String createProductPage(
             @RequestParam String name,
@@ -84,6 +87,7 @@ public class ProductsPageController {
         }
 
         model.addAttribute("product", producto);
+        model.addAttribute("items", itemService.findAll());
 
         return "products/edit";
     }
