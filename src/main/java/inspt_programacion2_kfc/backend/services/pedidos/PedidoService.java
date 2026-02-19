@@ -55,6 +55,10 @@ public class PedidoService {
         return itemsPedidoRepository.findAll();
     }
 
+    public List<Pedido> findAllPedidos() {
+        return pedidoRepository.findAll();
+    }
+
     private Pedido findByIdPedido(Long idPedido) {
         if (idPedido == null) {
             throw new OrderNotFoundException("ID pedido invalido.");
@@ -99,6 +103,9 @@ public class PedidoService {
 
             ItemPedido item = new ItemPedido();
             item.setProducto(productoBase);
+            item.setProductoIdSnapshot(productoBase.getId());
+            item.setProductoNombre(productoBase.getName());
+            item.setPrecioBaseUnitario(productoBase.getPrecioBase());
             item.setQuantity(cartItem.getQuantity());
             item.setUnitPrice(unitPrice);
             item.setSubtotal(unitPrice * cartItem.getQuantity());
@@ -106,7 +113,14 @@ public class PedidoService {
             for (Ingrediente ingrediente : ingredientesSeleccionados) {
                 PedidoProducto customizacion = new PedidoProducto();
                 customizacion.setIngrediente(ingrediente);
+                customizacion.setIngredienteIdSnapshot(ingrediente.getId());
+                customizacion.setIngredienteNombre(ingrediente.getItem().getName());
+                customizacion.setItemStockIdSnapshot(ingrediente.getItem().getId());
+                customizacion.setItemStockNombre(ingrediente.getItem().getName());
                 customizacion.setCantidad(ingrediente.getCantidad());
+                int precioUnitarioExtra = ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+                customizacion.setPrecioUnitarioExtra(precioUnitarioExtra);
+                customizacion.setSubtotalExtra(precioUnitarioExtra * cartItem.getQuantity());
                 item.addCustomizacion(customizacion);
             }
 
@@ -120,11 +134,11 @@ public class PedidoService {
 
         for (ItemPedido item : guardado.getItems()) {
             for (PedidoProducto customizacion : item.getCustomizaciones()) {
-                if (customizacion.getIngrediente() == null) {
+                if (customizacion.getItemStockIdSnapshot() == null) {
                     continue;
                 }
                 int cantidad = customizacion.getCantidad() * item.getQuantity();
-                stockService.registrarMovimiento(customizacion.getIngrediente().getItem(),
+                stockService.registrarMovimiento(customizacion.getItemStockIdSnapshot(),
                         TipoMovimiento.SALIDA,
                         cantidad,
                         AppConstants.MOVIMIENTO_VENTA,

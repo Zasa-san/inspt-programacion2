@@ -20,12 +20,12 @@ public class PedidoHelper {
     public void registrarMovimientoStock(Pedido guardado, TipoMovimiento movimiento, String motivo) {
         for (ItemPedido item : guardado.getItems()) {
             for (PedidoProducto customizacion : item.getCustomizaciones()) {
-                if (customizacion.getIngrediente() == null) {
+                if (customizacion.getItemStockIdSnapshot() == null) {
                     continue;
                 }
                 int cantidad = customizacion.getCantidad() * item.getQuantity();
                 stockService.registrarMovimiento(
-                        customizacion.getIngrediente().getItem(),
+                        customizacion.getItemStockIdSnapshot(),
                         movimiento,
                         cantidad,
                         motivo + guardado.getId(),

@@ -1,25 +1,29 @@
 package inspt_programacion2_kfc.backend.services.stock;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.Item;
 import inspt_programacion2_kfc.backend.models.stock.MovimientoStock;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
+import inspt_programacion2_kfc.backend.repositories.stock.ItemRepository;
 import inspt_programacion2_kfc.backend.repositories.stock.MovimientoStockRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class MovimientoStockService {
 
     private final MovimientoStockRepository movimientoStockRepository;
+    private final ItemRepository itemRepository;
 
-    public MovimientoStockService(MovimientoStockRepository movimientoStockRepository) {
+    public MovimientoStockService(MovimientoStockRepository movimientoStockRepository, ItemRepository itemRepository) {
         this.movimientoStockRepository = movimientoStockRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Transactional
@@ -31,6 +35,15 @@ public class MovimientoStockService {
         if (item != null) {
             movimientoStockRepository.save(new MovimientoStock(item, tipo, cantidad, motivo, pedidoId));
         }
+    }
+
+    @Transactional
+    public void registrarMovimiento(Long itemId, TipoMovimiento tipo, int cantidad, String motivo, Long pedidoId) {
+        if (itemId == null) {
+            return;
+        }
+        itemRepository.findById(itemId)
+                .ifPresent(item -> registrarMovimiento(item, tipo, cantidad, motivo, pedidoId));
     }
 
     public int calcularStockItem(Long itemId) {
@@ -54,5 +67,3 @@ public class MovimientoStockService {
         return result;
     }
 }
-
-

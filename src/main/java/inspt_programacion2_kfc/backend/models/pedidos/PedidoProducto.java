@@ -35,7 +35,33 @@ public class PedidoProducto {
     @JoinColumn(name = "ingrediente_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Ingrediente ingrediente;
 
+    @Column(name = "ingrediente_id_snapshot")
+    private Long ingredienteIdSnapshot;
+
+    @Column(name = "ingrediente_nombre", length = 255)
+    private String ingredienteNombre;
+
+    @Column(name = "item_stock_id_snapshot")
+    private Long itemStockIdSnapshot;
+
+    @Column(name = "item_stock_nombre", length = 255)
+    private String itemStockNombre;
+
     @Column(nullable = false)
     private int cantidad = 1;
+
+    /**
+     * Precio unitario extra de esta customización al momento del pedido, en
+     * centavos.
+     */
+    @Column(name = "precio_unitario_extra")
+    private Integer precioUnitarioExtra;
+
+    /**
+     * Subtotal extra de esta customización en el item (precioUnitarioExtra *
+     * cantidad de producto).
+     */
+    @Column(name = "subtotal_extra")
+    private Integer subtotalExtra;
 
 }

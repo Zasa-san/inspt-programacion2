@@ -5,9 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
-import inspt_programacion2_kfc.backend.models.pedidos.PedidoProducto;
-import inspt_programacion2_kfc.backend.models.products.Ingrediente;
-import inspt_programacion2_kfc.backend.models.stock.Item;
 
 @Component("itemPedidoHelper")
 public class ItemPedidoHelper {
@@ -18,10 +15,19 @@ public class ItemPedidoHelper {
         }
 
         return item.getCustomizaciones().stream()
-                .map(PedidoProducto::getIngrediente)
-                .filter(ing -> ing != null && ing.getItem() != null)
-                .map(Ingrediente::getItem)
-                .map(Item::getName)
+                .map(customizacion -> {
+                    if (customizacion.getIngredienteNombre() != null && !customizacion.getIngredienteNombre().isBlank()) {
+                        return customizacion.getIngredienteNombre();
+                    }
+                    if (customizacion.getItemStockNombre() != null && !customizacion.getItemStockNombre().isBlank()) {
+                        return customizacion.getItemStockNombre();
+                    }
+                    if (customizacion.getIngrediente() != null && customizacion.getIngrediente().getItem() != null) {
+                        return customizacion.getIngrediente().getItem().getName();
+                    }
+                    return null;
+                })
+                .filter(nombre -> nombre != null && !nombre.isBlank())
                 .toList();
     }
 

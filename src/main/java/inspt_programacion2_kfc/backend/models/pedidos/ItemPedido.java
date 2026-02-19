@@ -43,6 +43,18 @@ public class ItemPedido {
     @JoinColumn(name = "producto_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private ProductoEntity producto;
 
+    @Column(name = "producto_id_snapshot")
+    private Long productoIdSnapshot;
+
+    @Column(name = "producto_nombre", length = 255)
+    private String productoNombre;
+
+    /**
+     * Precio base unitario del producto al momento del pedido, en centavos.
+     */
+    @Column(name = "precio_base_unitario")
+    private Integer precioBaseUnitario;
+
     @Column(nullable = false)
     private int quantity;
 

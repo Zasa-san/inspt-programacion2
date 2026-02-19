@@ -13,13 +13,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
+import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
 import inspt_programacion2_kfc.backend.models.products.Ingrediente;
+import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.Item;
 import inspt_programacion2_kfc.backend.models.stock.TipoMovimiento;
 import inspt_programacion2_kfc.backend.models.users.Role;
 import inspt_programacion2_kfc.backend.models.users.Turno;
 import inspt_programacion2_kfc.backend.models.users.User;
+import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.ItemService;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
@@ -37,6 +41,7 @@ public class DataLoaderCli {
         try {
             UserService userService = ctx.getBean(UserService.class);
             ProductoService productoService = ctx.getBean(ProductoService.class);
+            PedidoService pedidoService = ctx.getBean(PedidoService.class);
             ItemService itemService = ctx.getBean(ItemService.class);
             MovimientoStockService stockService = ctx.getBean(MovimientoStockService.class);
             TurnoService turnoService = ctx.getBean(TurnoService.class);
@@ -467,6 +472,54 @@ public class DataLoaderCli {
 
             System.out.println("Productos creados: 6 productos con grupos e ingredientes");
 
+            // ═══════════════════════════════════════════════════════════════
+            // PEDIDOS DE EJEMPLO (ENTREGADOS)
+            // ═══════════════════════════════════════════════════════════════
+            List<ProductoEntity> productos = productoService.findAll();
+
+            Long comboClasicoId = findProductoIdPorNombre(productos, "Combo Clásico");
+            Long bucketFamiliarId = findProductoIdPorNombre(productos, "Bucket Familiar");
+            Long tendersBoxId = findProductoIdPorNombre(productos, "Tenders Box");
+            Long heladoSundaeId = findProductoIdPorNombre(productos, "Helado Sundae");
+            Long wrapPolloId = findProductoIdPorNombre(productos, "Wrap de Pollo");
+
+            List<CartItemDto> pedido1 = new ArrayList<>();
+
+            pedido1.add(cartItem(comboClasicoId, 1, "Combo Clásico",
+                    ing1_1.getId(), ing1_2.getId(), ing1_3.getId(),
+                    ing1_ex2.getId(), ing1_ex3.getId()));
+
+            pedido1.add(cartItem(bucketFamiliarId, 1, "Bucket Familiar",
+                    ing2_1.getId(), ing2_2.getId(), ing2_3.getId(),
+                    ing2_ex2.getId(), ing2_ex3.getId()));
+
+            pedidoService.crearPedidoDesdeCarrito(pedido1, EstadoPedido.ENTREGADO);
+
+            List<CartItemDto> pedido2 = new ArrayList<>();
+
+            pedido2.add(cartItem(tendersBoxId, 1, "Tenders Box",
+                    ing3_1.getId(), ing3_2.getId(), ing3_3.getId(),
+                    ing3_ex1.getId(), ing3_ex3.getId()));
+
+            pedido2.add(cartItem(comboClasicoId, 2, "Combo Clásico",
+                    ing1_1.getId(), ing1_2.getId(), ing1_3.getId(),
+                    ing1_ex1.getId()));
+
+            pedidoService.crearPedidoDesdeCarrito(pedido2, EstadoPedido.ENTREGADO);
+
+            List<CartItemDto> pedido3 = new ArrayList<>();
+
+            pedido3.add(cartItem(heladoSundaeId, 2, "Helado Sundae",
+                    ing4_1.getId(), ing4_s1.getId(), ing4_t1.getId(), ing4_t3.getId()));
+
+            pedido3.add(cartItem(wrapPolloId, 1, "Wrap de Pollo",
+                    ing6_1.getId(), ing6_2.getId(),
+                    ing6_ex2.getId(), ing6_ex3.getId()));
+
+            pedidoService.crearPedidoDesdeCarrito(pedido3, EstadoPedido.ENTREGADO);
+
+            System.out.println("Pedidos entregados de ejemplo creados sobre productos existentes");
+
             message = "Base de datos inicializada con usuarios, turnos, asignaciones, items, stock y productos.";
 
         } catch (BeansException e) {
@@ -494,6 +547,32 @@ public class DataLoaderCli {
 
             System.exit(1);
         }
+    }
+
+    private static Long findProductoIdPorNombre(List<ProductoEntity> productos, String nombre) {
+        return productos.stream()
+                .filter(p -> p != null && p.getName() != null)
+                .filter(p -> p.getName().equalsIgnoreCase(nombre))
+                .map(ProductoEntity::getId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static CartItemDto cartItem(Long productoId, int quantity, String productoName, Long... ingredientesIds) {
+        List<Long> seleccionados = new ArrayList<>();
+        if (ingredientesIds != null) {
+            for (Long ingredienteId : ingredientesIds) {
+                if (ingredienteId != null) {
+                    seleccionados.add(ingredienteId);
+                }
+            }
+        }
+
+        if (seleccionados.isEmpty()) {
+            return new CartItemDto(productoId, quantity, productoName);
+        }
+
+        return new CartItemDto(productoId, quantity, productoName, 0, seleccionados);
     }
 
 }
