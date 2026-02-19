@@ -100,6 +100,7 @@ public class PedidoService {
             validarStockIngredientes(ingredientesSeleccionados, cartItem.getQuantity());
 
             int unitPrice = calcularPrecioUnitario(ingredientesSeleccionados);
+            validarPrecioUnitarioContraBackend(cartItem, unitPrice, productoBase.getName());
 
             ItemPedido item = new ItemPedido();
             item.setProducto(productoBase);
@@ -155,17 +156,34 @@ public class PedidoService {
             }
         }
 
-        List<Ingrediente> seleccionados = new ArrayList<>();
-        if (ingredientesIds == null || ingredientesIds.isEmpty()) {
-            for (Ingrediente ingrediente : ingredientesPorId.values()) {
-                if (ingrediente.isSeleccionadoPorDefecto()) {
-                    seleccionados.add(ingrediente);
-                }
-            }
-            return seleccionados;
+        Set<Long> idsUnicos = new HashSet<>();
+        if (ingredientesIds != null) {
+            idsUnicos.addAll(ingredientesIds);
         }
 
-        Set<Long> idsUnicos = new HashSet<>(ingredientesIds);
+        if (idsUnicos.isEmpty()) {
+            List<Ingrediente> defaults = new ArrayList<>();
+            for (GrupoIngrediente grupo : producto.getGruposIngredientes()) {
+                if (grupo == null || grupo.getIngredientes() == null || grupo.getIngredientes().isEmpty()) {
+                    continue;
+                }
+
+                List<Ingrediente> defaultsGrupo = grupo.getIngredientes().stream()
+                        .filter(Ingrediente::isSeleccionadoPorDefecto)
+                        .toList();
+
+                if (!defaultsGrupo.isEmpty()) {
+                    if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
+                        defaults.add(defaultsGrupo.get(0));
+                    } else {
+                        defaults.addAll(defaultsGrupo);
+                    }
+                }
+            }
+            return defaults;
+        }
+
+        List<Ingrediente> seleccionados = new ArrayList<>();
         for (Long ingredienteId : idsUnicos) {
             Ingrediente ingrediente = ingredientesPorId.get(ingredienteId);
             if (ingrediente == null) {
@@ -174,7 +192,46 @@ public class PedidoService {
             seleccionados.add(ingrediente);
         }
 
+        validarConfiguracionIngredientes(producto, seleccionados);
         return seleccionados;
+    }
+
+    private void validarConfiguracionIngredientes(ProductoEntity producto, List<Ingrediente> seleccionados) {
+        Map<Long, List<Ingrediente>> seleccionadosPorGrupo = new HashMap<>();
+        for (Ingrediente ingrediente : seleccionados) {
+            if (ingrediente == null || ingrediente.getGrupo() == null || ingrediente.getGrupo().getId() == null) {
+                continue;
+            }
+            seleccionadosPorGrupo
+                    .computeIfAbsent(ingrediente.getGrupo().getId(), key -> new ArrayList<>())
+                    .add(ingrediente);
+        }
+
+        for (GrupoIngrediente grupo : producto.getGruposIngredientes()) {
+            if (grupo == null || grupo.getId() == null || grupo.getIngredientes() == null || grupo.getIngredientes().isEmpty()) {
+                continue;
+            }
+
+            List<Ingrediente> seleccionGrupo = seleccionadosPorGrupo.getOrDefault(grupo.getId(), List.of());
+            List<Ingrediente> defaultsGrupo = grupo.getIngredientes().stream()
+                    .filter(Ingrediente::isSeleccionadoPorDefecto)
+                    .toList();
+
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+                List<Ingrediente> obligatorios = defaultsGrupo.isEmpty() ? grupo.getIngredientes() : defaultsGrupo;
+                Set<Long> obligatoriosIds = obligatorios.stream().map(Ingrediente::getId).collect(java.util.stream.Collectors.toSet());
+                Set<Long> seleccionIds = seleccionGrupo.stream().map(Ingrediente::getId).collect(java.util.stream.Collectors.toSet());
+
+                if (!seleccionIds.equals(obligatoriosIds)) {
+                    throw new ProductException("Configuración inválida: ingredientes obligatorios incompletos o inválidos.");
+                }
+                continue;
+            }
+
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO && seleccionGrupo.size() > 1) {
+                throw new ProductException("Configuración inválida: solo se permite una selección en grupo opcional único.");
+            }
+        }
     }
 
     private int calcularPrecioUnitario(List<Ingrediente> ingredientesSeleccionados) {
@@ -183,6 +240,19 @@ public class PedidoService {
             precio += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
         }
         return precio;
+    }
+
+    private void validarPrecioUnitarioContraBackend(CartItemDto cartItem, int unitPriceBackend, String nombreProducto) {
+        int unitPriceFrontend = cartItem.getPrecioUnitario();
+
+        if (unitPriceFrontend <= 0) {
+            return;
+        }
+
+        if (unitPriceFrontend != unitPriceBackend) {
+            throw new IllegalArgumentException(
+                    "Error de precio para '" + nombreProducto + "'. Recalculá el carrito e intentá nuevamente.");
+        }
     }
 
     private void validarStockIngredientes(List<Ingrediente> ingredientesSeleccionados, int cantidadProducto) {
