@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
+import inspt_programacion2_kfc.frontend.mapper.ProductoDTOConverter;
 import inspt_programacion2_kfc.frontend.models.CartItem;
 import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 import inspt_programacion2_kfc.frontend.services.FrontProductoService;
@@ -48,7 +49,7 @@ public class BaseRoutesController {
         List<ProductoEntity> productosEntities = frontProductoService.findAllAvailable();
 
         List<ProductoDTO> products = productosEntities.stream()
-                .map(frontProductoService::mapToProductoDTO)
+                .map(ProductoDTOConverter::mapToProductoDTO)
                 .toList();
         model.addAttribute("products", products);
 
