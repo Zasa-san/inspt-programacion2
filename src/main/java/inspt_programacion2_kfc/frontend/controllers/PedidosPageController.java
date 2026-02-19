@@ -1,6 +1,6 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
-import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
 import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
 import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.frontend.helpers.ItemPedidoHelper;
@@ -56,24 +55,32 @@ public class PedidosPageController {
         PageMetadata page = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", page);
 
-        List<ItemPedido> items = pedidoService.findAll();
+        List<Pedido> pedidos = pedidoService.findAllPedidos().stream()
+                .sorted(Comparator.comparing(Pedido::getCreatedAt).reversed())
+                .toList();
 
-        Map<Long, Pedido> pedidosMap = new HashMap<>();
+        Map<Long, String> nombresProductoPorItem = new HashMap<>();
         Map<Long, List<String>> customizacionesPorItem = new HashMap<>();
 
-        for (ItemPedido item : items) {
-            Pedido pedido = item.getPedido();
-            if (pedido != null && pedido.getId() != null && !pedidosMap.containsKey(pedido.getId())) {
-                pedidosMap.put(pedido.getId(), pedido);
+        for (Pedido pedido : pedidos) {
+            if (pedido.getItems() == null) {
+                continue;
             }
-
-            if (itemPedidoHelper.tieneCustomizaciones(item)) {
-                customizacionesPorItem.put(item.getId(), itemPedidoHelper.getCustomizacionesNombres(item));
-            }
+            pedido.getItems().forEach(item -> {
+                nombresProductoPorItem.put(item.getId(), itemPedidoHelper.getNombreProducto(item));
+                if (itemPedidoHelper.tieneCustomizaciones(item)) {
+                    customizacionesPorItem.put(item.getId(), itemPedidoHelper.getCustomizacionesNombres(item));
+                }
+            });
         }
 
-        List<Pedido> pedidos = new ArrayList<>(pedidosMap.values());
-        model.addAttribute("pedidos", pedidos);
+        if (pedidos.isEmpty()) {
+            model.addAttribute("pedidos", List.of());
+        } else {
+            model.addAttribute("pedidos", pedidos);
+        }
+
+        model.addAttribute("nombresProductoPorItem", nombresProductoPorItem);
         model.addAttribute("customizacionesPorItem", customizacionesPorItem);
 
         return "pedidos/index";

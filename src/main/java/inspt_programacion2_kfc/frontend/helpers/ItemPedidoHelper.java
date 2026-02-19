@@ -9,6 +9,16 @@ import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
 @Component("itemPedidoHelper")
 public class ItemPedidoHelper {
 
+    public String getNombreProducto(ItemPedido item) {
+        if (item.getProductoNombre() != null && !item.getProductoNombre().isBlank()) {
+            return item.getProductoNombre();
+        }
+        if (item.getProducto() != null && item.getProducto().getName() != null && !item.getProducto().getName().isBlank()) {
+            return item.getProducto().getName();
+        }
+        return "Producto descontinuado";
+    }
+
     public List<String> getCustomizacionesNombres(ItemPedido item) {
         if (item == null || item.getCustomizaciones() == null) {
             return List.of();

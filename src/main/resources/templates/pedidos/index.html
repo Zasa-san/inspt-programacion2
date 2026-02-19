@@ -50,7 +50,7 @@
                   </li>
                   <li th:each="it : ${p.items}" class="mb-2">
                     <div>
-                      <strong th:text="${it.producto != null ? it.producto.name : 'Producto descontinuado'}">Producto</strong>
+                      <strong th:text="${nombresProductoPorItem[it.id]}">Producto</strong>
                       x <span th:text="${it.quantity}">1</span>
                       - $ <span class="price-format" th:attr="data-price=${it.subtotal}">0</span>
                     </div>
