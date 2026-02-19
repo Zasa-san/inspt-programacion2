@@ -1,8 +1,15 @@
 package inspt_programacion2_kfc.frontend.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
 import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
@@ -13,11 +20,6 @@ import inspt_programacion2_kfc.backend.services.stock.ItemService;
 import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
 import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class FrontProductoService {
@@ -32,8 +34,12 @@ public class FrontProductoService {
         this.objectMapper = objectMapper;
     }
 
-    public List<ProductoEntity> findAll() {
+    public List<ProductoEntity> findAllAvailable() {
         return productoService.findAllAvailable();
+    }
+
+    public List<ProductoEntity> findAll() {
+        return productoService.findAll();
     }
 
     public ProductoEntity findProductoById(Long id) {
@@ -65,7 +71,8 @@ public class FrontProductoService {
         List<GrupoIngredienteDTO> grupoIngredientesDTO;
 
         try {
-            grupoIngredientesDTO = objectMapper.readValue(gruposJson, new TypeReference<>() {});
+            grupoIngredientesDTO = objectMapper.readValue(gruposJson, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             throw new ProductException("Error al parsear los grupos de ingredientes.", e);
         }
@@ -86,6 +93,7 @@ public class FrontProductoService {
             GrupoIngrediente.TipoGrupo tipo = parseTipoGrupo(ingredienteDTO.getTipo());
 
             GrupoIngrediente grupo = getGrupoIngrediente(ingredienteDTO, tipo, nombre);
+            int seleccionadosPorDefecto = 0;
 
             for (IngredienteDTO ingrediente : ingredienteDTO.getIngredientes()) {
                 if (ingrediente == null || ingrediente.getItemId() == null) {
@@ -100,19 +108,29 @@ public class FrontProductoService {
                     throw new ProductException("Item no encontrado para el grupo: " + nombre, e);
                 }
 
-                int cantidad = ingrediente.getCantidad() != null ? ingrediente.getCantidad() : 1;
+                Integer cantidadDTO = ingrediente.getCantidad();
+                int cantidad = cantidadDTO != null ? cantidadDTO : 1;
 
-                if (cantidad <= 0) {
-                    throw new ProductException("Cantidad invalida en el grupo: " + nombre);
+                if (cantidad < 0) {
+                    throw new ProductException("Cantidad invalida (no puede ser negativa) en el grupo: " + nombre);
                 }
 
                 nuevoIngrediente.setCantidad(cantidad);
 
                 boolean seleccionado = ingrediente.getSeleccionadoPorDefecto() != null
                         && ingrediente.getSeleccionadoPorDefecto();
+
+                if (seleccionado) {
+                    seleccionadosPorDefecto++;
+                }
+
                 nuevoIngrediente.setSeleccionadoPorDefecto(seleccionado);
 
                 grupo.getIngredientes().add(nuevoIngrediente);
+            }
+
+            if (tipo == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO && seleccionadosPorDefecto > 1) {
+                throw new ProductException("En el grupo '" + nombre + "' solo puede haber un ingrediente seleccionado por defecto.");
             }
 
             grupos.add(grupo);
@@ -126,13 +144,6 @@ public class FrontProductoService {
             throw new ProductException("Tipo de grupo invalido para: " + nombre);
         }
 
-        int minSeleccion = ingredienteDTO.getMinSeleccion() != null ? ingredienteDTO.getMinSeleccion() : 0;
-        int maxSeleccion = ingredienteDTO.getMaxSeleccion() != null ? ingredienteDTO.getMaxSeleccion() : 0;
-
-        if (minSeleccion < 0 || maxSeleccion < 0 || minSeleccion > maxSeleccion) {
-            throw new ProductException("Rangos invalidos para el grupo: " + nombre);
-        }
-
         if (ingredienteDTO.getIngredientes() == null || ingredienteDTO.getIngredientes().isEmpty()) {
             throw new ProductException("El grupo '" + nombre + "' debe tener ingredientes.");
         }
@@ -141,8 +152,6 @@ public class FrontProductoService {
 
         grupo.setNombre(nombre);
         grupo.setTipo(tipo);
-        grupo.setMinSeleccion(minSeleccion);
-        grupo.setMaxSeleccion(maxSeleccion);
         return grupo;
     }
 
@@ -156,7 +165,6 @@ public class FrontProductoService {
             return null;
         }
     }
-
 
     public ProductoDTO mapToProductoDTO(ProductoEntity prodEntity) {
         if (prodEntity == null) {
@@ -175,8 +183,8 @@ public class FrontProductoService {
                     continue;
                 }
 
-                GrupoIngredienteDTO grupoDTO = new GrupoIngredienteDTO(grupoEntity.getNombre(), grupoEntity.getTipo().name(), grupoEntity.getMinSeleccion(),
-                        grupoEntity.getMaxSeleccion(), getIngredienteDTOS(grupoEntity));
+                GrupoIngredienteDTO grupoDTO = new GrupoIngredienteDTO(grupoEntity.getNombre(), grupoEntity.getTipo().name(),
+                        getIngredienteDTOS(grupoEntity));
 
                 grupos.add(grupoDTO);
             }

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+  <div th:fragment="gruposIngredientesSection(product)">
+    <div class="box mt-5">
+      <h2 class="subtitle mb-3">Grupos de ingredientes</h2>
+      <p class="help mb-4">Definí los grupos (obligatorios u opcionales) y sus ingredientes. Se guarda como JSON en
+        <code>gruposJson</code>.
+      </p>
+
+      <input type="hidden" name="gruposJson" id="gruposJsonHidden" />
+
+      <div id="gruposContainer">
+        <div th:if="${product == null || product.gruposIngredientes == null || product.gruposIngredientes.isEmpty()}"
+          id="noGruposMessage" class="notification is-info is-light">
+          <p>No hay grupos aún. Hacé clic en "Agregar grupo" para crear uno.</p>
+        </div>
+
+        <div th:if="${product != null && product.gruposIngredientes != null && !product.gruposIngredientes.isEmpty()}"
+          th:each="g : ${product.gruposIngredientes}" class="grupo-item box mb-4 has-background-light">
+          <div class="columns is-multiline is-vcentered">
+            <div class="column is-4">
+              <div class="field">
+                <label class="label is-small">Nombre del grupo</label>
+                <input class="input grupo-nombre" type="text" th:value="${g.nombre}" placeholder="Ej: Tamaño, Extras" />
+              </div>
+            </div>
+            <div class="column is-3">
+              <div class="field">
+                <label class="label is-small">Tipo</label>
+                <div class="select is-fullwidth">
+                  <select class="grupo-tipo">
+                    <option value="OBLIGATORIO" th:selected="${g.tipo != null && g.tipo.name() == 'OBLIGATORIO'}">
+                      Obligatorio</option>
+                    <option value="OPCIONAL_MULTIPLE"
+                      th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_MULTIPLE'}">Opcional (múltiple)
+                    </option>
+                    <option value="OPCIONAL_UNICO" th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_UNICO'}">
+                      Opcional (único)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="column is-1 has-text-right">
+              <button type="button" class="button is-danger is-light is-small remove-grupo-btn" title="Eliminar grupo">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </button>
+            </div>
+            <div class="column is-12">
+              <p class="help is-danger grupo-error" hidden></p>
+            </div>
+          </div>
+
+          <div class="box has-background-white">
+            <div class="level mb-2">
+              <div class="level-left">
+                <p class="has-text-weight-semibold">Ingredientes</p>
+              </div>
+              <div class="level-right">
+                <button type="button" class="button is-success is-light is-small add-ingrediente-btn">
+                  <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                  <span>Agregar ingrediente</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="ingredientes-container">
+              <div th:each="ing : ${g.ingredientes}"
+                class="ingrediente-item columns is-mobile is-vcentered is-multiline mb-2">
+                <div class="column is-5">
+                  <div class="field">
+                    <label class="label is-small">Ingrediente</label>
+                    <div class="select is-fullwidth">
+                      <select class="ingrediente-itemSelect">
+                        <option value="">Seleccionar ingrediente...</option>
+                        <option th:each="it : ${items}" th:value="${it.id}" th:text="${it.name}"
+                          th:attr="data-price=${it.price}" th:selected="${ing.item != null && it.id == ing.item.id}">
+                        </option>
+                      </select>
+                    </div>
+                    <p class="help is-danger ingrediente-error" hidden></p>
+                  </div>
+                </div>
+                <div class="column is-3">
+                  <div class="field">
+                    <label class="label is-small">Cantidad</label>
+                    <input class="input ingrediente-cantidad" type="number" min="0" th:value="${ing.cantidad}" />
+                  </div>
+                </div>
+                <div class="column is-3 ingrediente-default-column"
+                  th:classappend="${g.tipo != null && g.tipo.name() == 'OBLIGATORIO' ? ' is-hidden' : ''}">
+                  <div class="field">
+                    <label class="checkbox mt-5 is-block">
+                      <input type="checkbox" class="ingrediente-default" th:checked="${ing.seleccionadoPorDefecto}" />
+                      <span class="ml-2">Por defecto</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="column is-1 has-text-right">
+                  <button type="button" class="button is-light is-small remove-ingrediente-btn" title="Quitar">
+                    <span class="icon is-small"><i class="fas fa-times"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field mt-4">
+        <button type="button" id="addGrupoBtn" class="button is-success is-light">
+          <span class="icon">
+            <i class="fas fa-plus"></i>
+          </span>
+          <span>Agregar grupo</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="grupoTemplate" hidden>
+      <div class="grupo-item box mb-4 has-background-light">
+        <div class="columns is-multiline is-vcentered">
+          <div class="column is-4">
+            <div class="field">
+              <label class="label is-small">Nombre del grupo</label>
+              <input class="input grupo-nombre" type="text" value="" placeholder="Ej: Tamaño, Extras" />
+            </div>
+          </div>
+          <div class="column is-3">
+            <div class="field">
+              <label class="label is-small">Tipo</label>
+              <div class="select is-fullwidth">
+                <select class="grupo-tipo">
+                  <option value="OBLIGATORIO">Obligatorio</option>
+                  <option value="OPCIONAL_MULTIPLE">Opcional (múltiple)</option>
+                  <option value="OPCIONAL_UNICO">Opcional (único)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="column is-1 has-text-right">
+            <button type="button" class="button is-danger is-light is-small remove-grupo-btn" title="Eliminar grupo">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </button>
+          </div>
+          <div class="column is-12">
+            <p class="help is-danger grupo-error" hidden></p>
+          </div>
+        </div>
+
+        <div class="box has-background-white">
+          <div class="level mb-2">
+            <div class="level-left">
+              <p class="has-text-weight-semibold">Ingredientes</p>
+            </div>
+            <div class="level-right">
+              <button type="button" class="button is-success is-light is-small add-ingrediente-btn">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>Agregar ingrediente</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="ingredientes-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ingredienteTemplate" hidden>
+      <div class="ingrediente-item columns is-mobile is-vcentered is-multiline mb-2">
+        <div class="column is-5">
+          <div class="field">
+            <label class="label is-small">Ingrediente</label>
+            <div class="select is-fullwidth">
+              <select class="ingrediente-itemSelect">
+                <option value="">Seleccionar ingrediente...</option>
+                <option th:each="it : ${items}" th:value="${it.id}" th:text="${it.name}"
+                  th:attr="data-price=${it.price}"></option>
+              </select>
+            </div>
+            <p class="help is-danger ingrediente-error" hidden></p>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="field">
+            <label class="label is-small">Cantidad</label>
+            <input class="input ingrediente-cantidad" type="number" min="0" value="1" />
+          </div>
+        </div>
+        <div class="column is-3 ingrediente-default-column">
+          <div class="field">
+            <label class="checkbox mt-5 is-block">
+              <input type="checkbox" class="ingrediente-default" />
+              <span class="ml-2">Por defecto</span>
+            </label>
+          </div>
+        </div>
+        <div class="column is-1 has-text-right">
+          <button type="button" class="button is-light is-small remove-ingrediente-btn" title="Quitar">
+            <span class="icon is-small"><i class="fas fa-times"></i></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

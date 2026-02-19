@@ -39,7 +39,7 @@
               <td th:text="${p.name}">Nombre</td>
               <td th:text="${p.description}">Descripción</td>
               <td class="has-text-right">
-                $ <span class="price-format" th:attr="data-price=${p.price}">0</span>
+                $ <span class="price-format" th:attr="data-price=${p.precioBase}">0</span>
               </td>
               <td>
                 <span th:if="${p.imgUrl != null}">
@@ -73,7 +73,7 @@
                   </form>
 
                   <form th:action="@{/products/delete/{id}(id=${p.id})}" method="post" style="display:inline;"
-                    onsubmit="return confirm('¿Está seguro que desea eliminar este producto?');">
+                    class="product-delete-form">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <button class="button is-small is-danger" title="Eliminar" type="submit">
                       <span class="icon is-small">
@@ -91,6 +91,7 @@
   </section>
 
   <script th:src="@{/js/products/precioHandler.js}" defer></script>
+  <script th:src="@{/js/products/indexHandler.js}" defer></script>
 </body>
 
 </html>

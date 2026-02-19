@@ -169,8 +169,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase1 = new GrupoIngrediente();
             grupoBase1.setNombre("Base");
             grupoBase1.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase1.setMinSeleccion(3);
-            grupoBase1.setMaxSeleccion(3);
 
             Ingrediente ing1_1 = new Ingrediente();
             ing1_1.setItem(piezaPollo);
@@ -193,8 +191,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoExtras1 = new GrupoIngrediente();
             grupoExtras1.setNombre("Extras");
             grupoExtras1.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoExtras1.setMinSeleccion(0);
-            grupoExtras1.setMaxSeleccion(10);
 
             Ingrediente ing1_ex1 = new Ingrediente();
             ing1_ex1.setItem(piezaPollo);
@@ -223,8 +219,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase2 = new GrupoIngrediente();
             grupoBase2.setNombre("Base");
             grupoBase2.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase2.setMinSeleccion(3);
-            grupoBase2.setMaxSeleccion(3);
 
             Ingrediente ing2_1 = new Ingrediente();
             ing2_1.setItem(piezaPollo);
@@ -247,8 +241,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoExtras2 = new GrupoIngrediente();
             grupoExtras2.setNombre("Extras");
             grupoExtras2.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoExtras2.setMinSeleccion(0);
-            grupoExtras2.setMaxSeleccion(10);
 
             Ingrediente ing2_ex1 = new Ingrediente();
             ing2_ex1.setItem(bastonPapa);
@@ -283,8 +275,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase3 = new GrupoIngrediente();
             grupoBase3.setNombre("Base");
             grupoBase3.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase3.setMinSeleccion(3);
-            grupoBase3.setMaxSeleccion(3);
 
             Ingrediente ing3_1 = new Ingrediente();
             ing3_1.setItem(tender);
@@ -307,8 +297,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoExtras3 = new GrupoIngrediente();
             grupoExtras3.setNombre("Extras");
             grupoExtras3.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoExtras3.setMinSeleccion(0);
-            grupoExtras3.setMaxSeleccion(10);
 
             Ingrediente ing3_ex1 = new Ingrediente();
             ing3_ex1.setItem(salsaRanch);
@@ -337,8 +325,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase4 = new GrupoIngrediente();
             grupoBase4.setNombre("Base");
             grupoBase4.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase4.setMinSeleccion(1);
-            grupoBase4.setMaxSeleccion(1);
 
             Ingrediente ing4_1 = new Ingrediente();
             ing4_1.setItem(helado);
@@ -349,8 +335,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoSalsa4 = new GrupoIngrediente();
             grupoSalsa4.setNombre("Salsa");
             grupoSalsa4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO);
-            grupoSalsa4.setMinSeleccion(0);
-            grupoSalsa4.setMaxSeleccion(1);
 
             Ingrediente ing4_s1 = new Ingrediente();
             ing4_s1.setItem(salsaChocolate);
@@ -373,8 +357,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoToppings4 = new GrupoIngrediente();
             grupoToppings4.setNombre("Toppings");
             grupoToppings4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoToppings4.setMinSeleccion(0);
-            grupoToppings4.setMaxSeleccion(5);
 
             Ingrediente ing4_t1 = new Ingrediente();
             ing4_t1.setItem(chipsChocolate);
@@ -404,8 +386,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase5 = new GrupoIngrediente();
             grupoBase5.setNombre("Base");
             grupoBase5.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase5.setMinSeleccion(1);
-            grupoBase5.setMaxSeleccion(1);
 
             Ingrediente ing5_1 = new Ingrediente();
             ing5_1.setItem(alita);
@@ -416,8 +396,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoExtras5 = new GrupoIngrediente();
             grupoExtras5.setNombre("Extras");
             grupoExtras5.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoExtras5.setMinSeleccion(0);
-            grupoExtras5.setMaxSeleccion(5);
 
             Ingrediente ing5_ex1 = new Ingrediente();
             ing5_ex1.setItem(salsaQuesoAzul);
@@ -440,8 +418,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoBase6 = new GrupoIngrediente();
             grupoBase6.setNombre("Base");
             grupoBase6.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
-            grupoBase6.setMinSeleccion(2);
-            grupoBase6.setMaxSeleccion(2);
 
             Ingrediente ing6_1 = new Ingrediente();
             ing6_1.setItem(tortilla);
@@ -458,8 +434,6 @@ public class DataLoaderCli {
             GrupoIngrediente grupoExtras6 = new GrupoIngrediente();
             grupoExtras6.setNombre("Extras");
             grupoExtras6.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
-            grupoExtras6.setMinSeleccion(0);
-            grupoExtras6.setMaxSeleccion(10);
 
             Ingrediente ing6_ex1 = new Ingrediente();
             ing6_ex1.setItem(quesoCheddar);

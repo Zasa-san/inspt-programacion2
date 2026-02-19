@@ -51,13 +51,13 @@ $(() => {
   // Actualizar input hidden con IDs seleccionados
   function updateSelectedIds() {
     const selectedIds = [];
-    
+
     $customizacionesContainer.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function () {
       const val = $(this).val();
       if (!val) return;
       selectedIds.push(parseInt(val));
     });
-    
+
     $customizacionesIdsInput.val(JSON.stringify(selectedIds));
   }
 
@@ -76,7 +76,7 @@ $(() => {
         return unit * cant;
       };
 
-      if (tipo === 'OPCIONAL_UNICO' || (tipo === 'OBLIGATORIO' && parseInt(grupo.maxSeleccion) === 1)) {
+      if (tipo === 'OPCIONAL_UNICO' || tipo === 'OBLIGATORIO') {
         const d = defaults.length ? defaults[0] : null;
         if (d) total += sumIngrediente(d);
       } else {
@@ -87,27 +87,7 @@ $(() => {
     return total;
   }
 
-  function enforceMinMax($groupRoot) {
-    const min = parseInt($groupRoot.attr('data-min')) || 0;
-    const max = parseInt($groupRoot.attr('data-max')) || 0;
 
-    const $checks = $groupRoot.find('input[type="checkbox"]');
-    if (!$checks.length) return;
-
-    const checked = $checks.filter(':checked').length;
-
-    if (max > 0 && checked > max) {
-      // Revertir el último cambio: desmarcar el que disparó el evento.
-      // (El handler de change pasa el input en `this`, pero acá no lo tenemos; desmarco el último checked.)
-      $checks.filter(':checked').last().prop('checked', false);
-    }
-
-    const checkedAfter = $checks.filter(':checked').length;
-    if (min > 0 && checkedAfter < min) {
-      // Volver a cumplir el mínimo: marcar los primeros no seleccionados.
-      $checks.not(':checked').slice(0, min - checkedAfter).prop('checked', true);
-    }
-  }
 
   // Abrir modal
   $('.open-customization-modal').on('click', function () {
@@ -144,15 +124,13 @@ $(() => {
 
         const grupoNombre = grupo.nombre || 'Grupo';
         const tipo = (grupo.tipo || '').toUpperCase();
-        const minSeleccion = parseInt(grupo.minSeleccion) || 0;
-        const maxSeleccion = parseInt(grupo.maxSeleccion) || 0;
         const ingredientes = grupo.ingredientes.filter(i => i != null);
 
-        // Determinar tipo de input para el grupo
-        const esUnico = tipo === 'OPCIONAL_UNICO' || (tipo === 'OBLIGATORIO' && maxSeleccion === 1);
+        // Determinar tipo de input para el grupo (basado solo en tipo)
+        const esUnico = tipo === 'OPCIONAL_UNICO' || tipo === 'OBLIGATORIO';
         const icono = esUnico ? 'fa-dot-circle' : 'fa-check-square';
 
-        const $grupoSection = $(`<div class="mb-4" data-grupo-index="${grupoIndex}" data-min="${minSeleccion}" data-max="${maxSeleccion}"></div>`);
+        const $grupoSection = $(`<div class="mb-4" data-grupo-index="${grupoIndex}"></div>`);
         $grupoSection.append(`
           <p class="has-text-weight-semibold mb-2">
             <span class="icon"><i class="fas ${icono}"></i></span>
@@ -202,9 +180,9 @@ $(() => {
             $grupoSection.append($item);
           });
 
-          // Si el grupo es obligatorio (min>0) y nada quedó chequeado (no había defaults),
+          // Si el grupo es obligatorio y nada quedó chequeado (no había defaults),
           // seleccionar el primer ingrediente.
-          if (minSeleccion > 0) {
+          if (tipo === 'OBLIGATORIO') {
             const $checked = $grupoSection.find('input[type="radio"]:checked');
             if (!$checked.length) {
               $grupoSection.find('input[type="radio"]').first().prop('checked', true);

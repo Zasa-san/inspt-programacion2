@@ -28,16 +28,6 @@
         </div>
 
         <div class="field">
-          <label class="label">Precio</label>
-          <div class="control">
-            <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50" pattern="[0-9]+(,[0-9]{1,2})?"
-              required />
-            <input type="hidden" name="price" id="priceHidden" />
-          </div>
-          <p class="help">Usar coma para decimales. Ej: 55 o 55,00 o 55,5</p>
-        </div>
-
-        <div class="field">
           <label class="label">Imagen del producto (opcional)</label>
           <div class="control">
             <div class="file has-name is-fullwidth">
@@ -60,8 +50,19 @@
           <p class="help">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</p>
         </div>
 
-        <!-- Sección de Customizaciones -->
-        <div th:replace="~{products/fragments/customizations :: customizationsSection(null)}"></div>
+        <!-- Sección de grupos de ingredientes -->
+        <div th:replace="~{products/fragments/gruposIngredientes :: gruposIngredientesSection(${product})}"></div>
+
+        <div class="field">
+          <label class="label">Precio</label>
+          <div class="control">
+            <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50" pattern="[0-9]+(,[0-9]{1,2})?"
+              required />
+            <input type="hidden" name="precio" id="priceHidden" />
+          </div>
+          <p class="help">Se calcula automáticamente según ingredientes y cantidades (obligatorios + por defecto).
+            También podés editarlo.</p>
+        </div>
 
         <div class="field is-grouped">
           <div class="control">
@@ -79,7 +80,7 @@
 
   <script th:src="@{/js/products/imageHandler.js}" defer></script>
   <script th:src="@{/js/products/precioHandler.js}" defer></script>
-  <script th:src="@{/js/products/customizationsHandler.js}" defer></script>
+  <script th:src="@{/js/products/gruposIngredientesHandler.js}" defer></script>
 </body>
 
 </html>
