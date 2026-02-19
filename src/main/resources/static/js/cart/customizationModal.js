@@ -16,6 +16,8 @@ $(() => {
   let currentProductPrice = 0;
   let currentGrupos = [];
   let currentDefaultTotal = 0;
+  let currentRequiredIds = [];
+  let currentRequiredTotal = 0;
 
   // Función para formatear precio (centavos a pesos)
   function formatPrice(centavos) {
@@ -27,7 +29,7 @@ $(() => {
 
   // Actualizar precios mostrados en el modal
   function updatePrices() {
-    let selectedTotal = 0;
+    let selectedTotal = currentRequiredTotal || 0;
 
     $customizacionesContainer.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function () {
       if (!$(this).val()) return; // "Sin selección"
@@ -50,7 +52,7 @@ $(() => {
 
   // Actualizar input hidden con IDs seleccionados
   function updateSelectedIds() {
-    const selectedIds = [];
+    const selectedIds = [...(currentRequiredIds || [])];
 
     $customizacionesContainer.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function () {
       const val = $(this).val();
@@ -58,7 +60,35 @@ $(() => {
       selectedIds.push(parseInt(val));
     });
 
-    $customizacionesIdsInput.val(JSON.stringify(selectedIds));
+    const uniqueIds = [...new Set(selectedIds.filter(id => Number.isInteger(id)))];
+    $customizacionesIdsInput.val(JSON.stringify(uniqueIds));
+  }
+
+  function computeRequiredSelection(grupos) {
+    const requiredIds = [];
+    let requiredTotal = 0;
+
+    (grupos || []).forEach(grupo => {
+      if (!grupo || !Array.isArray(grupo.ingredientes)) return;
+      const tipo = (grupo.tipo || '').toUpperCase();
+      if (tipo !== 'OBLIGATORIO') return;
+
+      const ingredientes = grupo.ingredientes.filter(i => i != null);
+      if (!ingredientes.length) return;
+
+      const defaults = ingredientes.filter(i => i.seleccionadoPorDefecto);
+      const obligatorios = defaults.length ? defaults : ingredientes;
+
+      obligatorios.forEach(ing => {
+        if (!ing || !ing.id) return;
+        const unit = parseInt(ing.itemPrice) || 0;
+        const cant = parseInt(ing.cantidad) || 1;
+        requiredIds.push(parseInt(ing.id));
+        requiredTotal += unit * cant;
+      });
+    });
+
+    return { requiredIds, requiredTotal };
   }
 
   function computeDefaultTotal(grupos) {
@@ -76,7 +106,10 @@ $(() => {
         return unit * cant;
       };
 
-      if (tipo === 'OPCIONAL_UNICO' || tipo === 'OBLIGATORIO') {
+      if (tipo === 'OBLIGATORIO') {
+        const obligatorios = defaults.length ? defaults : ingredientes;
+        obligatorios.forEach(d => { total += sumIngrediente(d); });
+      } else if (tipo === 'OPCIONAL_UNICO') {
         const d = defaults.length ? defaults[0] : null;
         if (d) total += sumIngrediente(d);
       } else {
@@ -107,6 +140,9 @@ $(() => {
 
     currentProductPrice = productPrice;
     currentDefaultTotal = computeDefaultTotal(currentGrupos);
+    const requiredSelection = computeRequiredSelection(currentGrupos);
+    currentRequiredIds = requiredSelection.requiredIds;
+    currentRequiredTotal = requiredSelection.requiredTotal;
 
     // Setear valores en el modal
     $modalProductName.text(productName);
@@ -126,9 +162,9 @@ $(() => {
         const tipo = (grupo.tipo || '').toUpperCase();
         const ingredientes = grupo.ingredientes.filter(i => i != null);
 
-        // Determinar tipo de input para el grupo (basado solo en tipo)
-        const esUnico = tipo === 'OPCIONAL_UNICO' || tipo === 'OBLIGATORIO';
-        const icono = esUnico ? 'fa-dot-circle' : 'fa-check-square';
+        const esObligatorio = tipo === 'OBLIGATORIO';
+        const esUnico = tipo === 'OPCIONAL_UNICO';
+        const icono = esObligatorio ? 'fa-lock' : (esUnico ? 'fa-dot-circle' : 'fa-check-square');
 
         const $grupoSection = $(`<div class="mb-4" data-grupo-index="${grupoIndex}"></div>`);
         $grupoSection.append(`
@@ -138,21 +174,37 @@ $(() => {
           </p>
         `);
 
-        const radioName = `grupo_${productId}_${grupoIndex}`;
+        if (esObligatorio) {
+          ingredientes.forEach((ing) => {
+            const unit = parseInt(ing.itemPrice) || 0;
+            const cant = parseInt(ing.cantidad) || 1;
+            const total = unit * cant;
 
-        if (esUnico) {
-          const allowEmpty = minSeleccion === 0 && tipo !== 'OBLIGATORIO';
+            const precioDisplay = total > 0 ? `$${formatPrice(total)}` : '$0,00';
+            const tagClass = total > 0 ? 'is-light' : 'is-light';
+            const isSelected = currentRequiredIds.includes(parseInt(ing.id));
 
-          if (allowEmpty) {
-            const $none = $(`
-              <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-                <input type="radio" name="${radioName}" value="" data-price="0" checked />
-                <span class="ml-2">Sin selección</span>
-                <span class="tag is-light ml-2">$0,00</span>
-              </label>
+            const label = ing.itemName || `Item ${ing.itemId || ''}`;
+            const $item = $(`
+              <div class="is-block mb-2 p-2 has-background-light" style="border-radius: 4px;">
+                <span>${label}</span>
+                <span class="tag ${tagClass} ml-2">${precioDisplay}</span>
+                ${isSelected ? '<span class="tag is-success is-light ml-2">Incluido</span>' : ''}
+              </div>
             `);
-            $grupoSection.append($none);
-          }
+            $grupoSection.append($item);
+          });
+        } else if (esUnico) {
+          const radioName = `grupo_${productId}_${grupoIndex}`;
+
+          const $none = $(`
+            <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
+              <input type="radio" name="${radioName}" value="" data-price="0" checked />
+              <span class="ml-2">Sin selección</span>
+              <span class="tag is-light ml-2">$0,00</span>
+            </label>
+          `);
+          $grupoSection.append($none);
 
           let checkedSet = false;
           ingredientes.forEach((ing) => {
@@ -167,6 +219,7 @@ $(() => {
             if (!checkedSet && ing.seleccionadoPorDefecto) {
               checked = 'checked';
               checkedSet = true;
+              $none.find('input[type="radio"]').prop('checked', false);
             }
 
             const label = ing.itemName || `Item ${ing.itemId || ''}`;
@@ -179,15 +232,6 @@ $(() => {
             `);
             $grupoSection.append($item);
           });
-
-          // Si el grupo es obligatorio y nada quedó chequeado (no había defaults),
-          // seleccionar el primer ingrediente.
-          if (tipo === 'OBLIGATORIO') {
-            const $checked = $grupoSection.find('input[type="radio"]:checked');
-            if (!$checked.length) {
-              $grupoSection.find('input[type="radio"]').first().prop('checked', true);
-            }
-          }
         } else {
           ingredientes.forEach((ing) => {
             const unit = parseInt(ing.itemPrice) || 0;
@@ -208,9 +252,6 @@ $(() => {
             `);
             $grupoSection.append($item);
           });
-
-          // Asegurar mínimos al abrir
-          enforceMinMax($grupoSection);
         }
 
         $customizacionesContainer.append($grupoSection);
@@ -241,10 +282,6 @@ $(() => {
 
   // Actualizar precios cuando cambian checkboxes o radio buttons
   $customizacionesContainer.on('change', 'input[type="checkbox"], input[type="radio"]', function () {
-    const $groupRoot = $(this).closest('[data-grupo-index]');
-    if ($groupRoot.length) {
-      enforceMinMax($groupRoot);
-    }
     updatePrices();
     updateSelectedIds();
   });
