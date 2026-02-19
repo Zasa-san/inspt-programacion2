@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head></head>
+
 <body>
   <div th:fragment="gruposIngredientesSection(product)">
     <div class="box mt-5">
       <h2 class="subtitle mb-3">Grupos de ingredientes</h2>
-      <p class="help mb-4">Definí los grupos (obligatorios u opcionales) y sus ingredientes. Se guarda como JSON en <code>gruposJson</code>.</p>
+      <p class="help mb-4">Definí los grupos (obligatorios u opcionales) y sus ingredientes. Se guarda como JSON en
+        <code>gruposJson</code>.
+      </p>
 
       <input type="hidden" name="gruposJson" id="gruposJsonHidden" />
-      <datalist id="itemsDatalist">
-        <option th:each="it : ${items}" th:value="${it.name}" th:attr="data-id=${it.id}"></option>
-      </datalist>
 
       <div id="gruposContainer">
         <div th:if="${product == null || product.gruposIngredientes == null || product.gruposIngredientes.isEmpty()}"
-             id="noGruposMessage" class="notification is-info is-light">
+          id="noGruposMessage" class="notification is-info is-light">
           <p>No hay grupos aún. Hacé clic en "Agregar grupo" para crear uno.</p>
         </div>
 
         <div th:if="${product != null && product.gruposIngredientes != null && !product.gruposIngredientes.isEmpty()}"
-             th:each="g : ${product.gruposIngredientes}"
-             class="grupo-item box mb-4" style="background-color: #f9f9f9;">
+          th:each="g : ${product.gruposIngredientes}" class="grupo-item box mb-4 has-background-light">
           <div class="columns is-multiline is-vcentered">
             <div class="column is-4">
               <div class="field">
@@ -33,9 +33,13 @@
                 <label class="label is-small">Tipo</label>
                 <div class="select is-fullwidth">
                   <select class="grupo-tipo">
-                    <option value="OBLIGATORIO" th:selected="${g.tipo != null && g.tipo.name() == 'OBLIGATORIO'}">Obligatorio</option>
-                    <option value="OPCIONAL_MULTIPLE" th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_MULTIPLE'}">Opcional (múltiple)</option>
-                    <option value="OPCIONAL_UNICO" th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_UNICO'}">Opcional (único)</option>
+                    <option value="OBLIGATORIO" th:selected="${g.tipo != null && g.tipo.name() == 'OBLIGATORIO'}">
+                      Obligatorio</option>
+                    <option value="OPCIONAL_MULTIPLE"
+                      th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_MULTIPLE'}">Opcional (múltiple)
+                    </option>
+                    <option value="OPCIONAL_UNICO" th:selected="${g.tipo != null && g.tipo.name() == 'OPCIONAL_UNICO'}">
+                      Opcional (único)</option>
                   </select>
                 </div>
               </div>
@@ -46,11 +50,11 @@
               </button>
             </div>
             <div class="column is-12">
-              <p class="help is-danger grupo-error" style="display:none;"></p>
+              <p class="help is-danger grupo-error" hidden></p>
             </div>
           </div>
 
-          <div class="box" style="background-color: #fff;">
+          <div class="box has-background-white">
             <div class="level mb-2">
               <div class="level-left">
                 <p class="has-text-weight-semibold">Ingredientes</p>
@@ -64,26 +68,32 @@
             </div>
 
             <div class="ingredientes-container">
-              <div th:each="ing : ${g.ingredientes}" class="ingrediente-item columns is-mobile is-vcentered is-multiline mb-2">
+              <div th:each="ing : ${g.ingredientes}"
+                class="ingrediente-item columns is-mobile is-vcentered is-multiline mb-2">
                 <div class="column is-5">
                   <div class="field">
-                    <label class="label is-small">Buscar item por nombre</label>
-                    <input class="input ingrediente-itemSearch" type="text" list="itemsDatalist"
-                           th:value="${ing.item != null ? ing.item.name : ''}" placeholder="Escribí el nombre del item..." />
-                    <label class="label is-small mt-2">Item ID</label>
-                    <input class="input ingrediente-itemId" type="number" min="1" th:value="${ing.item != null ? ing.item.id : ''}" placeholder="Ej: 12" />
-                    <p class="help is-danger ingrediente-error" style="display:none;"></p>
+                    <label class="label is-small">Ingrediente</label>
+                    <div class="select is-fullwidth">
+                      <select class="ingrediente-itemSelect">
+                        <option value="">Seleccionar ingrediente...</option>
+                        <option th:each="it : ${items}" th:value="${it.id}" th:text="${it.name}"
+                          th:attr="data-price=${it.price}" th:selected="${ing.item != null && it.id == ing.item.id}">
+                        </option>
+                      </select>
+                    </div>
+                    <p class="help is-danger ingrediente-error" hidden></p>
                   </div>
                 </div>
                 <div class="column is-3">
                   <div class="field">
                     <label class="label is-small">Cantidad</label>
-                    <input class="input ingrediente-cantidad" type="number" min="1" th:value="${ing.cantidad}" />
+                    <input class="input ingrediente-cantidad" type="number" min="0" th:value="${ing.cantidad}" />
                   </div>
                 </div>
-                <div class="column is-3">
+                <div class="column is-3 ingrediente-default-column"
+                  th:classappend="${g.tipo != null && g.tipo.name() == 'OBLIGATORIO' ? ' is-hidden' : ''}">
                   <div class="field">
-                    <label class="checkbox" style="margin-top: 28px;">
+                    <label class="checkbox mt-5 is-block">
                       <input type="checkbox" class="ingrediente-default" th:checked="${ing.seleccionadoPorDefecto}" />
                       <span class="ml-2">Por defecto</span>
                     </label>
@@ -108,14 +118,10 @@
           <span>Agregar grupo</span>
         </button>
       </div>
-
-      <div class="notification is-warning is-light mt-4">
-        <p><strong>Nota:</strong> por ahora se cargan ingredientes por <strong>Item ID</strong> (sin buscador). El backend valida que el Item exista.</p>
-      </div>
     </div>
 
-    <div id="grupoTemplate" style="display:none;">
-      <div class="grupo-item box mb-4" style="background-color: #f0f7ff;">
+    <div id="grupoTemplate" hidden>
+      <div class="grupo-item box mb-4 has-background-light">
         <div class="columns is-multiline is-vcentered">
           <div class="column is-4">
             <div class="field">
@@ -141,11 +147,11 @@
             </button>
           </div>
           <div class="column is-12">
-            <p class="help is-danger grupo-error" style="display:none;"></p>
+            <p class="help is-danger grupo-error" hidden></p>
           </div>
         </div>
 
-        <div class="box" style="background-color: #fff;">
+        <div class="box has-background-white">
           <div class="level mb-2">
             <div class="level-left">
               <p class="has-text-weight-semibold">Ingredientes</p>
@@ -163,27 +169,30 @@
       </div>
     </div>
 
-    <div id="ingredienteTemplate" style="display:none;">
+    <div id="ingredienteTemplate" hidden>
       <div class="ingrediente-item columns is-mobile is-vcentered is-multiline mb-2">
         <div class="column is-5">
           <div class="field">
-            <label class="label is-small">Buscar item por nombre</label>
-            <input class="input ingrediente-itemSearch" type="text" list="itemsDatalist" value=""
-                   placeholder="Escribí el nombre del item..." />
-            <label class="label is-small mt-2">Item ID</label>
-            <input class="input ingrediente-itemId" type="number" min="1" value="" placeholder="Ej: 12" />
-            <p class="help is-danger ingrediente-error" style="display:none;"></p>
+            <label class="label is-small">Ingrediente</label>
+            <div class="select is-fullwidth">
+              <select class="ingrediente-itemSelect">
+                <option value="">Seleccionar ingrediente...</option>
+                <option th:each="it : ${items}" th:value="${it.id}" th:text="${it.name}"
+                  th:attr="data-price=${it.price}"></option>
+              </select>
+            </div>
+            <p class="help is-danger ingrediente-error" hidden></p>
           </div>
         </div>
         <div class="column is-3">
           <div class="field">
             <label class="label is-small">Cantidad</label>
-            <input class="input ingrediente-cantidad" type="number" min="1" value="1" />
+            <input class="input ingrediente-cantidad" type="number" min="0" value="1" />
           </div>
         </div>
-        <div class="column is-3">
+        <div class="column is-3 ingrediente-default-column">
           <div class="field">
-            <label class="checkbox" style="margin-top: 28px;">
+            <label class="checkbox mt-5 is-block">
               <input type="checkbox" class="ingrediente-default" />
               <span class="ml-2">Por defecto</span>
             </label>
@@ -198,4 +207,5 @@
     </div>
   </div>
 </body>
+
 </html>

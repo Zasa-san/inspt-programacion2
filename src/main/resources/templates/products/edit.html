@@ -27,16 +27,6 @@
           </div>
         </div>
 
-        <div class="field">
-          <label class="label">Precio</label>
-          <div class="control">
-            <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50" pattern="[0-9]+(,[0-9]{1,2})?"
-              required />
-            <input type="hidden" name="precio" id="priceHidden" th:value="${product.precioBase}" />
-          </div>
-          <p class="help">Usar coma para decimales. Ej: 55 o 55,00 o 55,5</p>
-        </div>
-
         <div class="field" th:if="${product.imgUrl != null}">
           <div class="control">
             <label class="checkbox">
@@ -74,6 +64,17 @@
 
         <!-- Sección de grupos de ingredientes -->
         <div th:replace="~{products/fragments/gruposIngredientes :: gruposIngredientesSection(${product})}"></div>
+
+        <div class="field">
+          <label class="label">Precio</label>
+          <div class="control">
+            <input class="input" type="text" id="priceInput" placeholder="Ej: 55 o 55,50" pattern="[0-9]+(,[0-9]{1,2})?"
+              required />
+            <input type="hidden" name="precio" id="priceHidden" th:value="${product.precioBase}" />
+          </div>
+          <p class="help">Se calcula automáticamente según ingredientes y cantidades (obligatorios + por defecto).
+            También podés editarlo.</p>
+        </div>
 
         <div class="field is-grouped">
           <div class="control">

@@ -93,6 +93,7 @@ public class FrontProductoService {
             GrupoIngrediente.TipoGrupo tipo = parseTipoGrupo(ingredienteDTO.getTipo());
 
             GrupoIngrediente grupo = getGrupoIngrediente(ingredienteDTO, tipo, nombre);
+            int seleccionadosPorDefecto = 0;
 
             for (IngredienteDTO ingrediente : ingredienteDTO.getIngredientes()) {
                 if (ingrediente == null || ingrediente.getItemId() == null) {
@@ -107,19 +108,29 @@ public class FrontProductoService {
                     throw new ProductException("Item no encontrado para el grupo: " + nombre, e);
                 }
 
-                int cantidad = ingrediente.getCantidad() != null ? ingrediente.getCantidad() : 1;
+                Integer cantidadDTO = ingrediente.getCantidad();
+                int cantidad = cantidadDTO != null ? cantidadDTO : 1;
 
-                if (cantidad <= 0) {
-                    throw new ProductException("Cantidad invalida en el grupo: " + nombre);
+                if (cantidad < 0) {
+                    throw new ProductException("Cantidad invalida (no puede ser negativa) en el grupo: " + nombre);
                 }
 
                 nuevoIngrediente.setCantidad(cantidad);
 
                 boolean seleccionado = ingrediente.getSeleccionadoPorDefecto() != null
                         && ingrediente.getSeleccionadoPorDefecto();
+
+                if (seleccionado) {
+                    seleccionadosPorDefecto++;
+                }
+
                 nuevoIngrediente.setSeleccionadoPorDefecto(seleccionado);
 
                 grupo.getIngredientes().add(nuevoIngrediente);
+            }
+
+            if (tipo == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO && seleccionadosPorDefecto > 1) {
+                throw new ProductException("En el grupo '" + nombre + "' solo puede haber un ingrediente seleccionado por defecto.");
             }
 
             grupos.add(grupo);

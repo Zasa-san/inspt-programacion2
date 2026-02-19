@@ -53,23 +53,88 @@ const formatPricesOnPage = () => {
 const initProductForm = () => {
   const $priceInput = $('#priceInput');
   const $priceHidden = $('#priceHidden');
+  const $gruposContainer = $('#gruposContainer');
 
   if ($priceInput.length === 0 || $priceHidden.length === 0) return;
 
-  // Buscar el formulario que contiene el input
   const $form = $priceInput.closest('form');
-
   if ($form.length === 0) return;
 
-  // Interceptar el submit
-  $form.on('submit', function (e) {
-    const priceValue = $priceInput.val().trim();
+  let lastAutoPrice = null;
 
-    if (priceValue) {
-      const centavos = parsePrice(priceValue);
-      $priceHidden.val(centavos);
+  const parseNonNegativeInt = (value) => {
+    const parsed = parseInt((value ?? '').toString(), 10);
+    if (!Number.isFinite(parsed)) return 0;
+    return Math.max(parsed, 0);
+  }
+
+  const calcularPrecioSugerido = () => {
+    if ($gruposContainer.length === 0) {
+      return parseNonNegativeInt($priceHidden.val());
     }
+
+    let total = 0;
+
+    $gruposContainer.find('.grupo-item').each(function () {
+      const $group = $(this);
+      const tipo = (($group.find('.grupo-tipo').val() ?? '').toString().trim().toUpperCase());
+
+      $group.find('.ingrediente-item').each(function () {
+        const $row = $(this);
+        const itemId = parseInt(($row.find('.ingrediente-itemSelect').val() ?? '').toString(), 10);
+        if (!Number.isFinite(itemId)) return;
+
+        const cantidad = parseNonNegativeInt($row.find('.ingrediente-cantidad').val());
+        const $selected = $row.find('.ingrediente-itemSelect option:selected').first();
+        const precioItem = parseNonNegativeInt($selected.attr('data-price'));
+        const seleccionadoPorDefecto = !!$row.find('.ingrediente-default').prop('checked');
+
+        const incluir = tipo === 'OBLIGATORIO' || seleccionadoPorDefecto;
+        if (!incluir) return;
+
+        total += precioItem * cantidad;
+      });
+    });
+
+    return total;
+  }
+
+  const actualizarPrecioSugerido = (forzarActualizacion = false) => {
+    const sugerido = calcularPrecioSugerido();
+    const actualIngresado = parsePrice(($priceInput.val() ?? '').toString());
+    const estaVacio = (($priceInput.val() ?? '').toString().trim() === '');
+    const debeAutocompletar = forzarActualizacion || estaVacio || actualIngresado === lastAutoPrice;
+
+    if (debeAutocompletar) {
+      $priceInput.val(formatPrice(sugerido));
+      $priceHidden.val(sugerido);
+    }
+
+    lastAutoPrice = sugerido;
+  }
+
+  document.addEventListener('product-groups-changed', () => {
+    actualizarPrecioSugerido(false);
   });
+
+  $priceInput.on('input change', function () {
+    const centavos = parsePrice(($priceInput.val() ?? '').toString());
+    $priceHidden.val(centavos);
+  });
+
+  $form.on('submit', function (e) {
+    const priceValue = ($priceInput.val() ?? '').toString().trim();
+    if (!priceValue && lastAutoPrice != null) {
+      $priceInput.val(formatPrice(lastAutoPrice));
+      $priceHidden.val(lastAutoPrice);
+      return;
+    }
+
+    const centavos = parsePrice(priceValue);
+    $priceHidden.val(centavos);
+  });
+
+  actualizarPrecioSugerido(true);
 }
 
 /**
@@ -88,7 +153,7 @@ const loadInitialPrice = (initialPriceCentavos) => {
 $(document).ready(function () {
   formatPricesOnPage();
   initProductForm();
-  // Si existe un input hidden con el precio (en centavos) lo cargamos en el input visible
+
   const $priceHidden = $('#priceHidden');
   if ($priceHidden.length > 0) {
     const initial = parseInt($priceHidden.val());
