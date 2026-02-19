@@ -62,7 +62,7 @@ public class FrontProductoService {
         productoService.update(id, nombre, descripcion, parseGruposIngredientes(gruposJson), precioBase, imageFile, removeImage);
     }
 
-    public List<GrupoIngrediente> parseGruposIngredientes(String gruposJson) {
+    private List<GrupoIngrediente> parseGruposIngredientes(String gruposJson) {
 
         if (gruposJson == null || gruposJson.trim().isEmpty()) {
             throw new ProductException("Debe cargar al menos un grupo de ingredientes.");
@@ -166,46 +166,4 @@ public class FrontProductoService {
         }
     }
 
-    public ProductoDTO mapToProductoDTO(ProductoEntity prodEntity) {
-        if (prodEntity == null) {
-            return null;
-        }
-
-        String img = prodEntity.getImgUrl();
-        if (img == null || img.isBlank()) {
-            img = AppConstants.DEFAULT_IMG_URL;
-        }
-
-        List<GrupoIngredienteDTO> grupos = new ArrayList<>();
-        if (prodEntity.getGruposIngredientes() != null) {
-            for (GrupoIngrediente grupoEntity : prodEntity.getGruposIngredientes()) {
-                if (grupoEntity == null) {
-                    continue;
-                }
-
-                GrupoIngredienteDTO grupoDTO = new GrupoIngredienteDTO(grupoEntity.getNombre(), grupoEntity.getTipo().name(),
-                        getIngredienteDTOS(grupoEntity));
-
-                grupos.add(grupoDTO);
-            }
-        }
-
-        return new ProductoDTO(prodEntity.getId(), prodEntity.getName(), prodEntity.getDescription(), prodEntity.getPrecioBase(), img, grupos);
-    }
-
-    private static List<IngredienteDTO> getIngredienteDTOS(GrupoIngrediente grupoEntity) {
-        List<IngredienteDTO> ingredientes = new ArrayList<>();
-        if (grupoEntity.getIngredientes() != null) {
-            for (Ingrediente ingredienteEntity : grupoEntity.getIngredientes()) {
-                if (ingredienteEntity == null) {
-                    continue;
-                }
-
-                IngredienteDTO ingredienteDTO = new IngredienteDTO(ingredienteEntity.getId(), ingredienteEntity.getItem().getId(), ingredienteEntity.getItem().getName(),
-                        ingredienteEntity.getItem().getPrice(), ingredienteEntity.getCantidad(), ingredienteEntity.isSeleccionadoPorDefecto());
-                ingredientes.add(ingredienteDTO);
-            }
-        }
-        return ingredientes;
-    }
 }
