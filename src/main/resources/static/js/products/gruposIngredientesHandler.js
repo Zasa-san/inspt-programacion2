@@ -99,8 +99,6 @@ $(() => {
       const $g = $(this);
       const nombre = ($g.find('.grupo-nombre').val() ?? '').toString().trim();
       const tipo = ($g.find('.grupo-tipo').val() ?? '').toString().trim().toUpperCase();
-      const minSeleccion = parseIntOrZero($g.find('.grupo-min').val());
-      const maxSeleccion = parseIntOrZero($g.find('.grupo-max').val());
 
       if (!nombre) {
         ok = false;
@@ -110,11 +108,6 @@ $(() => {
       if (!isValidTipo(tipo)) {
         ok = false;
         showGroupError($g, 'Tipo de grupo inválido.');
-        return;
-      }
-      if (minSeleccion < 0 || maxSeleccion < 0 || minSeleccion > maxSeleccion) {
-        ok = false;
-        showGroupError($g, 'Rango inválido: min/max deben ser >= 0 y min no puede ser mayor que max.');
         return;
       }
 
@@ -141,7 +134,7 @@ $(() => {
         return;
       }
 
-      grupos.push({ nombre, tipo, minSeleccion, maxSeleccion, ingredientes });
+      grupos.push({ nombre, tipo, ingredientes });
     });
 
     return { ok, grupos };

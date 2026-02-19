@@ -34,21 +34,22 @@ public class ProductoDTO {
     }
 
     /**
-     * Define si el producto tiene opciones para que el cliente elija (y por lo tanto
-     * conviene mostrar el modal). Si solo hay grupos obligatorios sin variaciones,
-     * puede agregarse directo al carrito.
+     * Define si el producto tiene opciones para que el cliente elija (y por lo
+     * tanto conviene mostrar el modal). Si solo hay grupos obligatorios sin
+     * variaciones, puede agregarse directo al carrito.
      */
     public boolean tieneOpciones() {
         if (gruposIngredientes == null || gruposIngredientes.isEmpty()) {
             return false;
         }
         return gruposIngredientes.stream().anyMatch(g -> {
-            if (g == null) return false;
-            if (g.getIngredientes() != null && g.getIngredientes().size() > 1) return true;
-            if (g.getTipo() != null && !g.getTipo().equalsIgnoreCase("OBLIGATORIO")) return true;
-            Integer min = g.getMinSeleccion();
-            Integer max = g.getMaxSeleccion();
-            return min != null && max != null && !min.equals(max);
+            if (g == null) {
+                return false;
+            }
+            if (g.getIngredientes() != null && g.getIngredientes().size() > 1) {
+                return true;
+            }
+            return g.getTipo() != null && !g.getTipo().equalsIgnoreCase("OBLIGATORIO");
         });
     }
 

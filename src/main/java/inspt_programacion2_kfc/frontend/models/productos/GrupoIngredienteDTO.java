@@ -17,8 +17,6 @@ public class GrupoIngredienteDTO {
 
     private String nombre;
     private String tipo;
-    private Integer minSeleccion;
-    private Integer maxSeleccion;
     private List<IngredienteDTO> ingredientes;
 
 }

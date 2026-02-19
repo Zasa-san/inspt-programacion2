@@ -44,12 +44,6 @@ public class GrupoIngrediente {
     @Column(nullable = false)
     private TipoGrupo tipo;
 
-    @Column(nullable = false)
-    private int minSeleccion = 0;
-
-    @Column(nullable = false)
-    private int maxSeleccion = 0;
-
     @OneToMany(mappedBy = "grupo", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingrediente> ingredientes = new ArrayList<>();
 }
