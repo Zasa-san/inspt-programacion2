@@ -35,11 +35,9 @@
               <tr th:each="item : ${cartItems}">
                 <td>
                   <span th:text="${item.producto.name}">Producto</span>
-                  <!-- Mostrar extras si hay -->
-                  <div th:if="${!item.customizaciones.isEmpty()}" class="is-size-7 has-text-grey">
-                    <span th:each="custom, iterStat : ${item.customizaciones}">
-                      <span th:text="${custom.nombre}">Extra</span><span th:if="${!iterStat.last}">, </span>
-                    </span>
+                  <!-- Mostrar obligatorios (por unidad) -->
+                  <div th:if="${item.obligatoriosResumen != null && !#strings.isEmpty(item.obligatoriosResumen)}" class="is-size-7 has-text-grey">
+                    <span th:text="${item.obligatoriosResumen}">Piezas de pollo x2</span>
                   </div>
                 </td>
                 <td class="has-text-centered" th:text="${item.quantity}">1</td>

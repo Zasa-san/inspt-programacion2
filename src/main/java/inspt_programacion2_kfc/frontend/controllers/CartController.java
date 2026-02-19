@@ -1,9 +1,7 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
-import inspt_programacion2_kfc.frontend.helpers.CartHelper;
 import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.services.FrontProductoService;
+import inspt_programacion2_kfc.frontend.services.CartService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,14 +16,10 @@ import java.util.Map;
 @RequestMapping("/cart")
 public class CartController {
 
-    private final FrontProductoService frontProductoService;
-    private final MovimientoStockService movimientoStockService;
-    private final CartHelper cartHelper;
+    private final CartService cartService;
     
-    public CartController(FrontProductoService frontProductoService, MovimientoStockService movimientoStockService, CartHelper cartHelper) {
-        this.frontProductoService = frontProductoService;
-        this.movimientoStockService = movimientoStockService;
-        this.cartHelper = cartHelper;
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
     }
 
 
@@ -39,57 +33,27 @@ public class CartController {
         session.setAttribute("cart", cart);
         return cart;
     }
-                    //TODO ajustar ProductoDTO o dejar de utilizarlo
-//    @PostMapping("/add")
-//    public String addToCart(
-//            @RequestParam("productId") Long productId,
-//            @RequestParam(name = "quantity", defaultValue = "1") int quantity,
-//            @RequestParam(name = "customizacionesIds", required = false) String customizacionesIdsJson,
-//            HttpSession session,
-//            RedirectAttributes redirectAttrs) {
-//
-//        ProductoDTO productoDTO = productService.findById(productId);
-//        if (productoDTO == null) {
-//            redirectAttrs.addFlashAttribute("cartError", "Producto no encontrado.");
-//            return "redirect:/";
-//        }
-//
-//        int stockDisponible = movimientoStockService.calcularStockItem(productId);
-//
-//        if (stockDisponible <= 0) {
-//            redirectAttrs.addFlashAttribute("cartError", "Producto sin stock disponible.");
-//            return "redirect:/";
-//        }
-//
-//        Map<String, CartItem> cart = getCart(session);
-//        // Calcular cantidad TOTAL de este producto en el carrito (todas las variantes)
-//        int totalProductoEnCarrito = cartHelper.calcularCantidadProductoEnCarrito(cart, productId);
-//        int totalRequested = totalProductoEnCarrito + quantity;
-//
-//        if (totalRequested > stockDisponible) {
-//            redirectAttrs.addFlashAttribute("cartError", "Stock insuficiente.");
-//            return "redirect:/";
-//        }
-//
-//        // Parsear customizaciones seleccionadas
-//        List<CustomizacionSeleccionada> customizacionesSeleccionadas = cartHelper.parseCustomizaciones(customizacionesIdsJson, productoDTO);
-//
-//        // Crear CartItem temporal para obtener la clave
-//        CartItem tempItem = new CartItem(productoDTO, quantity, customizacionesSeleccionadas);
-//        String cartKey = tempItem.getCartKey();
-//
-//        CartItem item = cart.get(cartKey);
-//
-//        if (item == null) {
-//            item = new CartItem(productoDTO, quantity, customizacionesSeleccionadas);
-//            cart.put(cartKey, item);
-//        } else {
-//            item.increment(quantity);
-//        }
-//
-//        redirectAttrs.addFlashAttribute("cartMessage", "Producto agregado al carrito.");
-//        return "redirect:/";
-//    }
+
+    @PostMapping("/add")
+    public String addToCart(
+            @RequestParam("productId") Long productId,
+            @RequestParam(name = "quantity", defaultValue = "1") int quantity,
+            @RequestParam(name = "ingredientesIds", required = false) String ingredientesIdsJson,
+            HttpSession session,
+            RedirectAttributes redirectAttrs) {
+
+        Map<String, CartItem> cart = getCart(session);
+
+        try {
+            cartService.addToCart(productId, quantity, ingredientesIdsJson, cart);
+        } catch (IllegalArgumentException ex) {
+            redirectAttrs.addFlashAttribute("cartError", ex.getMessage());
+            return "redirect:/";
+        }
+
+        redirectAttrs.addFlashAttribute("cartMessage", "Producto agregado al carrito.");
+        return "redirect:/";
+    }
 
     @PostMapping("/remove")
     public String removeFromCart(
