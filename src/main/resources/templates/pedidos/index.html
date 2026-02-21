@@ -14,6 +14,18 @@
       <form method="get" th:action="@{/pedidos}" class="mb-4">
         <div class="field has-addons is-align-items-end">
           <div class="control">
+            <label class="label" for="estado">Estado</label>
+            <div class="select">
+              <select id="estado" name="estado">
+                <option value="" th:selected="${estadoSeleccionado == ''}">Todos</option>
+                <option value="CREADO" th:selected="${estadoSeleccionado == 'CREADO'}">CREADO</option>
+                <option value="PAGADO" th:selected="${estadoSeleccionado == 'PAGADO'}">PAGADO</option>
+                <option value="ENTREGADO" th:selected="${estadoSeleccionado == 'ENTREGADO'}">ENTREGADO</option>
+                <option value="CANCELADO" th:selected="${estadoSeleccionado == 'CANCELADO'}">CANCELADO</option>
+              </select>
+            </div>
+          </div>
+          <div class="control">
             <label class="label" for="size">Pedidos por página</label>
             <input id="size" class="input" type="number" name="size" min="1" max="200" th:value="${pageSize}" />
           </div>
@@ -84,6 +96,7 @@
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <input type="hidden" name="page" th:value="${currentPage}" />
                   <input type="hidden" name="size" th:value="${pageSize}" />
+                  <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
                   <button type="submit" class="button is-small is-link">
                     Marcar pagado
                   </button>
@@ -95,6 +108,7 @@
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <input type="hidden" name="page" th:value="${currentPage}" />
                   <input type="hidden" name="size" th:value="${pageSize}" />
+                  <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
                   <button type="submit" class="button is-small is-success">
                     Marcar entregado
                   </button>
@@ -106,6 +120,7 @@
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                   <input type="hidden" name="page" th:value="${currentPage}" />
                   <input type="hidden" name="size" th:value="${pageSize}" />
+                  <input type="hidden" name="estado" th:value="${estadoSeleccionado}" />
                   <button type="submit" class="button is-small is-danger is-light">
                     Cancelar
                   </button>
@@ -127,11 +142,11 @@
           <div class="level-right">
             <div class="level-item buttons">
               <a class="button is-small" th:classappend="${!hasPrevious} ? ' is-static'"
-                th:href="${hasPrevious} ? @{/pedidos(page=${currentPage - 1},size=${pageSize})} : @{/pedidos(page=${currentPage},size=${pageSize})}">
+                th:href="${hasPrevious} ? @{/pedidos(page=${currentPage - 1},size=${pageSize},estado=${estadoSeleccionado})} : @{/pedidos(page=${currentPage},size=${pageSize},estado=${estadoSeleccionado})}">
                 Anterior
               </a>
               <a class="button is-small" th:classappend="${!hasNext} ? ' is-static'"
-                th:href="${hasNext} ? @{/pedidos(page=${currentPage + 1},size=${pageSize})} : @{/pedidos(page=${currentPage},size=${pageSize})}">
+                th:href="${hasNext} ? @{/pedidos(page=${currentPage + 1},size=${pageSize},estado=${estadoSeleccionado})} : @{/pedidos(page=${currentPage},size=${pageSize},estado=${estadoSeleccionado})}">
                 Siguiente
               </a>
             </div>

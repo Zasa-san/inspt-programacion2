@@ -55,6 +55,7 @@ public class PedidosPageController {
     public String pedidosPage(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "20") Integer size,
+            @RequestParam(name = "estado", required = false) String estado,
             Model model) {
         PageMetadata pageMetadata = new PageMetadata("Pedidos", "Listado de pedidos registrados en el sistema");
         model.addAttribute("page", pageMetadata);
@@ -62,7 +63,9 @@ public class PedidosPageController {
         int currentPage = (page != null && page >= 0) ? page : 0;
         int pageSize = (size != null && size > 0) ? Math.min(size, 200) : 20;
 
-        Page<Pedido> pedidosPage = pedidoService.findPedidosPaginados(currentPage, pageSize);
+        EstadoPedido estadoFiltro = parseEstado(estado);
+
+        Page<Pedido> pedidosPage = pedidoService.findPedidosPaginados(currentPage, pageSize, estadoFiltro);
         List<Pedido> pedidos = pedidosPage.getContent();
 
         Map<Long, String> nombresProductoPorItem = new HashMap<>();
@@ -94,6 +97,7 @@ public class PedidosPageController {
         model.addAttribute("totalItems", pedidosPage.getTotalElements());
         model.addAttribute("hasPrevious", pedidosPage.hasPrevious());
         model.addAttribute("hasNext", pedidosPage.hasNext());
+        model.addAttribute("estadoSeleccionado", estadoFiltro != null ? estadoFiltro.name() : "");
 
         return "pedidos/index";
     }
@@ -104,6 +108,7 @@ public class PedidosPageController {
             @PathVariable Long id,
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "estado", required = false) String estado,
             RedirectAttributes redirectAttrs) {
         try {
             pedidoService.cancelarPedido(id);
@@ -111,7 +116,7 @@ public class PedidosPageController {
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return buildPedidosRedirect(page, size);
+        return buildPedidosRedirect(page, size, estado);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SOPORTE')")
@@ -120,6 +125,7 @@ public class PedidosPageController {
             @PathVariable Long id,
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "estado", required = false) String estado,
             RedirectAttributes redirectAttrs) {
         try {
             pedidoService.marcarEntregado(id);
@@ -127,7 +133,7 @@ public class PedidosPageController {
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return buildPedidosRedirect(page, size);
+        return buildPedidosRedirect(page, size, estado);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
@@ -136,6 +142,7 @@ public class PedidosPageController {
             @PathVariable Long id,
             @RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "estado", required = false) String estado,
             RedirectAttributes redirectAttrs) {
         try {
             pedidoService.marcarComoPagado(id);
@@ -143,12 +150,24 @@ public class PedidosPageController {
         } catch (IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return buildPedidosRedirect(page, size);
+        return buildPedidosRedirect(page, size, estado);
     }
 
-    private String buildPedidosRedirect(Integer page, Integer size) {
+    private String buildPedidosRedirect(Integer page, Integer size, String estado) {
         int safePage = (page != null && page >= 0) ? page : 0;
         int safeSize = (size != null && size > 0) ? Math.min(size, 200) : 20;
-        return "redirect:/pedidos?page=" + safePage + "&size=" + safeSize;
+        String estadoParam = parseEstado(estado) != null ? "&estado=" + parseEstado(estado).name() : "";
+        return "redirect:/pedidos?page=" + safePage + "&size=" + safeSize + estadoParam;
+    }
+
+    private EstadoPedido parseEstado(String estado) {
+        if (estado == null || estado.isBlank()) {
+            return null;
+        }
+        try {
+            return EstadoPedido.valueOf(estado.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 }

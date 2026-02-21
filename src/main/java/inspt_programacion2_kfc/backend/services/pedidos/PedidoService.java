@@ -73,6 +73,14 @@ public class PedidoService {
         return pedidoRepository.findAll(pageable);
     }
 
+    public Page<Pedido> findPedidosPaginados(int page, int size, EstadoPedido estado) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        if (estado == null) {
+            return pedidoRepository.findAll(pageable);
+        }
+        return pedidoRepository.findByEstado(estado, pageable);
+    }
+
     public List<Pedido> findPedidosByDateRange(LocalDateTime desde, LocalDateTime hasta) {
         return pedidoRepository.findAllByCreatedAtBetweenOrderByCreatedAtDesc(desde, hasta);
     }
