@@ -81,17 +81,8 @@ public class ProductoService {
         productoRepository.save(productoEntity);
     }
 
-    private static int getPrecio(List<GrupoIngrediente> grupoIngredientes) {
-        int precio = 0;
-
-        for (GrupoIngrediente grupoIngrediente : grupoIngredientes) {
-            for (Ingrediente ingrediente : grupoIngrediente.getIngredientes()) {
-                if (ingrediente.isSeleccionadoPorDefecto()) {
-                    precio += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
-                }
-            }
-        }
-        return precio;
+    private int getPrecio(List<GrupoIngrediente> grupoIngredientes) {
+        return calcularCostoBaseIngredientes(grupoIngredientes);
     }
 
     public void delete(Long id) {
