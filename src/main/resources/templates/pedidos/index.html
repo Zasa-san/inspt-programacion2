@@ -11,6 +11,19 @@
       <h1 class="title" th:text="${page.title}">Pedidos</h1>
       <p class="subtitle" th:text="${page.description}">Listado de pedidos</p>
 
+      <form method="get" th:action="@{/pedidos}" class="mb-4">
+        <div class="field has-addons is-align-items-end">
+          <div class="control">
+            <label class="label" for="size">Pedidos por página</label>
+            <input id="size" class="input" type="number" name="size" min="1" max="200" th:value="${pageSize}" />
+          </div>
+          <input type="hidden" name="page" value="0" />
+          <div class="control">
+            <button type="submit" class="button is-link is-light">Aplicar</button>
+          </div>
+        </div>
+      </form>
+
       <div th:if="${successMessage != null}" class="notification is-success" th:text="${successMessage}"></div>
       <div th:if="${errorMessage != null}" class="notification is-danger" th:text="${errorMessage}"></div>
 
@@ -69,6 +82,8 @@
                   th:action="@{'/pedidos/' + ${p.id} + '/pagar'}" method="post"
                   style="display:inline-block; margin-right: 4px;">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <input type="hidden" name="page" th:value="${currentPage}" />
+                  <input type="hidden" name="size" th:value="${pageSize}" />
                   <button type="submit" class="button is-small is-link">
                     Marcar pagado
                   </button>
@@ -78,6 +93,8 @@
                   th:action="@{'/pedidos/' + ${p.id} + '/entregar'}" method="post"
                   style="display:inline-block; margin-right: 4px;">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <input type="hidden" name="page" th:value="${currentPage}" />
+                  <input type="hidden" name="size" th:value="${pageSize}" />
                   <button type="submit" class="button is-small is-success">
                     Marcar entregado
                   </button>
@@ -87,6 +104,8 @@
                   sec:authorize="hasAnyRole('ADMIN', 'VENDEDOR')" th:action="@{'/pedidos/' + ${p.id} + '/cancel'}"
                   method="post" style="display:inline-block;">
                   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <input type="hidden" name="page" th:value="${currentPage}" />
+                  <input type="hidden" name="size" th:value="${pageSize}" />
                   <button type="submit" class="button is-small is-danger is-light">
                     Cancelar
                   </button>
@@ -95,6 +114,29 @@
             </tr>
           </tbody>
         </table>
+
+        <div class="level mt-4" th:if="${totalPages > 1}">
+          <div class="level-left">
+            <div class="level-item">
+              <p class="is-size-7 has-text-grey">
+                Página <strong th:text="${currentPage + 1}">1</strong> de <strong th:text="${totalPages}">1</strong>
+                - Total pedidos: <strong th:text="${totalItems}">0</strong>
+              </p>
+            </div>
+          </div>
+          <div class="level-right">
+            <div class="level-item buttons">
+              <a class="button is-small" th:classappend="${!hasPrevious} ? ' is-static'"
+                th:href="${hasPrevious} ? @{/pedidos(page=${currentPage - 1},size=${pageSize})} : @{/pedidos(page=${currentPage},size=${pageSize})}">
+                Anterior
+              </a>
+              <a class="button is-small" th:classappend="${!hasNext} ? ' is-static'"
+                th:href="${hasNext} ? @{/pedidos(page=${currentPage + 1},size=${pageSize})} : @{/pedidos(page=${currentPage},size=${pageSize})}">
+                Siguiente
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
