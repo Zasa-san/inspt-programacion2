@@ -1,0 +1,45 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head :: head}"></head>
+
+<body>
+  <header th:replace="~{fragments/navbar :: navbar}"></header>
+
+  <section class="section">
+    <div class="container">
+      <h1 class="title" th:text="${page.title}">Exportar datos</h1>
+      <p class="subtitle" th:text="${page.description}">Descarga de ventas y movimientos de stock</p>
+
+      <div th:if="${errorMessage != null}" class="notification is-danger" th:text="${errorMessage}"></div>
+
+      <form method="get" th:action="@{/exportar-datos/ventas.csv}">
+        <div class="columns is-multiline is-vcentered">
+          <div class="column is-12-mobile is-4-tablet is-3-desktop">
+            <label class="label" for="fechaDesde">Desde</label>
+            <input id="fechaDesde" name="fechaDesde" class="input" type="date" th:value="${fechaDesde}" required />
+          </div>
+          <div class="column is-12-mobile is-4-tablet is-3-desktop">
+            <label class="label" for="fechaHasta">Hasta</label>
+            <input id="fechaHasta" name="fechaHasta" class="input" type="date" th:value="${fechaHasta}" required />
+          </div>
+          <div class="column is-12-mobile is-4-tablet is-6-desktop">
+            <label class="label">Descargar</label>
+            <div class="buttons">
+              <button type="submit" class="button is-link">
+                <span class="icon is-small"><i class="fas fa-file-csv"></i></span>
+                <span>Ventas CSV</span>
+              </button>
+              <button type="submit" class="button is-info is-light" formaction="/exportar-datos/movimientos.csv">
+                <span class="icon is-small"><i class="fas fa-file-csv"></i></span>
+                <span>Movimientos CSV</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</body>
+
+</html>

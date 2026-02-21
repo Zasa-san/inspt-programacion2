@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/users/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/products/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/items/**").hasRole(Role.ROLE_ADMIN.getRoleName())
+                .requestMatchers("/exportar-datos", "/exportar-datos/**").hasRole(Role.ROLE_ADMIN.getRoleName())
                 .requestMatchers("/stock/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .requestMatchers("/pedidos/**").hasAnyRole(Role.ROLE_ADMIN.getRoleName(), Role.ROLE_VENDEDOR.getRoleName(), Role.ROLE_SOPORTE.getRoleName())
                 .anyRequest().authenticated()

@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
 import inspt_programacion2_kfc.backend.models.pedidos.Pedido;
-import inspt_programacion2_kfc.backend.services.files.CsvService;
 import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.frontend.helpers.ItemPedidoHelper;
 
@@ -27,13 +23,10 @@ public class PedidosPageController {
 
     private final PedidoService pedidoService;
     private final ItemPedidoHelper itemPedidoHelper;
-    private final CsvService csvExportService;
 
-    public PedidosPageController(PedidoService pedidoService, ItemPedidoHelper itemPedidoHelper,
-            CsvService csvExportService) {
+    public PedidosPageController(PedidoService pedidoService, ItemPedidoHelper itemPedidoHelper) {
         this.pedidoService = pedidoService;
         this.itemPedidoHelper = itemPedidoHelper;
-        this.csvExportService = csvExportService;
     }
 
     @ModelAttribute("CREADO")
@@ -88,17 +81,6 @@ public class PedidosPageController {
         model.addAttribute("customizacionesPorItem", customizacionesPorItem);
 
         return "pedidos/index";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/pedidos/export.csv", produces = "text/csv")
-    public ResponseEntity<byte[]> exportarPedidosCsv() {
-        byte[] csv = csvExportService.exportarPedidosCsv();
-
-        return ResponseEntity.ok()
-                .contentType(new MediaType("text", "csv"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ventas.csv")
-                .body(csv);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")

@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.backend.services.stock;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,5 +70,9 @@ public class MovimientoStockService {
 
     public List<MovimientoStock> findAllMovimientos() {
         return movimientoStockRepository.findAllByOrderByFechaDesc();
+    }
+
+    public List<MovimientoStock> findMovimientosByDateRange(LocalDateTime desde, LocalDateTime hasta) {
+        return movimientoStockRepository.findAllByFechaBetweenOrderByFechaDesc(desde, hasta);
     }
 }

@@ -1,6 +1,8 @@
 package inspt_programacion2_kfc.backend.services.files;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -27,8 +29,10 @@ public class CsvService {
         this.movimientoStockService = movimientoStockService;
     }
 
-    public byte[] exportarPedidosCsv() {
-        List<Pedido> pedidos = pedidoService.findAllPedidosSorted();
+    public byte[] exportarPedidosCsv(LocalDate fechaDesde, LocalDate fechaHasta) {
+        LocalDateTime desde = fechaDesde.atStartOfDay();
+        LocalDateTime hasta = fechaHasta.plusDays(1).atStartOfDay().minusNanos(1);
+        List<Pedido> pedidos = pedidoService.findPedidosByDateRange(desde, hasta);
 
         StringBuilder csv = new StringBuilder();
         csv.append("pedido_id,fecha,estado,total_centavos,total,cantidad_items,items\n");
@@ -52,8 +56,10 @@ public class CsvService {
         return csv.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    public byte[] exportarMovimientosStockCsv() {
-        List<MovimientoStock> movimientos = movimientoStockService.findAllMovimientos();
+    public byte[] exportarMovimientosStockCsv(LocalDate fechaDesde, LocalDate fechaHasta) {
+        LocalDateTime desde = fechaDesde.atStartOfDay();
+        LocalDateTime hasta = fechaHasta.plusDays(1).atStartOfDay().minusNanos(1);
+        List<MovimientoStock> movimientos = movimientoStockService.findMovimientosByDateRange(desde, hasta);
 
         StringBuilder csv = new StringBuilder();
         csv.append("movimiento_id,fecha,item_id,item,tipo,cantidad,motivo,pedido_id\n");

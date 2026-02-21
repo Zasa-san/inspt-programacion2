@@ -1,5 +1,6 @@
 package inspt_programacion2_kfc.backend.services.pedidos;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,10 @@ public class PedidoService {
 
     public List<Pedido> findAllPedidosSorted() {
         return pedidoRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public List<Pedido> findPedidosByDateRange(LocalDateTime desde, LocalDateTime hasta) {
+        return pedidoRepository.findAllByCreatedAtBetweenOrderByCreatedAtDesc(desde, hasta);
     }
 
     private Pedido findByIdPedido(Long idPedido) {

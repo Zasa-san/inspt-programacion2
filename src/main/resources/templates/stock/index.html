@@ -19,14 +19,6 @@
         </div>
         <div class="level-right" sec:authorize="hasRole('ADMIN')">
           <div class="level-item">
-            <a th:href="@{/stock/movimientos/export.csv}" class="button is-info is-light">
-              <span class="icon is-small">
-                <i class="fas fa-file-csv"></i>
-              </span>
-              <span>Descargar CSV</span>
-            </a>
-          </div>
-          <div class="level-item">
             <a href="/items" class="button is-info">
               <span class="icon is-small">
                 <i class="fas fa-box"></i>
