@@ -125,7 +125,7 @@ public class PedidoService {
             List<Ingrediente> ingredientesSeleccionados = resolveIngredientesSeleccionados(productoBase, cartItem.getIngredientesIds());
             validarStockIngredientes(ingredientesSeleccionados, cartItem.getQuantity());
 
-            int unitPrice = calcularPrecioUnitario(ingredientesSeleccionados);
+            int unitPrice = calcularPrecioUnitario(productoBase, ingredientesSeleccionados);
             validarPrecioUnitarioContraBackend(cartItem, unitPrice, productoBase.getName());
 
             ItemPedido item = new ItemPedido();
@@ -198,12 +198,20 @@ public class PedidoService {
                         .filter(Ingrediente::isSeleccionadoPorDefecto)
                         .toList();
 
-                if (!defaultsGrupo.isEmpty()) {
-                    if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
-                        defaults.add(defaultsGrupo.get(0));
-                    } else {
-                        defaults.addAll(defaultsGrupo);
-                    }
+                if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+                    // Si no hay defaults explícitos, todo el grupo obligatorio se considera seleccionado.
+                    defaults.addAll(defaultsGrupo.isEmpty() ? grupo.getIngredientes() : defaultsGrupo);
+                    continue;
+                }
+
+                if (defaultsGrupo.isEmpty()) {
+                    continue;
+                }
+
+                if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
+                    defaults.add(defaultsGrupo.getFirst());
+                } else {
+                    defaults.addAll(defaultsGrupo);
                 }
             }
             return defaults;
@@ -260,12 +268,58 @@ public class PedidoService {
         }
     }
 
-    private int calcularPrecioUnitario(List<Ingrediente> ingredientesSeleccionados) {
-        int precio = 0;
+    private int calcularPrecioUnitario(ProductoEntity producto, List<Ingrediente> ingredientesSeleccionados) {
+        int extras = 0;
+
+        Map<Long, List<Ingrediente>> seleccionadosPorGrupo = new HashMap<>();
         for (Ingrediente ingrediente : ingredientesSeleccionados) {
-            precio += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+            if (ingrediente == null || ingrediente.getGrupo() == null || ingrediente.getGrupo().getId() == null) {
+                continue;
+            }
+            seleccionadosPorGrupo
+                    .computeIfAbsent(ingrediente.getGrupo().getId(), key -> new ArrayList<>())
+                    .add(ingrediente);
         }
-        return precio;
+
+        for (GrupoIngrediente grupo : producto.getGruposIngredientes()) {
+            if (grupo == null || grupo.getId() == null || grupo.getTipo() == null) {
+                continue;
+            }
+
+            List<Ingrediente> seleccionGrupo = seleccionadosPorGrupo.getOrDefault(grupo.getId(), List.of());
+            if (seleccionGrupo.isEmpty()) {
+                continue;
+            }
+
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+                continue;
+            }
+
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
+                Ingrediente elegido = seleccionGrupo.getFirst();
+                int precioElegido = precioIngrediente(elegido);
+                int precioDefault = grupo.getIngredientes().stream()
+                        .filter(Ingrediente::isSeleccionadoPorDefecto)
+                        .findFirst()
+                        .map(this::precioIngrediente)
+                        .orElse(0);
+                extras += Math.max(0, precioElegido - precioDefault);
+                continue;
+            }
+
+            for (Ingrediente ingrediente : seleccionGrupo) {
+                if (ingrediente.isSeleccionadoPorDefecto()) {
+                    continue;
+                }
+                extras += precioIngrediente(ingrediente);
+            }
+        }
+
+        return producto.getPrecioBase() + extras;
+    }
+
+    private int precioIngrediente(Ingrediente ingrediente) {
+        return ingrediente.getCantidad() * ingrediente.getItem().getPrice();
     }
 
     private void validarPrecioUnitarioContraBackend(CartItemDto cartItem, int unitPriceBackend, String nombreProducto) {

@@ -60,6 +60,7 @@ public class ProductoService {
         productoEntity.setDescription(description);
 
         configurarGrupos(productoEntity, grupoIngredientes);
+        validarPrecioBaseMinimo(grupoIngredientes, precioBase);
 
         int precio;
 
@@ -131,6 +132,7 @@ public class ProductoService {
 
         existing.getGruposIngredientes().clear();
         configurarGrupos(existing, grupoIngredientes);
+        validarPrecioBaseMinimo(grupoIngredientes, precioBase);
 
         if (precioBase != null && precioBase > 0) {
             existing.setPrecioBase(precioBase);
@@ -195,5 +197,46 @@ public class ProductoService {
                 }
             }
         }
+    }
+
+    private void validarPrecioBaseMinimo(List<GrupoIngrediente> grupos, Integer precioBase) {
+        if (precioBase == null || precioBase <= 0 || CollectionUtils.isEmpty(grupos)) {
+            return;
+        }
+
+        int costoBase = calcularCostoBaseIngredientes(grupos);
+        if (precioBase < costoBase) {
+            throw new ProductException("Precio base invalido: no puede ser menor al costo base de ingredientes (" + costoBase + ").");
+        }
+    }
+
+    private int calcularCostoBaseIngredientes(List<GrupoIngrediente> grupos) {
+        int total = 0;
+
+        for (GrupoIngrediente grupo : grupos) {
+            if (grupo == null || grupo.getTipo() == null || CollectionUtils.isEmpty(grupo.getIngredientes())) {
+                continue;
+            }
+
+            List<Ingrediente> defaults = grupo.getIngredientes().stream()
+                    .filter(i -> i != null && i.getItem() != null && i.isSeleccionadoPorDefecto())
+                    .toList();
+
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+                List<Ingrediente> base = defaults.isEmpty()
+                        ? grupo.getIngredientes().stream().filter(i -> i != null && i.getItem() != null).toList()
+                        : defaults;
+                for (Ingrediente ingrediente : base) {
+                    total += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+                }
+                continue;
+            }
+
+            for (Ingrediente ingrediente : defaults) {
+                total += ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+            }
+        }
+
+        return total;
     }
 }
