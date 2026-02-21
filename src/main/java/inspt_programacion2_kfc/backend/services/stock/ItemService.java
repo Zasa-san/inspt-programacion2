@@ -114,7 +114,7 @@ public class ItemService {
         List<ProductoEntity> productosEnUso = ingredientes.stream()
                 .map(ing -> ing.getGrupo().getProducto())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         if (!productosEnUso.isEmpty()) {
             List<String> nombresProductos = productosEnUso.stream()

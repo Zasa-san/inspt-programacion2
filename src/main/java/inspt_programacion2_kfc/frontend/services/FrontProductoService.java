@@ -11,13 +11,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import inspt_programacion2_kfc.backend.exceptions.product.ProductException;
-import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
 import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.ItemService;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
 import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
 import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
 

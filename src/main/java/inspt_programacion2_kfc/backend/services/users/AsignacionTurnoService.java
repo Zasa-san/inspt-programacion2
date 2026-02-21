@@ -35,13 +35,13 @@ public class AsignacionTurnoService {
     }
 
     @Transactional
-    public AsignacionTurno asignarTurno(User usuario, Turno turno, Timestamp inicio, boolean vigente) {
+    public void asignarTurno(User usuario, Turno turno, Timestamp inicio, boolean vigente) {
         AsignacionTurno asignacion = new AsignacionTurno();
         asignacion.setUsuario(usuario);
         asignacion.setTurno(turno);
         asignacion.setInicio(inicio);
         asignacion.setVigente(vigente);
-        return asignacionTurnoRepository.save(asignacion);
+        asignacionTurnoRepository.save(asignacion);
     }
 
     public List<AsignacionTurno> findVigentesByDia(int dia) {
@@ -53,7 +53,7 @@ public class AsignacionTurnoService {
     }
 
     @Transactional
-    public AsignacionTurno asignarTurnoVigente(User usuario, Turno turno) {
+    public void asignarTurnoVigente(User usuario, Turno turno) {
         Objects.requireNonNull(usuario, "usuario no puede ser null");
         Objects.requireNonNull(turno, "turno no puede ser null");
 
@@ -68,7 +68,7 @@ public class AsignacionTurnoService {
         asignacion.setTurno(turno);
         asignacion.setInicio(Timestamp.from(Instant.now()));
         asignacion.setVigente(true);
-        return asignacionTurnoRepository.save(asignacion);
+        asignacionTurnoRepository.save(asignacion);
     }
 
     @Transactional
