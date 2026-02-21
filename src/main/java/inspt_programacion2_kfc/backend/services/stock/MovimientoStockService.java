@@ -66,4 +66,8 @@ public class MovimientoStockService {
         }
         return result;
     }
+
+    public List<MovimientoStock> findAllMovimientos() {
+        return movimientoStockRepository.findAllByOrderByFechaDesc();
+    }
 }

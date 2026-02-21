@@ -59,6 +59,10 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
+    public List<Pedido> findAllPedidosSorted() {
+        return pedidoRepository.findAllByOrderByCreatedAtDesc();
+    }
+
     private Pedido findByIdPedido(Long idPedido) {
         if (idPedido == null) {
             throw new OrderNotFoundException("ID pedido invalido.");

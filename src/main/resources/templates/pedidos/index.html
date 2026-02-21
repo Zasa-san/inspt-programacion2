@@ -11,6 +11,15 @@
       <h1 class="title" th:text="${page.title}">Pedidos</h1>
       <p class="subtitle" th:text="${page.description}">Listado de pedidos</p>
 
+      <div class="field has-text-right" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/pedidos/export.csv}" class="button is-info is-light">
+          <span class="icon is-small">
+            <i class="fas fa-file-csv"></i>
+          </span>
+          <span>Descargar CSV</span>
+        </a>
+      </div>
+
       <div th:if="${successMessage != null}" class="notification is-success" th:text="${successMessage}"></div>
       <div th:if="${errorMessage != null}" class="notification is-danger" th:text="${errorMessage}"></div>
 

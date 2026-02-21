@@ -9,6 +9,8 @@ import inspt_programacion2_kfc.backend.models.stock.MovimientoStock;
 public interface MovimientoStockRepository extends JpaRepository<MovimientoStock, Long> {
 
     List<MovimientoStock> findByItemId(Long itemId);
+
+    List<MovimientoStock> findAllByOrderByFechaDesc();
 }
 
 
