@@ -171,48 +171,26 @@ public class DataLoaderCli {
 
             System.out.println("Stock inicial registrado para todos los items");
 
-            GrupoIngrediente grupoBase1 = new GrupoIngrediente();
-            grupoBase1.setNombre("Base");
-            grupoBase1.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase1 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing1_1 = new Ingrediente();
-            ing1_1.setItem(piezaPollo);
-            ing1_1.setCantidad(2);
-            ing1_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing1_1 = getIngrediente(piezaPollo, 2, true);
             grupoBase1.getIngredientes().add(ing1_1);
 
-            Ingrediente ing1_2 = new Ingrediente();
-            ing1_2.setItem(bastonPapa);
-            ing1_2.setCantidad(1);
-            ing1_2.setSeleccionadoPorDefecto(true);
+            Ingrediente ing1_2 = getIngrediente(bastonPapa, 1, true);
             grupoBase1.getIngredientes().add(ing1_2);
 
-            Ingrediente ing1_3 = new Ingrediente();
-            ing1_3.setItem(vaso);
-            ing1_3.setCantidad(1);
-            ing1_3.setSeleccionadoPorDefecto(true);
+            Ingrediente ing1_3 = getIngrediente(vaso, 1, true);
             grupoBase1.getIngredientes().add(ing1_3);
 
-            GrupoIngrediente grupoExtras1 = new GrupoIngrediente();
-            grupoExtras1.setNombre("Extras");
-            grupoExtras1.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoExtras1 = getGrupoIngrediente("Extras", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing1_ex1 = new Ingrediente();
-            ing1_ex1.setItem(piezaPollo);
-            ing1_ex1.setCantidad(2);
-            ing1_ex1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing1_ex1 = getIngrediente(piezaPollo, 2, false);
             grupoExtras1.getIngredientes().add(ing1_ex1);
 
-            Ingrediente ing1_ex2 = new Ingrediente();
-            ing1_ex2.setItem(bacon);
-            ing1_ex2.setCantidad(1);
-            ing1_ex2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing1_ex2 = getIngrediente(bacon, 1, false);
             grupoExtras1.getIngredientes().add(ing1_ex2);
 
-            Ingrediente ing1_ex3 = new Ingrediente();
-            ing1_ex3.setItem(quesoCheddar);
-            ing1_ex3.setCantidad(1);
-            ing1_ex3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing1_ex3 = getIngrediente(quesoCheddar, 1, false);
             grupoExtras1.getIngredientes().add(ing1_ex3);
 
             List<GrupoIngrediente> gruposComboClasico = new ArrayList<>();
@@ -221,54 +199,29 @@ public class DataLoaderCli {
 
             productoService.create("Combo Clásico", "Sandwich de pollo frito + papas medianas + bebida", gruposComboClasico, null, null, "/uploads/products/combo-clasico.jpg");
 
-            GrupoIngrediente grupoBase2 = new GrupoIngrediente();
-            grupoBase2.setNombre("Base");
-            grupoBase2.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase2 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing2_1 = new Ingrediente();
-            ing2_1.setItem(piezaPollo);
-            ing2_1.setCantidad(8);
-            ing2_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing2_1 = getIngrediente(piezaPollo, 8, true);
             grupoBase2.getIngredientes().add(ing2_1);
 
-            Ingrediente ing2_2 = new Ingrediente();
-            ing2_2.setItem(bastonPapa);
-            ing2_2.setCantidad(2);
-            ing2_2.setSeleccionadoPorDefecto(true);
+            Ingrediente ing2_2 = getIngrediente(bastonPapa, 2, true);
             grupoBase2.getIngredientes().add(ing2_2);
 
-            Ingrediente ing2_3 = new Ingrediente();
-            ing2_3.setItem(vaso);
-            ing2_3.setCantidad(4);
-            ing2_3.setSeleccionadoPorDefecto(true);
+            Ingrediente ing2_3 = getIngrediente(vaso, 4, true);
             grupoBase2.getIngredientes().add(ing2_3);
 
-            GrupoIngrediente grupoExtras2 = new GrupoIngrediente();
-            grupoExtras2.setNombre("Extras");
-            grupoExtras2.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoExtras2 = getGrupoIngrediente("Extras", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing2_ex1 = new Ingrediente();
-            ing2_ex1.setItem(bastonPapa);
-            ing2_ex1.setCantidad(2);
-            ing2_ex1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing2_ex1 = getIngrediente(bastonPapa, 2, false);
             grupoExtras2.getIngredientes().add(ing2_ex1);
 
-            Ingrediente ing2_ex2 = new Ingrediente();
-            ing2_ex2.setItem(salsaBBQ);
-            ing2_ex2.setCantidad(1);
-            ing2_ex2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing2_ex2 = getIngrediente(salsaBBQ, 1, false);
             grupoExtras2.getIngredientes().add(ing2_ex2);
 
-            Ingrediente ing2_ex3 = new Ingrediente();
-            ing2_ex3.setItem(coleslaw);
-            ing2_ex3.setCantidad(1);
-            ing2_ex3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing2_ex3 = getIngrediente(coleslaw, 1, false);
             grupoExtras2.getIngredientes().add(ing2_ex3);
 
-            Ingrediente ing2_ex4 = new Ingrediente();
-            ing2_ex4.setItem(purePapas);
-            ing2_ex4.setCantidad(1);
-            ing2_ex4.setSeleccionadoPorDefecto(false);
+            Ingrediente ing2_ex4 = getIngrediente(purePapas, 1, false);
             grupoExtras2.getIngredientes().add(ing2_ex4);
 
             List<GrupoIngrediente> gruposBucket = new ArrayList<>();
@@ -277,48 +230,26 @@ public class DataLoaderCli {
 
             productoService.create("Bucket Familiar", "8 piezas de pollo + 2 papas grandes + 4 bebidas", gruposBucket, null, null, "/uploads/products/bucket-familiar.jpg");
 
-            GrupoIngrediente grupoBase3 = new GrupoIngrediente();
-            grupoBase3.setNombre("Base");
-            grupoBase3.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase3 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing3_1 = new Ingrediente();
-            ing3_1.setItem(tender);
-            ing3_1.setCantidad(6);
-            ing3_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing3_1 = getIngrediente(tender, 6, true);
             grupoBase3.getIngredientes().add(ing3_1);
 
-            Ingrediente ing3_2 = new Ingrediente();
-            ing3_2.setItem(bastonPapa);
-            ing3_2.setCantidad(1);
-            ing3_2.setSeleccionadoPorDefecto(true);
+            Ingrediente ing3_2 = getIngrediente(bastonPapa, 1, true);
             grupoBase3.getIngredientes().add(ing3_2);
 
-            Ingrediente ing3_3 = new Ingrediente();
-            ing3_3.setItem(vaso);
-            ing3_3.setCantidad(1);
-            ing3_3.setSeleccionadoPorDefecto(true);
+            Ingrediente ing3_3 = getIngrediente(vaso, 1, true);
             grupoBase3.getIngredientes().add(ing3_3);
 
-            GrupoIngrediente grupoExtras3 = new GrupoIngrediente();
-            grupoExtras3.setNombre("Extras");
-            grupoExtras3.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoExtras3 = getGrupoIngrediente("Extras", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing3_ex1 = new Ingrediente();
-            ing3_ex1.setItem(salsaRanch);
-            ing3_ex1.setCantidad(1);
-            ing3_ex1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing3_ex1 = getIngrediente(salsaRanch, 1, false);
             grupoExtras3.getIngredientes().add(ing3_ex1);
 
-            Ingrediente ing3_ex2 = new Ingrediente();
-            ing3_ex2.setItem(salsaBuffalo);
-            ing3_ex2.setCantidad(1);
-            ing3_ex2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing3_ex2 = getIngrediente(salsaBuffalo, 1, false);
             grupoExtras3.getIngredientes().add(ing3_ex2);
 
-            Ingrediente ing3_ex3 = new Ingrediente();
-            ing3_ex3.setItem(arosCebolla);
-            ing3_ex3.setCantidad(1);
-            ing3_ex3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing3_ex3 = getIngrediente(arosCebolla, 1, false);
             grupoExtras3.getIngredientes().add(ing3_ex3);
 
             List<GrupoIngrediente> gruposTenders = new ArrayList<>();
@@ -327,58 +258,31 @@ public class DataLoaderCli {
 
             productoService.create("Tenders Box", "6 tenders crujientes + papas + bebida + salsa a elección", gruposTenders, null, null, "/uploads/products/tenders-box.jpg");
 
-            GrupoIngrediente grupoBase4 = new GrupoIngrediente();
-            grupoBase4.setNombre("Base");
-            grupoBase4.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase4 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing4_1 = new Ingrediente();
-            ing4_1.setItem(helado);
-            ing4_1.setCantidad(1);
-            ing4_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing4_1 = getIngrediente(helado, 1, true);
             grupoBase4.getIngredientes().add(ing4_1);
 
-            GrupoIngrediente grupoSalsa4 = new GrupoIngrediente();
-            grupoSalsa4.setNombre("Salsa");
-            grupoSalsa4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO);
+            GrupoIngrediente grupoSalsa4 = getGrupoIngrediente("Salsa", GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO);
 
-            Ingrediente ing4_s1 = new Ingrediente();
-            ing4_s1.setItem(salsaChocolate);
-            ing4_s1.setCantidad(1);
-            ing4_s1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_s1 = getIngrediente(salsaChocolate, 1, false);
             grupoSalsa4.getIngredientes().add(ing4_s1);
 
-            Ingrediente ing4_s2 = new Ingrediente();
-            ing4_s2.setItem(salsaFrutilla);
-            ing4_s2.setCantidad(1);
-            ing4_s2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_s2 = getIngrediente(salsaFrutilla, 1, false);
             grupoSalsa4.getIngredientes().add(ing4_s2);
 
-            Ingrediente ing4_s3 = new Ingrediente();
-            ing4_s3.setItem(salsaDulceLeche);
-            ing4_s3.setCantidad(1);
-            ing4_s3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_s3 = getIngrediente(salsaDulceLeche, 1, false);
             grupoSalsa4.getIngredientes().add(ing4_s3);
 
-            GrupoIngrediente grupoToppings4 = new GrupoIngrediente();
-            grupoToppings4.setNombre("Toppings");
-            grupoToppings4.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoToppings4 = getGrupoIngrediente("Toppings", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing4_t1 = new Ingrediente();
-            ing4_t1.setItem(chipsChocolate);
-            ing4_t1.setCantidad(1);
-            ing4_t1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_t1 = getIngrediente(chipsChocolate, 1, false);
             grupoToppings4.getIngredientes().add(ing4_t1);
 
-            Ingrediente ing4_t2 = new Ingrediente();
-            ing4_t2.setItem(mani);
-            ing4_t2.setCantidad(1);
-            ing4_t2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_t2 = getIngrediente(mani, 1, false);
             grupoToppings4.getIngredientes().add(ing4_t2);
 
-            Ingrediente ing4_t3 = new Ingrediente();
-            ing4_t3.setItem(cremaBatida);
-            ing4_t3.setCantidad(1);
-            ing4_t3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing4_t3 = getIngrediente(cremaBatida, 1, false);
             grupoToppings4.getIngredientes().add(ing4_t3);
 
             List<GrupoIngrediente> gruposHelado = new ArrayList<>();
@@ -388,30 +292,17 @@ public class DataLoaderCli {
 
             productoService.create("Helado Sundae", "Helado cremoso con salsa y toppings", gruposHelado, null, null, "/uploads/products/helado-sundae.jpg");
 
-            GrupoIngrediente grupoBase5 = new GrupoIngrediente();
-            grupoBase5.setNombre("Base");
-            grupoBase5.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase5 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing5_1 = new Ingrediente();
-            ing5_1.setItem(alita);
-            ing5_1.setCantidad(6);
-            ing5_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing5_1 = getIngrediente(alita, 6, true);
             grupoBase5.getIngredientes().add(ing5_1);
 
-            GrupoIngrediente grupoExtras5 = new GrupoIngrediente();
-            grupoExtras5.setNombre("Extras");
-            grupoExtras5.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoExtras5 = getGrupoIngrediente("Extras", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing5_ex1 = new Ingrediente();
-            ing5_ex1.setItem(salsaQuesoAzul);
-            ing5_ex1.setCantidad(1);
-            ing5_ex1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing5_ex1 = getIngrediente(salsaQuesoAzul, 1, false);
             grupoExtras5.getIngredientes().add(ing5_ex1);
 
-            Ingrediente ing5_ex2 = new Ingrediente();
-            ing5_ex2.setItem(bastonesVegetales);
-            ing5_ex2.setCantidad(1);
-            ing5_ex2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing5_ex2 = getIngrediente(bastonesVegetales, 1, false);
             grupoExtras5.getIngredientes().add(ing5_ex2);
 
             List<GrupoIngrediente> gruposAlitas = new ArrayList<>();
@@ -420,48 +311,26 @@ public class DataLoaderCli {
 
             productoService.create("Alitas Picantes", "Alitas de pollo bañadas en salsa picante", gruposAlitas, null, null, "/uploads/products/alitas-picantes.jpg");
 
-            GrupoIngrediente grupoBase6 = new GrupoIngrediente();
-            grupoBase6.setNombre("Base");
-            grupoBase6.setTipo(GrupoIngrediente.TipoGrupo.OBLIGATORIO);
+            GrupoIngrediente grupoBase6 = getGrupoIngrediente("Base", GrupoIngrediente.TipoGrupo.OBLIGATORIO);
 
-            Ingrediente ing6_1 = new Ingrediente();
-            ing6_1.setItem(tortilla);
-            ing6_1.setCantidad(1);
-            ing6_1.setSeleccionadoPorDefecto(true);
+            Ingrediente ing6_1 = getIngrediente(tortilla, 1, true);
             grupoBase6.getIngredientes().add(ing6_1);
 
-            Ingrediente ing6_2 = new Ingrediente();
-            ing6_2.setItem(piezaPollo);
-            ing6_2.setCantidad(1);
-            ing6_2.setSeleccionadoPorDefecto(true);
+            Ingrediente ing6_2 = getIngrediente(piezaPollo, 1, true);
             grupoBase6.getIngredientes().add(ing6_2);
 
-            GrupoIngrediente grupoExtras6 = new GrupoIngrediente();
-            grupoExtras6.setNombre("Extras");
-            grupoExtras6.setTipo(GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
+            GrupoIngrediente grupoExtras6 = getGrupoIngrediente("Extras", GrupoIngrediente.TipoGrupo.OPCIONAL_MULTIPLE);
 
-            Ingrediente ing6_ex1 = new Ingrediente();
-            ing6_ex1.setItem(quesoCheddar);
-            ing6_ex1.setCantidad(1);
-            ing6_ex1.setSeleccionadoPorDefecto(false);
+            Ingrediente ing6_ex1 = getIngrediente(quesoCheddar, 1, false);
             grupoExtras6.getIngredientes().add(ing6_ex1);
 
-            Ingrediente ing6_ex2 = new Ingrediente();
-            ing6_ex2.setItem(bacon);
-            ing6_ex2.setCantidad(1);
-            ing6_ex2.setSeleccionadoPorDefecto(false);
+            Ingrediente ing6_ex2 = getIngrediente(bacon, 1, false);
             grupoExtras6.getIngredientes().add(ing6_ex2);
 
-            Ingrediente ing6_ex3 = new Ingrediente();
-            ing6_ex3.setItem(jalapenos);
-            ing6_ex3.setCantidad(1);
-            ing6_ex3.setSeleccionadoPorDefecto(false);
+            Ingrediente ing6_ex3 = getIngrediente(jalapenos, 1, false);
             grupoExtras6.getIngredientes().add(ing6_ex3);
 
-            Ingrediente ing6_ex4 = new Ingrediente();
-            ing6_ex4.setItem(palta);
-            ing6_ex4.setCantidad(1);
-            ing6_ex4.setSeleccionadoPorDefecto(false);
+            Ingrediente ing6_ex4 = getIngrediente(palta, 1, false);
             grupoExtras6.getIngredientes().add(ing6_ex4);
 
             List<GrupoIngrediente> gruposWrap = new ArrayList<>();
@@ -575,4 +444,18 @@ public class DataLoaderCli {
         return new CartItemDto(productoId, quantity, productoName, 0, seleccionados);
     }
 
+    private static Ingrediente getIngrediente(Item item, int cantidad, boolean seleccionadoPorDefecto) {
+        Ingrediente ingrediente = new Ingrediente();
+        ingrediente.setItem(item);
+        ingrediente.setCantidad(cantidad);
+        ingrediente.setSeleccionadoPorDefecto(seleccionadoPorDefecto);
+        return ingrediente;
+    }
+
+    private static GrupoIngrediente getGrupoIngrediente(String nombre, GrupoIngrediente.TipoGrupo tipo) {
+        GrupoIngrediente grupoBase1 = new GrupoIngrediente();
+        grupoBase1.setNombre(nombre);
+        grupoBase1.setTipo(tipo);
+        return grupoBase1;
+    }
 }

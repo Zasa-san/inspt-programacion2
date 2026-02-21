@@ -299,12 +299,16 @@ public class PedidoService {
         }
 
         Pedido pedido = findByIdPedido(id);
+        EstadoPedido estado = pedido.getEstado();
 
-        if (pedido.getEstado() == EstadoPedido.CANCELADO) {
+        if (estado == EstadoPedido.CANCELADO) {
             throw new OrderCancelledException("El pedido ya está cancelado.");
         }
-        if (pedido.getEstado() == EstadoPedido.ENTREGADO) {
+        if (estado == EstadoPedido.ENTREGADO) {
             throw new OrderAlreadyDeliveredException("No se puede cancelar un pedido ya entregado.");
+        }
+        if (estado != EstadoPedido.CREADO && estado != EstadoPedido.PAGADO) {
+            throw new OrderException("Solo se pueden cancelar pedidos en estado CREADO o PAGADO.");
         }
 
         pedido.setEstado(EstadoPedido.CANCELADO);
