@@ -114,6 +114,7 @@ public class PedidoService {
         pedido.setEstado(estadoInicial);
 
         int total = 0;
+        Map<Long, Integer> consumoAcumuladoPorItem = new HashMap<>();
 
         for (CartItemDto cartItem : items) {
             ProductoEntity productoBase = findByIdProducto(cartItem.getProductoId());
@@ -123,7 +124,7 @@ public class PedidoService {
             }
 
             List<Ingrediente> ingredientesSeleccionados = resolveIngredientesSeleccionados(productoBase, cartItem.getIngredientesIds());
-            validarStockIngredientes(ingredientesSeleccionados, cartItem.getQuantity());
+            validarStockIngredientes(ingredientesSeleccionados, cartItem.getQuantity(), consumoAcumuladoPorItem);
 
             int unitPrice = calcularPrecioUnitario(productoBase, ingredientesSeleccionados);
             validarPrecioUnitarioContraBackend(cartItem, unitPrice, productoBase.getName());
@@ -158,6 +159,7 @@ public class PedidoService {
         pedido.setTotal(total);
 
         Pedido guardado = pedidoRepository.save(pedido);
+        Map<Long, Integer> salidasPorItem = new HashMap<>();
 
         for (ItemPedido item : guardado.getItems()) {
             for (PedidoProducto customizacion : item.getCustomizaciones()) {
@@ -165,12 +167,16 @@ public class PedidoService {
                     continue;
                 }
                 int cantidad = customizacion.getCantidad() * item.getQuantity();
-                stockService.registrarMovimiento(customizacion.getItemStockIdSnapshot(),
-                        TipoMovimiento.SALIDA,
-                        cantidad,
-                        AppConstants.MOVIMIENTO_VENTA,
-                        guardado.getId());
+                salidasPorItem.merge(customizacion.getItemStockIdSnapshot(), cantidad, Integer::sum);
             }
+        }
+
+        for (Map.Entry<Long, Integer> salida : salidasPorItem.entrySet()) {
+            stockService.registrarMovimiento(salida.getKey(),
+                    TipoMovimiento.SALIDA,
+                    salida.getValue(),
+                    AppConstants.MOVIMIENTO_VENTA,
+                    guardado.getId());
         }
     }
 
@@ -335,14 +341,36 @@ public class PedidoService {
         }
     }
 
-    private void validarStockIngredientes(List<Ingrediente> ingredientesSeleccionados, int cantidadProducto) {
+    private void validarStockIngredientes(List<Ingrediente> ingredientesSeleccionados, int cantidadProducto, Map<Long, Integer> consumoAcumuladoPorItem) {
+        Map<Long, Integer> consumoPorItemActual = new HashMap<>();
+        Map<Long, String> nombreItemPorId = new HashMap<>();
+
         for (Ingrediente ingrediente : ingredientesSeleccionados) {
-            int stockActual = stockService.calcularStockItem(ingrediente.getItem().getId());
-            int cantidadNecesaria = ingrediente.getCantidad() * cantidadProducto;
-            if (stockActual < cantidadNecesaria) {
-                System.out.printf("Ingrediente %s sin stock suficiente", ingrediente.getItem().getName());
+            if (ingrediente == null || ingrediente.getItem() == null || ingrediente.getItem().getId() == null) {
                 throw new StockException("Producto o ingredientes sin stock.");
             }
+
+            Long itemId = ingrediente.getItem().getId();
+            nombreItemPorId.put(itemId, ingrediente.getItem().getName());
+            int cantidadNecesaria = ingrediente.getCantidad() * cantidadProducto;
+            consumoPorItemActual.merge(itemId, cantidadNecesaria, Integer::sum);
+        }
+
+        for (Map.Entry<Long, Integer> consumoItem : consumoPorItemActual.entrySet()) {
+            Long itemId = consumoItem.getKey();
+            int stockActual = stockService.calcularStockItem(itemId);
+            int yaReservadoEnPedido = consumoAcumuladoPorItem.getOrDefault(itemId, 0);
+            int consumoTotalRequerido = yaReservadoEnPedido + consumoItem.getValue();
+
+            if (stockActual < consumoTotalRequerido) {
+                String nombreItem = nombreItemPorId.getOrDefault(itemId, "Ingrediente");
+                System.out.printf("Ingrediente %s sin stock suficiente", nombreItem);
+                throw new StockException("Producto o ingredientes sin stock.");
+            }
+        }
+
+        for (Map.Entry<Long, Integer> consumoItem : consumoPorItemActual.entrySet()) {
+            consumoAcumuladoPorItem.merge(consumoItem.getKey(), consumoItem.getValue(), Integer::sum);
         }
     }
 

@@ -48,8 +48,14 @@ public class ProductoDTOConverter {
                     continue;
                 }
 
-                IngredienteDTO ingredienteDTO = new IngredienteDTO(ingredienteEntity.getId(), ingredienteEntity.getItem().getId(), ingredienteEntity.getItem().getName(),
-                        ingredienteEntity.getItem().getPrice(), ingredienteEntity.getCantidad(), ingredienteEntity.isSeleccionadoPorDefecto());
+                IngredienteDTO ingredienteDTO = new IngredienteDTO(
+                        ingredienteEntity.getId(),
+                        ingredienteEntity.getItem().getId(),
+                        ingredienteEntity.getItem().getName(),
+                        ingredienteEntity.getItem().getPrice(),
+                        null,
+                        ingredienteEntity.getCantidad(),
+                        ingredienteEntity.isSeleccionadoPorDefecto());
                 ingredientes.add(ingredienteDTO);
             }
         }

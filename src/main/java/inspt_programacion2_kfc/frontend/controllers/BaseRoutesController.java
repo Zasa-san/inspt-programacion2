@@ -55,7 +55,9 @@ public class BaseRoutesController {
 
         // JSON por producto para que el modal renderice grupos/ingredientes sin serializar entidades JPA.
         Map<Long, String> gruposJsonMap = new HashMap<>();
+        Map<Long, Integer> stockPorItemCache = new HashMap<>();
         for (ProductoDTO p : products) {
+            calcularStockPorItem(p, stockPorItemCache);
             try {
                 String json = objectMapper.writeValueAsString(p.getGruposIngredientes());
                 gruposJsonMap.put(p.getId(), json);
@@ -74,6 +76,25 @@ public class BaseRoutesController {
         model.addAttribute("cartTotal", cartTotal);
 
         return "index";
+    }
+
+    private void calcularStockPorItem(ProductoDTO p, Map<Long, Integer> stockPorItemCache) {
+        if (p.getGruposIngredientes() != null) {
+            p.getGruposIngredientes().forEach(grupo -> {
+                if (grupo == null || grupo.getIngredientes() == null) {
+                    return;
+                }
+                grupo.getIngredientes().forEach(ingrediente -> {
+                    if (ingrediente == null || ingrediente.getItemId() == null) {
+                        return;
+                    }
+                    int stock = stockPorItemCache.computeIfAbsent(
+                            ingrediente.getItemId(),
+                            movimientoStockService::calcularStockItem);
+                    ingrediente.setItemStock(stock);
+                });
+            });
+        }
     }
 
     @GetMapping("/login")

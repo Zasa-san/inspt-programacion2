@@ -17,6 +17,7 @@ public class IngredienteDTO {
     private Long itemId;
     private String itemName;
     private Integer itemPrice;
+    private Integer itemStock;
     private Integer cantidad;
     private Boolean seleccionadoPorDefecto;
 

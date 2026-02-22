@@ -18,6 +18,7 @@ $(() => {
   let currentDefaultTotal = 0;
   let currentRequiredIds = [];
   let currentRequiredTotal = 0;
+  let currentRequiredConsumptionByItem = {};
 
   // Función para formatear precio (centavos a pesos)
   function formatPrice(centavos) {
@@ -91,6 +92,45 @@ $(() => {
     return { requiredIds, requiredTotal };
   }
 
+  function computeRequiredConsumptionByItem(grupos) {
+    const consumo = {};
+
+    (grupos || []).forEach(grupo => {
+      if (!grupo || !Array.isArray(grupo.ingredientes)) return;
+      const tipo = (grupo.tipo || '').toUpperCase();
+      if (tipo !== 'OBLIGATORIO') return;
+
+      const ingredientes = grupo.ingredientes.filter(i => i != null);
+      if (!ingredientes.length) return;
+
+      const defaults = ingredientes.filter(i => i.seleccionadoPorDefecto);
+      const obligatorios = defaults.length ? defaults : ingredientes;
+
+      obligatorios.forEach(ing => {
+        const itemId = parseInt(ing.itemId);
+        if (!Number.isInteger(itemId)) return;
+        const cant = parseInt(ing.cantidad) || 1;
+        consumo[itemId] = (consumo[itemId] || 0) + cant;
+      });
+    });
+
+    return consumo;
+  }
+
+  function isOptionalIngredientAvailable(ing) {
+    const itemStock = parseInt(ing.itemStock);
+    const itemId = parseInt(ing.itemId);
+    const cant = parseInt(ing.cantidad) || 1;
+
+    if (!Number.isInteger(itemStock) || !Number.isInteger(itemId)) {
+      return true;
+    }
+
+    const reservadoPorObligatorios = currentRequiredConsumptionByItem[itemId] || 0;
+    const disponibleParaOpcionales = itemStock - reservadoPorObligatorios;
+    return disponibleParaOpcionales >= cant;
+  }
+
   function computeDefaultTotal(grupos) {
     let total = 0;
 
@@ -143,6 +183,7 @@ $(() => {
     const requiredSelection = computeRequiredSelection(currentGrupos);
     currentRequiredIds = requiredSelection.requiredIds;
     currentRequiredTotal = requiredSelection.requiredTotal;
+    currentRequiredConsumptionByItem = computeRequiredConsumptionByItem(currentGrupos);
 
     // Setear valores en el modal
     $modalProductName.text(productName);
@@ -215,8 +256,12 @@ $(() => {
             const precioDisplay = total > 0 ? `+$${formatPrice(total)}` : '$0,00';
             const tagClass = total > 0 ? 'is-warning' : 'is-light';
 
+            const disponible = isOptionalIngredientAvailable(ing);
+            const disabled = disponible ? '' : 'disabled';
+            const agotadoTag = disponible ? '' : '<span class="tag is-danger is-light ml-2">Agotado</span>';
+
             let checked = '';
-            if (!checkedSet && ing.seleccionadoPorDefecto) {
+            if (disponible && !checkedSet && ing.seleccionadoPorDefecto) {
               checked = 'checked';
               checkedSet = true;
               $none.find('input[type="radio"]').prop('checked', false);
@@ -224,10 +269,11 @@ $(() => {
 
             const label = ing.itemName || `Item ${ing.itemId || ''}`;
             const $item = $(`
-              <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-                <input type="radio" name="${radioName}" value="${ing.id}" data-price="${total}" ${checked} />
+              <label class="radio is-block mb-2 p-2 has-background-light" style="border-radius: 4px; ${disponible ? 'cursor: pointer;' : 'cursor: not-allowed; opacity: 0.75;'}">
+                <input type="radio" name="${radioName}" value="${ing.id}" data-price="${total}" ${checked} ${disabled} />
                 <span class="ml-2">${label}</span>
                 <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
+                ${agotadoTag}
               </label>
             `);
             $grupoSection.append($item);
@@ -240,14 +286,18 @@ $(() => {
 
             const precioDisplay = total > 0 ? `+$${formatPrice(total)}` : '$0,00';
             const tagClass = total > 0 ? 'is-info' : 'is-light';
-            const checked = ing.seleccionadoPorDefecto ? 'checked' : '';
+            const disponible = isOptionalIngredientAvailable(ing);
+            const disabled = disponible ? '' : 'disabled';
+            const checked = ing.seleccionadoPorDefecto && disponible ? 'checked' : '';
+            const agotadoTag = disponible ? '' : '<span class="tag is-danger is-light ml-2">Agotado</span>';
             const label = ing.itemName || `Item ${ing.itemId || ''}`;
 
             const $item = $(`
-              <label class="checkbox is-block mb-2 p-2 has-background-light" style="border-radius: 4px; cursor: pointer;">
-                <input type="checkbox" value="${ing.id}" data-price="${total}" ${checked} />
+              <label class="checkbox is-block mb-2 p-2 has-background-light" style="border-radius: 4px; ${disponible ? 'cursor: pointer;' : 'cursor: not-allowed; opacity: 0.75;'}">
+                <input type="checkbox" value="${ing.id}" data-price="${total}" ${checked} ${disabled} />
                 <span class="ml-2">${label}</span>
                 <span class="tag ${tagClass} is-light ml-2">${precioDisplay}</span>
+                ${agotadoTag}
               </label>
             `);
             $grupoSection.append($item);

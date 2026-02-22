@@ -36,6 +36,12 @@ public class MovimientoStockService {
         }
 
         if (item != null) {
+            if (tipo == TipoMovimiento.SALIDA) {
+                int stockActual = calcularStockItem(item.getId());
+                if (stockActual < cantidad) {
+                    throw new StockException("Stock insuficiente para registrar el movimiento.");
+                }
+            }
             movimientoStockRepository.save(new MovimientoStock(item, tipo, cantidad, motivo, pedidoId));
         }
     }
