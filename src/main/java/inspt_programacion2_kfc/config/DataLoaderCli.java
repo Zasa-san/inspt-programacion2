@@ -362,7 +362,7 @@ public class DataLoaderCli {
                     ing2_1.getId(), ing2_2.getId(), ing2_3.getId(),
                     ing2_ex2.getId(), ing2_ex3.getId()));
 
-            pedidoService.crearPedidoDesdeCarrito(pedido1, EstadoPedido.ENTREGADO);
+            pedidoService.crearPedidoDesdeCarrito(pedido1, EstadoPedido.ENTREGADO, "Lucas");
 
             List<CartItemDto> pedido2 = new ArrayList<>();
 
@@ -374,7 +374,7 @@ public class DataLoaderCli {
                     ing1_1.getId(), ing1_2.getId(), ing1_3.getId(),
                     ing1_ex1.getId()));
 
-            pedidoService.crearPedidoDesdeCarrito(pedido2, EstadoPedido.ENTREGADO);
+            pedidoService.crearPedidoDesdeCarrito(pedido2, EstadoPedido.ENTREGADO, "Mia");
 
             List<CartItemDto> pedido3 = new ArrayList<>();
 
@@ -385,7 +385,7 @@ public class DataLoaderCli {
                     ing6_1.getId(), ing6_2.getId(),
                     ing6_ex2.getId(), ing6_ex3.getId()));
 
-            pedidoService.crearPedidoDesdeCarrito(pedido3, EstadoPedido.ENTREGADO);
+            pedidoService.crearPedidoDesdeCarrito(pedido3, EstadoPedido.ENTREGADO, "Tomas");
 
             System.out.println("Pedidos entregados de ejemplo creados sobre productos existentes");
 

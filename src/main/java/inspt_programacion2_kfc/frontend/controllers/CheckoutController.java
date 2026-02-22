@@ -57,7 +57,16 @@ public class CheckoutController {
     }
 
     @PostMapping("/checkout/pagar-en-caja")
-    public String pagarEnCaja(HttpSession session, RedirectAttributes redirectAttrs) {
+    public String pagarEnCaja(
+            @RequestParam("customerName") String customerName,
+            HttpSession session,
+            RedirectAttributes redirectAttrs) {
+        String nombreCliente = checkoutHelper.normalizarNombreCliente(customerName);
+        if (nombreCliente == null) {
+            redirectAttrs.addFlashAttribute("paymentError", "Debes ingresar el nombre del cliente.");
+            return "redirect:/checkout";
+        }
+
         Map<String, CartItem> cart = getCart(session);
         if (CollectionUtils.isEmpty(cart)) {
             redirectAttrs.addFlashAttribute("cartError", "No hay productos en el carrito.");
@@ -69,7 +78,7 @@ public class CheckoutController {
             List<CartItemDto> dtoItems = items.stream()
                     .map(checkoutHelper::toCartItemDto)
                     .toList();
-            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO);
+            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO, nombreCliente);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pedido registrado. Pagá en caja al retirar.");
         } catch (StockException | IllegalArgumentException ex) {
@@ -88,6 +97,12 @@ public class CheckoutController {
             @RequestParam("cvv") String cvv,
             HttpSession session,
             RedirectAttributes redirectAttrs) {
+
+        String nombreCliente = checkoutHelper.normalizarNombreCliente(cardholderName);
+        if (nombreCliente == null) {
+            redirectAttrs.addFlashAttribute("paymentError", "Debes ingresar el nombre en la tarjeta.");
+            return "redirect:/checkout";
+        }
 
         if (cardholderName == null || cardholderName.isBlank()
                 || cardNumber == null || cardNumber.isBlank()
@@ -108,7 +123,7 @@ public class CheckoutController {
             List<CartItemDto> dtoItems = items.stream()
                     .map(checkoutHelper::toCartItemDto)
                     .toList();
-            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO);
+            pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO, nombreCliente);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pago realizado y pedido registrado correctamente.");
         } catch (StockException | IllegalArgumentException ex) {
@@ -118,5 +133,4 @@ public class CheckoutController {
 
         return "redirect:/";
     }
-
 }

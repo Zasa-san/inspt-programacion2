@@ -59,6 +59,12 @@
           </table>
 
           <form th:action="@{/checkout/pagar-en-caja}" method="post" class="mt-4">
+            <div class="field">
+              <label class="label">Nombre del cliente</label>
+              <div class="control">
+                <input class="input" type="text" name="customerName" maxlength="80" placeholder="Nombre y apellido" required />
+              </div>
+            </div>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="button is-info is-fullwidth">
               Pagar en caja

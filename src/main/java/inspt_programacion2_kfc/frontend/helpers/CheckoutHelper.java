@@ -30,4 +30,15 @@ public class CheckoutHelper {
                 ingredientesIds
         );
     }
+
+    public String normalizarNombreCliente(String customerName) {
+        if (customerName == null) {
+            return null;
+        }
+        String limpio = customerName.trim();
+        if (limpio.isEmpty() || limpio.length() > 80) {
+            return null;
+        }
+        return limpio;
+    }
 }

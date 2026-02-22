@@ -101,17 +101,26 @@ public class PedidoService {
 
     @Transactional
     public void crearPedidoDesdeCarrito(List<CartItemDto> items) {
-        crearPedidoDesdeCarrito(items, EstadoPedido.CREADO);
+        crearPedidoDesdeCarrito(items, EstadoPedido.CREADO, null);
     }
 
     @Transactional
     public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial) {
+        crearPedidoDesdeCarrito(items, estadoInicial, null);
+    }
+
+    @Transactional
+    public void crearPedidoDesdeCarrito(List<CartItemDto> items, EstadoPedido estadoInicial, String nombreCliente) {
         if (items == null || items.isEmpty()) {
             throw new CartEmptyException("El carrito está vacío.");
         }
 
         Pedido pedido = new Pedido();
         pedido.setEstado(estadoInicial);
+        if (nombreCliente != null) {
+            String nombreLimpio = nombreCliente.trim();
+            pedido.setNombreCliente(nombreLimpio.isEmpty() ? null : nombreLimpio);
+        }
 
         int total = 0;
         Map<Long, Integer> consumoAcumuladoPorItem = new HashMap<>();

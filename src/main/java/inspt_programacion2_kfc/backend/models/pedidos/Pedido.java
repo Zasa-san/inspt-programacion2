@@ -38,6 +38,9 @@ public class Pedido {
     @Column(nullable = false)
     private int total;
 
+    @Column(length = 80)
+    private String nombreCliente;
+
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> items = new ArrayList<>();
 

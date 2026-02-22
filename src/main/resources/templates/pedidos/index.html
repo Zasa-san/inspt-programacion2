@@ -57,7 +57,13 @@
           </thead>
           <tbody>
             <tr th:each="p : ${pedidos}">
-              <td th:text="${p.id}">1</td>
+              <td>
+                <div><strong>#<span th:text="${p.id}">1</span></strong></div>
+                <div class="is-size-7 has-text-grey"
+                     th:text="${(p.nombreCliente != null and !#strings.isEmpty(p.nombreCliente)) ? p.nombreCliente : 'Sin nombre'}">
+                  Sin nombre
+                </div>
+              </td>
               <td th:text="${#temporals.format(p.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2025 12:00</td>
               <td>
                 <span class="tag is-info" th:if="${p.estado == CREADO}" th:text="${p.estado}">CREADO</span>
