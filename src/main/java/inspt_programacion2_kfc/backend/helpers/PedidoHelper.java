@@ -1,5 +1,7 @@
 package inspt_programacion2_kfc.backend.helpers;
 
+import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
+import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import org.springframework.stereotype.Component;
 
 import inspt_programacion2_kfc.backend.models.pedidos.ItemPedido;
@@ -37,4 +39,19 @@ public class PedidoHelper {
     public int obtenerStockPorIdProducto(Long idProducto) {
         return stockService.calcularStockItem(idProducto);
     }
+
+    public PedidoProducto getPedidoProducto(CartItemDto cartItem, Ingrediente ingrediente) {
+        PedidoProducto customizacion = new PedidoProducto();
+        customizacion.setIngrediente(ingrediente);
+        customizacion.setIngredienteIdSnapshot(ingrediente.getId());
+        customizacion.setIngredienteNombre(ingrediente.getItem().getName());
+        customizacion.setItemStockIdSnapshot(ingrediente.getItem().getId());
+        customizacion.setItemStockNombre(ingrediente.getItem().getName());
+        customizacion.setCantidad(ingrediente.getCantidad());
+        int precioUnitarioExtra = ingrediente.getCantidad() * ingrediente.getItem().getPrice();
+        customizacion.setPrecioUnitarioExtra(precioUnitarioExtra);
+        customizacion.setSubtotalExtra(precioUnitarioExtra * cartItem.getQuantity());
+        return customizacion;
+    }
+
 }

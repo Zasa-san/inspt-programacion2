@@ -67,7 +67,7 @@ public class ProductoService {
         if (precioBase != null && precioBase > 0) {
             precio = precioBase;
         } else {
-            precio = getPrecio(grupoIngredientes);
+            precio = calcularPrecioBaseIngredientes(grupoIngredientes);
         }
 
         productoEntity.setPrecioBase(precio);
@@ -79,10 +79,6 @@ public class ProductoService {
         }
 
         productoRepository.save(productoEntity);
-    }
-
-    private int getPrecio(List<GrupoIngrediente> grupoIngredientes) {
-        return calcularCostoBaseIngredientes(grupoIngredientes);
     }
 
     public void delete(Long id) {
@@ -128,7 +124,7 @@ public class ProductoService {
         if (precioBase != null && precioBase > 0) {
             existing.setPrecioBase(precioBase);
         } else {
-            existing.setPrecioBase(getPrecio(grupoIngredientes));
+            existing.setPrecioBase(calcularPrecioBaseIngredientes(grupoIngredientes));
         }
 
         setImagen(imageFile, removeImage, existing);
@@ -172,7 +168,7 @@ public class ProductoService {
                 .toList();
 
         for (ProductoEntity producto : productosAfectados) {
-            int nuevoPrecio = getPrecio(producto.getGruposIngredientes());
+            int nuevoPrecio = calcularPrecioBaseIngredientes(producto.getGruposIngredientes());
             producto.setPrecioBase(nuevoPrecio);
             productoRepository.save(producto);
         }
@@ -195,13 +191,13 @@ public class ProductoService {
             return;
         }
 
-        int costoBase = calcularCostoBaseIngredientes(grupos);
+        int costoBase = calcularPrecioBaseIngredientes(grupos);
         if (precioBase < costoBase) {
             throw new ProductException("Precio base invalido: no puede ser menor al costo base de ingredientes (" + costoBase + ").");
         }
     }
 
-    private int calcularCostoBaseIngredientes(List<GrupoIngrediente> grupos) {
+    private int calcularPrecioBaseIngredientes(List<GrupoIngrediente> grupos) {
         int total = 0;
 
         for (GrupoIngrediente grupo : grupos) {

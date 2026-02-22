@@ -148,16 +148,7 @@ public class PedidoService {
             item.setSubtotal(unitPrice * cartItem.getQuantity());
 
             for (Ingrediente ingrediente : ingredientesSeleccionados) {
-                PedidoProducto customizacion = new PedidoProducto();
-                customizacion.setIngrediente(ingrediente);
-                customizacion.setIngredienteIdSnapshot(ingrediente.getId());
-                customizacion.setIngredienteNombre(ingrediente.getItem().getName());
-                customizacion.setItemStockIdSnapshot(ingrediente.getItem().getId());
-                customizacion.setItemStockNombre(ingrediente.getItem().getName());
-                customizacion.setCantidad(ingrediente.getCantidad());
-                int precioUnitarioExtra = ingrediente.getCantidad() * ingrediente.getItem().getPrice();
-                customizacion.setPrecioUnitarioExtra(precioUnitarioExtra);
-                customizacion.setSubtotalExtra(precioUnitarioExtra * cartItem.getQuantity());
+                PedidoProducto customizacion = pedidoHelper.getPedidoProducto(cartItem, ingrediente);
                 item.addCustomizacion(customizacion);
             }
 

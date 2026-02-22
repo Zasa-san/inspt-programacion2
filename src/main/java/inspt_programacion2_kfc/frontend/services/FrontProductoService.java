@@ -16,8 +16,8 @@ import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.products.ProductoService;
 import inspt_programacion2_kfc.backend.services.stock.ItemService;
-import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
-import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.GrupoIngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.IngredienteDTO;
 
 @Service
 public class FrontProductoService {

@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.frontend.models.productos;
+package inspt_programacion2_kfc.frontend.models.productos.dto;
 
 import java.util.List;
 

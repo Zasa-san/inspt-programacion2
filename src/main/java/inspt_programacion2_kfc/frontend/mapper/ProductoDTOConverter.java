@@ -4,9 +4,9 @@ import inspt_programacion2_kfc.backend.models.constants.AppConstants;
 import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
 import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
-import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
-import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.ProductoDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.GrupoIngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.IngredienteDTO;
 
 import java.util.ArrayList;
 import java.util.List;

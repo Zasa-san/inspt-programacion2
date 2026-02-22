@@ -1,4 +1,4 @@
-package inspt_programacion2_kfc.frontend.models;
+package inspt_programacion2_kfc.frontend.models.productos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

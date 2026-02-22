@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.mapper.ProductoDTOConverter;
-import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
+import inspt_programacion2_kfc.frontend.models.carrito.CartItem;
+import inspt_programacion2_kfc.frontend.models.productos.dto.ProductoDTO;
 import inspt_programacion2_kfc.frontend.services.FrontProductoService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +21,15 @@ import java.util.Map;
 @Controller
 public class BaseRoutesController {
 
-    @Autowired
-    private FrontProductoService frontProductoService;
+    private final FrontProductoService frontProductoService;
+    private final MovimientoStockService movimientoStockService;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private MovimientoStockService movimientoStockService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    public BaseRoutesController(FrontProductoService frontProductoService, MovimientoStockService movimientoStockService, ObjectMapper objectMapper) {
+        this.frontProductoService = frontProductoService;
+        this.movimientoStockService = movimientoStockService;
+        this.objectMapper = objectMapper;
+    }
 
     @SuppressWarnings("unchecked")
     private List<CartItem> getCartItems(HttpSession session) {

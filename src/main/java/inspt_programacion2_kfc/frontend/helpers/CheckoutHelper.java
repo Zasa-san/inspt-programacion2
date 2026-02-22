@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
-import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
+import inspt_programacion2_kfc.frontend.models.carrito.CartItem;
+import inspt_programacion2_kfc.frontend.models.productos.CustomizacionSeleccionada;
 
 @Component
 public class CheckoutHelper {

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Service
 public class FileUploadService {
 
+    public static final String UPLOADS = "/uploads/";
     @Value("${app.upload-dir:uploads}")
     private String uploadDir;
 
@@ -38,7 +39,7 @@ public class FileUploadService {
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return "/uploads/" + subdirectory + "/" + filename;
+        return UPLOADS + subdirectory + "/" + filename;
     }
 
     public void deleteFile(String fileUrl) {
@@ -47,8 +48,8 @@ public class FileUploadService {
         }
 
         try {
-            if (fileUrl.startsWith("/uploads/")) {
-                String relativePath = fileUrl.substring("/uploads/".length());
+            if (fileUrl.startsWith(UPLOADS)) {
+                String relativePath = fileUrl.substring(UPLOADS.length());
                 Path filePath = Paths.get(uploadDir, relativePath);
                 Files.deleteIfExists(filePath);
             }

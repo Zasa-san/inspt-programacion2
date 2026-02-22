@@ -1,8 +1,10 @@
-package inspt_programacion2_kfc.frontend.models;
+package inspt_programacion2_kfc.frontend.models.carrito;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import inspt_programacion2_kfc.frontend.models.productos.CustomizacionSeleccionada;
+import inspt_programacion2_kfc.frontend.models.productos.dto.ProductoDTO;
 import lombok.Data;
 
 @Data
@@ -12,7 +14,6 @@ public class CartItem {
     private int quantity;
     private final List<CustomizacionSeleccionada> customizaciones;
 
-    // Compatibilidad con templates/helpers viejos que referencian "producto".
     public ProductoDTO getProducto() {
         return productoDTO;
     }

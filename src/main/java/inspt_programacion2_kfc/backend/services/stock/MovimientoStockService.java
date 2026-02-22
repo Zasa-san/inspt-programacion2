@@ -93,16 +93,7 @@ public class MovimientoStockService {
                     .filter(Ingrediente::isSeleccionadoPorDefecto)
                     .toList();
 
-            List<Ingrediente> requeridos = List.of();
-            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
-                requeridos = defaultsGrupo.isEmpty() ? grupo.getIngredientes() : defaultsGrupo;
-            } else if (!defaultsGrupo.isEmpty()) {
-                if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
-                    requeridos = List.of(defaultsGrupo.getFirst());
-                } else {
-                    requeridos = defaultsGrupo;
-                }
-            }
+            List<Ingrediente> requeridos = getIngredientesRequeridos(grupo, defaultsGrupo);
 
             for (Ingrediente ingrediente : requeridos) {
                 if (ingrediente == null || ingrediente.getItem() == null) {
@@ -122,6 +113,20 @@ public class MovimientoStockService {
         }
 
         return tieneIngredientesRequeridos ? stockMaximoPosible : 0;
+    }
+
+    private static List<Ingrediente> getIngredientesRequeridos(GrupoIngrediente grupo, List<Ingrediente> defaultsGrupo) {
+        List<Ingrediente> requeridos = List.of();
+        if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+            requeridos = defaultsGrupo.isEmpty() ? grupo.getIngredientes() : defaultsGrupo;
+        } else if (!defaultsGrupo.isEmpty()) {
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
+                requeridos = List.of(defaultsGrupo.getFirst());
+            } else {
+                requeridos = defaultsGrupo;
+            }
+        }
+        return requeridos;
     }
 
     public List<MovimientoStock> findAllMovimientos() {

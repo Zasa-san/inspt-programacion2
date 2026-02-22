@@ -18,7 +18,7 @@ import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
 import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
 import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
 import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
-import inspt_programacion2_kfc.frontend.models.CartItem;
+import inspt_programacion2_kfc.frontend.models.carrito.CartItem;
 import jakarta.servlet.http.HttpSession;
 
 @Controller

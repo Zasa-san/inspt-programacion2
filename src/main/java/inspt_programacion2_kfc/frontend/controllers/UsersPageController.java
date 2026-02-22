@@ -57,7 +57,7 @@ public class UsersPageController {
         }
 
         List<UserResponseDTO> dtos = filteredUsers.stream()
-                .map(user -> new UserResponseDTO(user))
+                .map(UserResponseDTO::new)
                 .collect(Collectors.toList());
 
         model.addAttribute("users", dtos);

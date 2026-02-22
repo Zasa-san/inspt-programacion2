@@ -14,9 +14,9 @@ import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.helpers.CartHelper;
 import inspt_programacion2_kfc.frontend.mapper.ProductoDTOConverter;
-import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
+import inspt_programacion2_kfc.frontend.models.carrito.CartItem;
+import inspt_programacion2_kfc.frontend.models.productos.CustomizacionSeleccionada;
+import inspt_programacion2_kfc.frontend.models.productos.dto.ProductoDTO;
 import inspt_programacion2_kfc.frontend.services.FrontProductoService;
 import jakarta.servlet.http.HttpSession;
 

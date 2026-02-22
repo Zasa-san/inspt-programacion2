@@ -15,11 +15,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import inspt_programacion2_kfc.backend.exceptions.cart.CartException;
-import inspt_programacion2_kfc.frontend.models.CartItem;
-import inspt_programacion2_kfc.frontend.models.CustomizacionSeleccionada;
-import inspt_programacion2_kfc.frontend.models.ProductoDTO;
-import inspt_programacion2_kfc.frontend.models.productos.GrupoIngredienteDTO;
-import inspt_programacion2_kfc.frontend.models.productos.IngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.carrito.CartItem;
+import inspt_programacion2_kfc.frontend.models.productos.CustomizacionSeleccionada;
+import inspt_programacion2_kfc.frontend.models.productos.dto.ProductoDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.GrupoIngredienteDTO;
+import inspt_programacion2_kfc.frontend.models.productos.dto.IngredienteDTO;
 
 @Component
 public class CartHelper {
