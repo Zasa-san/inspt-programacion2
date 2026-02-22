@@ -67,6 +67,37 @@ $(() => {
     }
   }
 
+  function syncIngredientSelectOptions($group) {
+    const $rows = $group.find('.ingrediente-item');
+    if (!$rows.length) return;
+
+    const selectedValues = $rows
+      .map(function () {
+        return ($(this).find('.ingrediente-itemSelect').val() ?? '').toString().trim();
+      })
+      .get()
+      .filter(v => v !== '');
+
+    $rows.each(function () {
+      const $select = $(this).find('.ingrediente-itemSelect').first();
+      if (!$select.length) return;
+
+      const currentValue = ($select.val() ?? '').toString().trim();
+      const selectedByOthers = new Set(selectedValues.filter(v => v !== currentValue));
+
+      $select.find('option').each(function () {
+        const value = ($(this).val() ?? '').toString().trim();
+        if (!value) {
+          $(this).prop('disabled', false).prop('hidden', false);
+          return;
+        }
+
+        const isUsedByOther = selectedByOthers.has(value);
+        $(this).prop('disabled', isUsedByOther).prop('hidden', isUsedByOther);
+      });
+    });
+  }
+
   function syncDefaultVisibilityByTipo($group) {
     const tipo = ($group.find('.grupo-tipo').val() ?? '').toString().trim().toUpperCase();
     const isObligatorio = tipo === 'OBLIGATORIO';
@@ -185,6 +216,7 @@ $(() => {
     $gruposContainer.append($newGroup);
     ensureAtLeastOneIngredient($newGroup);
     syncDefaultVisibilityByTipo($newGroup);
+    syncIngredientSelectOptions($newGroup);
     notifyGroupsChanged();
   });
 
@@ -202,6 +234,7 @@ $(() => {
     if (!$container.length) return;
     $container.append($ingredienteTemplate.clone());
     syncDefaultVisibilityByTipo($group);
+    syncIngredientSelectOptions($group);
     notifyGroupsChanged();
   });
 
@@ -209,6 +242,7 @@ $(() => {
     const $group = $(this).closest('.grupo-item');
     $(this).closest('.ingrediente-item').remove();
     ensureAtLeastOneIngredient($group);
+    syncIngredientSelectOptions($group);
     notifyGroupsChanged();
   });
 
@@ -219,6 +253,9 @@ $(() => {
 
       if ($(this).hasClass('ingrediente-default')) {
         enforceSingleDefaultByTipo($group, $(this));
+      }
+      if ($(this).hasClass('ingrediente-itemSelect')) {
+        syncIngredientSelectOptions($group);
       }
     }
 
@@ -245,6 +282,7 @@ $(() => {
     const $group = $(this);
     ensureAtLeastOneIngredient($group);
     syncDefaultVisibilityByTipo($group);
+    syncIngredientSelectOptions($group);
   });
 
   notifyGroupsChanged();
