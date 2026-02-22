@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
+import inspt_programacion2_kfc.backend.models.products.GrupoIngrediente;
+import inspt_programacion2_kfc.backend.models.products.Ingrediente;
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
 import inspt_programacion2_kfc.backend.models.stock.Item;
 import inspt_programacion2_kfc.backend.models.stock.MovimientoStock;
@@ -63,9 +65,57 @@ public class MovimientoStockService {
     public Map<Long, Integer> calcularStockParaProductos(List<ProductoEntity> productos) {
         Map<Long, Integer> result = new HashMap<>();
         for (ProductoEntity p : productos) {
-            result.put(p.getId(), calcularStockItem(p.getId()));
+            result.put(p.getId(), calcularStockProducto(p));
         }
         return result;
+    }
+
+    public int calcularStockProducto(ProductoEntity producto) {
+        if (producto == null || producto.getGruposIngredientes() == null || producto.getGruposIngredientes().isEmpty()) {
+            return 0;
+        }
+
+        int stockMaximoPosible = Integer.MAX_VALUE;
+        boolean tieneIngredientesRequeridos = false;
+
+        for (GrupoIngrediente grupo : producto.getGruposIngredientes()) {
+            if (grupo == null || grupo.getIngredientes() == null || grupo.getIngredientes().isEmpty()) {
+                continue;
+            }
+
+            List<Ingrediente> defaultsGrupo = grupo.getIngredientes().stream()
+                    .filter(Ingrediente::isSeleccionadoPorDefecto)
+                    .toList();
+
+            List<Ingrediente> requeridos = List.of();
+            if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OBLIGATORIO) {
+                requeridos = defaultsGrupo.isEmpty() ? grupo.getIngredientes() : defaultsGrupo;
+            } else if (!defaultsGrupo.isEmpty()) {
+                if (grupo.getTipo() == GrupoIngrediente.TipoGrupo.OPCIONAL_UNICO) {
+                    requeridos = List.of(defaultsGrupo.getFirst());
+                } else {
+                    requeridos = defaultsGrupo;
+                }
+            }
+
+            for (Ingrediente ingrediente : requeridos) {
+                if (ingrediente == null || ingrediente.getItem() == null) {
+                    return 0;
+                }
+
+                int cantidadIngrediente = ingrediente.getCantidad();
+                if (cantidadIngrediente <= 0) {
+                    return 0;
+                }
+
+                int stockItem = calcularStockItem(ingrediente.getItem().getId());
+                int stockPosibleConIngrediente = Math.max(0, stockItem / cantidadIngrediente);
+                stockMaximoPosible = Math.min(stockMaximoPosible, stockPosibleConIngrediente);
+                tieneIngredientesRequeridos = true;
+            }
+        }
+
+        return tieneIngredientesRequeridos ? stockMaximoPosible : 0;
     }
 
     public List<MovimientoStock> findAllMovimientos() {

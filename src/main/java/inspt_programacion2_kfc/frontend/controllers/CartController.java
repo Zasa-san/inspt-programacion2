@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import inspt_programacion2_kfc.backend.models.products.ProductoEntity;
+import inspt_programacion2_kfc.backend.services.stock.MovimientoStockService;
 import inspt_programacion2_kfc.frontend.helpers.CartHelper;
 import inspt_programacion2_kfc.frontend.mapper.ProductoDTOConverter;
 import inspt_programacion2_kfc.frontend.models.CartItem;
@@ -25,10 +26,14 @@ public class CartController {
 
     private final FrontProductoService frontProductoService;
     private final CartHelper cartHelper;
+    private final MovimientoStockService movimientoStockService;
 
-    public CartController(FrontProductoService frontProductoService, CartHelper cartHelper) {
+    public CartController(FrontProductoService frontProductoService,
+            CartHelper cartHelper,
+            MovimientoStockService movimientoStockService) {
         this.frontProductoService = frontProductoService;
         this.cartHelper = cartHelper;
+        this.movimientoStockService = movimientoStockService;
     }
 
     @SuppressWarnings("unchecked")
@@ -75,6 +80,21 @@ public class CartController {
         }
 
         Map<String, CartItem> cart = getCart(session);
+
+        int cantidadEnCarrito = cartHelper.calcularCantidadProductoEnCarrito(cart, productId);
+        int stockDisponible = movimientoStockService.calcularStockProducto(productoEntity);
+        int cantidadSolicitada = cantidadEnCarrito + quantity;
+
+        if (stockDisponible <= 0) {
+            redirectAttrs.addFlashAttribute("cartError", "Producto sin stock disponible.");
+            return "redirect:/";
+        }
+
+        if (cantidadSolicitada > stockDisponible) {
+            redirectAttrs.addFlashAttribute("cartError",
+                    String.format("Stock insuficiente. Disponible para este producto: %d.", stockDisponible));
+            return "redirect:/";
+        }
 
         CartItem tempItem = new CartItem(productoDTO, quantity, customizacionesSeleccionadas);
         String cartKey = tempItem.getCartKey();

@@ -1,11 +1,10 @@
 package inspt_programacion2_kfc.frontend.controllers;
 
-import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
-import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
-import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
-import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
-import inspt_programacion2_kfc.frontend.models.CartItem;
-import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -14,10 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import inspt_programacion2_kfc.backend.exceptions.stock.StockException;
+import inspt_programacion2_kfc.backend.models.dto.order.CartItemDto;
+import inspt_programacion2_kfc.backend.models.pedidos.EstadoPedido;
+import inspt_programacion2_kfc.backend.services.pedidos.PedidoService;
+import inspt_programacion2_kfc.frontend.helpers.CheckoutHelper;
+import inspt_programacion2_kfc.frontend.models.CartItem;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class CheckoutController {
@@ -70,7 +72,7 @@ public class CheckoutController {
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.CREADO);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pedido registrado. Pagá en caja al retirar.");
-        } catch (IllegalArgumentException ex) {
+        } catch (StockException | IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("cartError", ex.getMessage());
             return "redirect:/checkout";
         }
@@ -109,7 +111,7 @@ public class CheckoutController {
             pedidoService.crearPedidoDesdeCarrito(dtoItems, EstadoPedido.PAGADO);
             cart.clear();
             redirectAttrs.addFlashAttribute("cartMessage", "Pago realizado y pedido registrado correctamente.");
-        } catch (IllegalArgumentException ex) {
+        } catch (StockException | IllegalArgumentException ex) {
             redirectAttrs.addFlashAttribute("cartError", ex.getMessage());
             return "redirect:/checkout";
         }
