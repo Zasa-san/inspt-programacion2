@@ -1,8 +1,5 @@
 # INSPT - Programación 2
 ## Trabajo Final
-### Espacio de entrega para el grupo 12, tema 13.
-
-- #### Informe del programa: <a href="INFORME.md">INFORME.md</a>
 
 ## Requisitos para ejecutar el proyecto
 - Java: JDK 21.
