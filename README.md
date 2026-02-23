@@ -1,6 +1,8 @@
 # INSPT - Programación 2
 ## Trabajo Final
 
+- #### Diagramas del programa: <a href="diagramas.md">diagramas.md</a>
+
 ## Requisitos para ejecutar el proyecto
 - Java: JDK 21.
 - Base de datos: MariaDB 10.4.32 o superior.
